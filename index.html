@@ -1693,6 +1693,11 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
           <svg viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 5.5h6M5 8h4M5 10.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           Account settings
         </button>
+        <button class="sb-item" id="si-a-collab" onclick="window.location.href='collab.html'" style="margin-top:4px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2.5 3.5-2.5 5.5s1 4 2.5 5.5M8 2.5c1.5 1.5 2.5 3.5 2.5 5.5s-1 4-2.5 5.5M2.5 8h11" stroke="currentColor" stroke-width="1.2"/></svg>
+          Collaboration Drive
+          <svg viewBox="0 0 16 16" fill="none" style="width:10px;height:10px;margin-left:auto;opacity:.4"><path d="M4 8h8M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
 
     </nav>
@@ -1817,6 +1822,25 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
               <div class="tick"><div class="tick-dot" style="background:var(--avenza-blue)"></div><div><div class="tick-title">SSO configuration error</div><div class="tick-meta">2 days ago · Awaiting reply</div></div></div>
               <div class="tick"><div class="tick-dot" style="background:var(--amber)"></div><div><div class="tick-title">Intermittent License Error</div><div class="tick-meta">5 days ago · Pending · On behalf of Mary Beth</div></div></div>
               <div class="tick"><div class="tick-dot" style="background:var(--green)"></div><div><div class="tick-title">User provisioning help</div><div class="tick-meta">Apr 1 · Resolved</div></div></div>
+            </div>
+            <!-- Collaboration Environment launch card -->
+            <div class="card" style="background:linear-gradient(135deg,#0a2240 0%,#084888 100%);border-color:transparent;position:relative;overflow:hidden;cursor:pointer" onclick="window.location.href='collab.html'">
+              <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+              <div style="display:flex;align-items:flex-start;gap:12px">
+                <div style="width:38px;height:38px;border-radius:var(--radius-sm);background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="white" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2.5 3.5-2.5 5.5s1 4 2.5 5.5M8 2.5c1.5 1.5 2.5 3.5 2.5 5.5s-1 4-2.5 5.5M2.5 8h11" stroke="white" stroke-width="1.2"/></svg>
+                </div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:3px">Collaboration Environment</div>
+                  <div style="font-size:11.5px;color:rgba(255,255,255,.6);margin-bottom:10px">Upload, organise and share geospatial files with your team</div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:rgba(255,255,255,.5)">
+                    <span>38.2 GB used</span>
+                    <span style="color:rgba(255,255,255,.2)">·</span>
+                    <span>4 users</span>
+                  </div>
+                </div>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:2px"><path d="M3 8h10M9 4l4 4-4 4" stroke="rgba(255,255,255,.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
             </div>
           </div>
         </div>
