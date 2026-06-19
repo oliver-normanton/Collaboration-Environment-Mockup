@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blue Marble Collaboration Environment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS (exact match to Hub) ─── */
+:root{
+  --avenza-navy:#0a2240;
+  --avenza-blue:#084888;
+  --avenza-blue-dk:#063a70;
+  --avenza-blue-lt:#deeaf7;
+  --avenza-teal:#0e7a8c;
+  --avenza-teal-lt:#d8f0f4;
+  --surface:#ffffff;
+  --surface-2:#f2f6fb;
+  --surface-3:#e5edf6;
+  --border:#c8d6e8;
+  --border-2:#b0c4d8;
+  --text-primary:#07162a;
+  --text-secondary:#253d58;
+  --text-muted:#617a94;
+  --green:#1ba461;
+  --green-lt:#e8f7ef;
+  --amber:#d97706;
+  --amber-lt:#fef3c7;
+  --red:#dc2626;
+  --red-lt:#fef2f2;
+  --shadow-sm:0 1px 3px rgba(0,45,92,.09),0 1px 2px rgba(0,45,92,.05);
+  --shadow-md:0 4px 12px rgba(0,45,92,.11),0 2px 4px rgba(0,45,92,.07);
+  --shadow-lg:0 12px 32px rgba(0,45,92,.15),0 4px 8px rgba(0,45,92,.09);
+  --radius-sm:6px;
+  --radius:8px;
+  --radius-md:10px;
+  --radius-lg:14px;
+  --sidebar-w:236px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:var(--surface-2);color:var(--text-primary);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* ─── PROTO BAR ─── */
+.proto-bar{
+  display:flex;align-items:center;gap:8px;
+  background:var(--avenza-navy);padding:8px 20px;
+  position:sticky;top:0;z-index:100;flex-shrink:0;
+}
+.proto-label{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.05em;text-transform:uppercase;font-weight:500;margin-right:4px}
+.proto-sep{width:1px;height:18px;background:rgba(255,255,255,.12);margin:0 4px}
+.proto-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 11px;border-radius:var(--radius-sm);
+  border:1px solid rgba(255,255,255,.1);background:transparent;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:12px;color:rgba(255,255,255,.65);transition:all .15s
+}
+.proto-btn:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)}
+.proto-btn.active{background:var(--avenza-blue);color:#fff;border-color:var(--avenza-blue)}
+.proto-hint{margin-left:auto;font-size:11px;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:5px}
+
+/* ─── APP SHELL ─── */
+.app{display:flex;height:calc(100vh - 42px);overflow:hidden}
+
+/* ─── SIDEBAR ─── */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--avenza-navy);display:flex;flex-direction:column;overflow:hidden;
+}
+.sb-brand{padding:16px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo{width:32px;height:32px;flex-shrink:0;background:var(--avenza-blue);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center}
+.sb-logo svg{width:18px;height:18px}
+.sb-product-name{font-size:14px;font-weight:600;color:#fff;letter-spacing:-.01em}
+.sb-product-tag{font-size:10.5px;color:rgba(255,255,255,.45);margin-top:1px;letter-spacing:.02em}
+.sb-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.sb-group{margin-bottom:20px}
+.sb-group-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:0 8px;margin-bottom:4px}
+.sb-item{
+  display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);
+  font-size:13px;color:rgba(255,255,255,.6);border:none;background:none;width:100%;text-align:left;
+  font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:1px;transition:all .12s
+}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.sb-item.active{background:var(--avenza-blue);color:#fff}
+.sb-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.sb-item.active svg{opacity:1}
+.sb-badge{margin-left:auto;font-size:10px;font-weight:600;padding:2px 6px;border-radius:20px;background:rgba(217,119,6,.3);color:#fbbf24}
+.sb-footer{padding:10px 10px 14px;border-top:1px solid rgba(255,255,255,.08)}
+.sb-user{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;transition:background .12s}
+.sb-user:hover{background:rgba(255,255,255,.07)}
+.sb-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.sb-uname{font-size:13px;font-weight:500;color:#fff}
+.sb-urole{font-size:11px;color:rgba(255,255,255,.45);margin-top:1px}
+
+/* ─── MAIN ─── */
+.main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--surface-2)}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:56px;background:var(--surface);
+  border-bottom:1px solid var(--border);flex-shrink:0;box-shadow:var(--shadow-sm)
+}
+.topbar-left{display:flex;align-items:center;gap:8px}
+.breadcrumb{font-size:12.5px;color:var(--text-muted)}
+.breadcrumb span{color:var(--text-primary);font-weight:500}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.page-body{flex:1;overflow-y:auto;padding:24px;min-height:0}
+
+/* ─── BUTTONS ─── */
+.btn{
+  display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);
+  color:var(--text-secondary);font-family:'DM Sans',sans-serif;transition:all .12s;white-space:nowrap
+}
+.btn:hover{background:var(--surface-2);border-color:var(--border-2);color:var(--text-primary)}
+.btn.primary{background:var(--avenza-blue);color:#fff;border-color:var(--avenza-blue)}
+.btn.primary:hover{background:var(--avenza-blue-dk);border-color:var(--avenza-blue-dk)}
+.btn.danger{background:var(--red-lt);color:var(--red);border-color:#fecaca}
+.btn.sm{padding:5px 11px;font-size:12px}
+.btn.xs{padding:3px 9px;font-size:11.5px}
+
+/* ─── ICON BUTTON ─── */
+.icon-btn{
+  width:34px;height:34px;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;flex-shrink:0
+}
+.icon-btn:hover{background:var(--surface-2);border-color:var(--border-2)}
+.icon-btn svg{width:15px;height:15px}
+
+/* ─── PILLS ─── */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.pill::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;display:block;flex-shrink:0}
+.pill.active{background:var(--green-lt);color:#166534;border:1px solid #bbf7d0}
+.pill.warn{background:var(--amber-lt);color:var(--amber);border:1px solid #fde68a}
+.pill.info{background:var(--avenza-blue-lt);color:var(--avenza-blue);border:1px solid #bfdbfe}
+.pill.neutral{background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border)}
+.pill.teal{background:var(--avenza-teal-lt);color:var(--avenza-teal);border:1px solid #99f6e4}
+
+/* ─── CARDS ─── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 20px}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-size:13.5px;font-weight:600;color:var(--text-primary)}
+
+/* ─── ALERT ─── */
+.alert{display:flex;align-items:center;gap:10px;border-radius:var(--radius-md);padding:11px 15px;margin-bottom:20px;font-size:12.5px}
+.alert.warn{background:var(--amber-lt);border:1px solid #fde68a;color:#92400e}
+.alert.info{background:var(--avenza-blue-lt);border:1px solid #bfdbfe;color:#1e40af}
+.alert a{color:inherit;cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+
+/* ─── PROFILE BTN ─── */
+.profile-btn{
+  display:flex;align-items:center;gap:7px;padding:5px 10px 5px 5px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all .12s
+}
+.profile-btn:hover{background:var(--surface-2);border-color:var(--border-2)}
+.profile-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0}
+.profile-name{font-size:12.5px;font-weight:500;color:var(--text-secondary)}
+
+/* ─── DROPDOWN ─── */
+.dd-wrap{position:relative}
+.dropdown{
+  position:absolute;top:calc(100% + 6px);right:0;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:5px;min-width:190px;z-index:500;display:none
+}
+.dropdown.open{display:block}
+.dd-item{
+  display:flex;align-items:center;gap:8px;padding:7px 11px;border-radius:var(--radius-sm);
+  font-size:12.5px;color:var(--text-secondary);cursor:pointer;font-family:'DM Sans',sans-serif;
+  border:none;background:none;width:100%;text-align:left;transition:background .1s
+}
+.dd-item:hover{background:var(--surface-2);color:var(--text-primary)}
+.dd-item svg{width:13px;height:13px;opacity:.55;flex-shrink:0}
+.dd-sep{height:1px;background:var(--surface-3);margin:4px 0}
+
+/* ─── TOAST ─── */
+.toast{
+  position:fixed;bottom:24px;right:24px;background:var(--avenza-navy);color:#fff;
+  font-size:13px;padding:11px 18px;border-radius:var(--radius-md);z-index:900;
+  opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none;
+  font-family:'DM Sans',sans-serif;box-shadow:var(--shadow-md)
+}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ─── MODAL ─── */
+.modal-bg{position:fixed;inset:0;background:rgba(15,31,53,.45);z-index:800;align-items:center;justify-content:center;display:none}
+.modal-bg.open{display:flex}
+.modal{
+  background:var(--surface);border-radius:var(--radius-lg);padding:26px;width:500px;max-width:90vw;
+  box-shadow:var(--shadow-lg);border:1px solid var(--border)
+}
+.modal-title{font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.modal-sub{font-size:12.5px;color:var(--text-muted);margin-bottom:20px}
+.modal-label{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.modal-row{display:flex;gap:10px;margin-top:20px}
+.modal-input,.modal-select{
+  width:100%;padding:8px 11px;font-size:13px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-family:'DM Sans',sans-serif;color:var(--text-primary);outline:none;margin-bottom:14px;background:var(--surface)
+}
+.modal-input:focus,.modal-select:focus{border-color:var(--avenza-blue);box-shadow:0 0 0 3px rgba(13,110,253,.1)}
+
+/* ─── COLLAB-SPECIFIC: FILE BROWSER ─── */
+.filebrowser-shell{display:flex;gap:0;height:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+
+/* Left tree panel */
+.fb-tree{
+  width:220px;flex-shrink:0;border-right:1px solid var(--border);
+  background:var(--surface-2);display:flex;flex-direction:column;overflow:hidden;
+}
+.fb-tree-header{padding:12px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;justify-content:space-between}
+.fb-tree-body{flex:1;overflow-y:auto;padding:8px 6px}
+.fb-tree-item{
+  display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:var(--radius-sm);
+  font-size:12.5px;color:var(--text-secondary);cursor:pointer;border:none;background:none;
+  width:100%;text-align:left;font-family:'DM Sans',sans-serif;transition:background .1s;
+}
+.fb-tree-item:hover{background:var(--surface-3)}
+.fb-tree-item.active{background:var(--avenza-blue-lt);color:var(--avenza-blue);font-weight:500}
+.fb-tree-item svg{width:13px;height:13px;flex-shrink:0;opacity:.6}
+.fb-tree-item.active svg{opacity:1;color:var(--avenza-blue)}
+.fb-tree-indent{padding-left:18px}
+
+/* Main file list */
+.fb-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.fb-toolbar{
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+  border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface);
+  flex-wrap:wrap;
+}
+.fb-path{
+  display:flex;align-items:center;gap:4px;flex:1;min-width:0;
+  font-size:12.5px;color:var(--text-muted);overflow:hidden;
+}
+.fb-path span{color:var(--text-primary);font-weight:500}
+.fb-path-sep{color:var(--border-2)}
+.fb-search{
+  display:flex;align-items:center;gap:7px;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:5px 10px;font-size:12.5px;min-width:180px;
+}
+.fb-search input{border:none;background:none;outline:none;font-size:12.5px;color:var(--text-primary);flex:1;font-family:'DM Sans',sans-serif}
+.fb-search input::placeholder{color:var(--text-muted)}
+
+/* File table */
+.fb-table-wrap{flex:1;overflow-y:auto}
+.fb-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.fb-table th{
+  text-align:left;font-size:10.5px;font-weight:600;color:var(--text-muted);
+  letter-spacing:.07em;text-transform:uppercase;padding:8px 14px;
+  border-bottom:1px solid var(--border);position:sticky;top:0;
+  background:var(--surface);white-space:nowrap;cursor:pointer;user-select:none;
+}
+.fb-table th:hover{color:var(--avenza-blue)}
+.fb-table td{padding:9px 14px;border-bottom:1px solid var(--surface-3);vertical-align:middle}
+.fb-table tr:last-child td{border-bottom:none}
+.fb-table tbody tr{cursor:pointer}
+.fb-table tbody tr:hover td{background:var(--surface-2)}
+.fb-table tbody tr.selected td{background:var(--avenza-blue-lt)}
+
+/* File icon + name cell */
+.fb-name-cell{display:flex;align-items:center;gap:9px}
+.fb-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;font-family:'DM Mono',monospace}
+.fb-icon.folder{background:#fff7ed;color:#c2410c}
+.fb-icon.gm{background:#deeaf7;color:#084888}
+.fb-icon.pdf{background:#fef2f2;color:#dc2626}
+.fb-icon.gpkg{background:#e8f7ef;color:#166534}
+.fb-icon.tif{background:#f5f3ff;color:#7c3aed}
+.fb-icon.csv{background:#fef3c7;color:#b45309}
+.fb-icon.kml{background:#f0fdf4;color:#15803d}
+.fb-file-name{font-size:13px;font-weight:500;color:var(--text-primary)}
+.fb-file-type{font-size:11px;color:var(--text-muted);margin-top:1px}
+.fb-meta{font-size:12px;color:var(--text-secondary)}
+.fb-size{font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;font-size:11.5px}
+.fb-actions-cell{display:flex;align-items:center;gap:4px;opacity:0;transition:opacity .1s}
+.fb-table tbody tr:hover .fb-actions-cell{opacity:1}
+.fb-table tbody tr.selected .fb-actions-cell{opacity:1}
+
+/* Share badge */
+.share-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10.5px;font-weight:500}
+.share-badge.org{background:var(--avenza-blue-lt);color:var(--avenza-blue);border:1px solid #bfdbfe}
+.share-badge.public{background:#fef3c7;color:#b45309;border:1px solid #fde68a}
+.share-badge.private{background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border)}
+.share-badge.pw{background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe}
+
+/* Info panel */
+.fb-info{
+  width:280px;flex-shrink:0;border-left:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+  background:var(--surface);
+}
+.fb-info-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.fb-info-title{font-size:13px;font-weight:600;color:var(--text-primary)}
+.fb-info-body{flex:1;overflow-y:auto;padding:16px}
+.fb-info-icon{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:14px;font-weight:700;font-family:'DM Mono',monospace}
+.fb-info-filename{font-size:14px;font-weight:600;color:var(--text-primary);text-align:center;margin-bottom:4px;word-break:break-all}
+.fb-info-type{font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:16px}
+.fb-info-section{margin-bottom:14px}
+.fb-info-section-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.fb-info-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px}
+.fb-info-key{font-size:11.5px;color:var(--text-muted);flex-shrink:0}
+.fb-info-val{font-size:11.5px;color:var(--text-primary);text-align:right;font-weight:500;word-break:break-all}
+.fb-info-footer{padding:14px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.fb-info-empty{padding:32px 20px;text-align:center;color:var(--text-muted);font-size:13px}
+
+/* Quota bar */
+.quota-bar-wrap{padding:14px 16px;background:var(--surface-2);border-top:1px solid var(--border);flex-shrink:0}
+.quota-label-row{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px}
+.quota-label{color:var(--text-muted)}
+.quota-used{font-weight:600;color:var(--text-primary)}
+.quota-track{background:var(--surface-3);border-radius:20px;height:5px;overflow:hidden}
+.quota-fill{height:100%;border-radius:20px;background:var(--avenza-blue);width:38%}
+
+/* Upload drag zone */
+.upload-zone{
+  border:2px dashed var(--border-2);border-radius:var(--radius-md);
+  padding:24px;text-align:center;margin-bottom:16px;
+  background:var(--surface-2);transition:all .15s;cursor:pointer
+}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--avenza-blue);background:var(--avenza-blue-lt)}
+.upload-zone-icon{width:36px;height:36px;border-radius:50%;background:var(--avenza-blue-lt);display:flex;align-items:center;justify-content:center;margin:0 auto 8px}
+.upload-zone-title{font-size:13.5px;font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.upload-zone-sub{font-size:12px;color:var(--text-muted)}
+
+/* ─── COLLAB-SPECIFIC: STORAGE ADMIN ─── */
+.storage-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.storage-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px 18px;position:relative;overflow:hidden}
+.storage-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius-md) var(--radius-md) 0 0}
+.storage-stat.blue::before{background:var(--avenza-blue)}
+.storage-stat.green::before{background:var(--green)}
+.storage-stat.amber::before{background:var(--amber)}
+.storage-stat-label{font-size:11px;font-weight:500;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.storage-stat-val{font-size:24px;font-weight:600;color:var(--text-primary);letter-spacing:-.03em;line-height:1}
+.storage-stat-sub{font-size:11.5px;color:var(--text-muted);margin-top:6px}
+
+/* User access table */
+.access-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.access-table th{text-align:left;font-size:10.5px;font-weight:600;color:var(--text-muted);letter-spacing:.07em;text-transform:uppercase;padding:0 14px 9px;border-bottom:1px solid var(--surface-3)}
+.access-table td{padding:10px 14px;border-bottom:1px solid var(--surface-3);vertical-align:middle;color:var(--text-secondary)}
+.access-table tr:last-child td{border-bottom:none}
+.access-table td:first-child{color:var(--text-primary)}
+.access-table tbody tr:hover td{background:var(--surface-2)}
+.user-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+
+/* Public share notification banner */
+.public-warn-banner{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:10px 16px;background:#fef3c7;border:1px solid #fde68a;
+  border-radius:var(--radius-sm);font-size:12.5px;color:#92400e;margin-bottom:12px;
+}
+
+/* ─── COLLAB-SPECIFIC: ACTIVITY ─── */
+.activity-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--surface-3)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.activity-title{font-size:12.5px;color:var(--text-primary);font-weight:500;margin-bottom:2px}
+.activity-meta{font-size:11px;color:var(--text-muted)}
+
+/* ─── PAGES ─── */
+.page{display:none;flex-direction:column;height:100%}
+.page.active{display:flex}
+
+/* ─── TABS ─── */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tab{padding:7px 15px;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .12s}
+.tab:hover{color:var(--text-primary)}
+.tab.on{color:var(--avenza-blue);border-bottom-color:var(--avenza-blue)}
+
+/* ─── WORKFLOW BAR ─── */
+.workflow-bar{background:var(--avenza-blue-lt);border:1px solid #bfdbfe;border-radius:var(--radius-md);padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.workflow-label{font-size:12px;color:#1e40af;font-weight:600;flex-shrink:0}
+.workflow-steps{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.workflow-step{font-size:11.5px;padding:4px 10px;border-radius:20px;cursor:pointer;transition:all .12s;border:1px solid transparent}
+.workflow-step.done{background:#dbeafe;color:#1e40af;border-color:#bfdbfe}
+.workflow-step.current{background:var(--avenza-blue);color:#fff}
+.workflow-step.pending{background:transparent;color:#94a3b8;border-color:var(--border)}
+
+/* ─── COMING SOON ─── */
+.coming-soon{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px dashed var(--border-2);border-radius:var(--radius-sm);padding:12px 14px;font-size:12.5px;color:var(--text-muted);margin-top:4px}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{text-align:center;padding:48px 24px}
+.empty-state-icon{width:48px;height:48px;border-radius:50%;background:var(--surface-3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.empty-state-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:6px}
+.empty-state-sub{font-size:13px;color:var(--text-muted);margin-bottom:18px;max-width:280px;margin-left:auto;margin-right:auto}
+
+/* ─── TWO COL ─── */
+.two-col{display:grid;grid-template-columns:1fr 300px;gap:16px}
+</style>
+</head>
+<body>
+
+<!-- PROTOTYPE TOOLBAR -->
+<div class="proto-bar">
+  <span class="proto-label">Prototype</span>
+  <div class="proto-sep"></div>
+  <button class="proto-btn" onclick="window.location.href='index.html'">
+    <svg viewBox="0 0 16 16" fill="none" width="13" height="13"><path d="M2 8h12M2 8l4-4M2 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Hub
+  </button>
+  <div class="proto-sep"></div>
+  <button class="proto-btn active" id="sw-files" onclick="switchView('files')">Files</button>
+  <button class="proto-btn" id="sw-shared" onclick="switchView('shared')">Shared with me</button>
+  <button class="proto-btn" id="sw-admin" onclick="switchView('admin')">Storage Admin</button>
+  <div class="proto-sep"></div>
+  <button class="proto-btn" id="sw-upload" onclick="openModal('modal-upload')">
+    <svg viewBox="0 0 16 16" fill="none" width="12" height="12"><path d="M8 2v9M4 5l4-3 4 3M3 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Upload files
+  </button>
+  <button class="proto-btn" id="sw-share" onclick="openModal('modal-share')">
+    <svg viewBox="0 0 16 16" fill="none" width="12" height="12"><circle cx="12" cy="3" r="1.5" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="13" r="1.5" stroke="currentColor" stroke-width="1.4"/><circle cx="4" cy="8" r="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 3.7L5.5 7.3M10.5 12.3L5.5 8.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Share file
+  </button>
+  <div class="proto-hint">
+    <svg viewBox="0 0 16 16" fill="none" width="12" height="12"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 7v4M8 5.5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Click rows and sidebar items to explore
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10" cy="10" r="7" stroke="white" stroke-width="1.5"/>
+          <path d="M3 10h14M10 3c-2 2.5-3 4.5-3 7s1 4.5 3 7M10 3c2 2.5 3 4.5 3 7s-1 4.5-3 7" stroke="white" stroke-width="1.2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sb-product-name">Collaboration</div>
+        <div class="sb-product-tag">Blue Marble Drive</div>
+      </div>
+    </div>
+
+    <div class="sb-nav">
+      <div class="sb-group">
+        <div class="sb-group-label">My Files</div>
+        <button class="sb-item active" id="si-myfiles" onclick="navSidebar('myfiles')">
+          <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 6h12" stroke="currentColor" stroke-width="1.4"/></svg>
+          All files
+        </button>
+        <button class="sb-item" id="si-recent" onclick="navSidebar('recent')">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5.5V8l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Recent
+        </button>
+        <button class="sb-item" id="si-starred" onclick="navSidebar('starred')">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          Starred
+        </button>
+        <button class="sb-item" id="si-trash" onclick="navSidebar('trash')">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6 4.5V3h4v1.5M5 4.5l.5 7.5h5l.5-7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Trash
+        </button>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-group-label">Shared</div>
+        <button class="sb-item" id="si-shared" onclick="navSidebar('shared')">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M5.5 7a2 2 0 100-4 2 2 0 000 4zM1 13c0-2 1.5-3.5 4.5-3.5M11 9a2 2 0 100-4 2 2 0 000 4zM8 13c.3-2.1 1.6-3 3-3 2 0 4 1 4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Shared with me
+          <span class="sb-badge">3</span>
+        </button>
+        <button class="sb-item" id="si-myshared" onclick="navSidebar('myshared')">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="12" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="13" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="8" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.7L5.5 7.3M10.5 12.3L5.5 8.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Shared by me
+        </button>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-group-label">Organisation</div>
+        <button class="sb-item" id="si-orgfiles" onclick="navSidebar('orgfiles')">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 13V6l6-3 6 3v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 13V9.5h4V13" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          ACME Corp storage
+        </button>
+        <button class="sb-item" id="si-public" onclick="navSidebar('public')">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2.5 3.5-2.5 5.5s1 4 2.5 5.5M8 2.5c1.5 1.5 2.5 3.5 2.5 5.5s-1 4-2.5 5.5M2.5 8h11" stroke="currentColor" stroke-width="1.2"/></svg>
+          Public files
+        </button>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-group-label">Admin</div>
+        <button class="sb-item" id="si-storageadmin" onclick="switchView('admin')">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M8 2.5V4.5M8 11.5v2M2.5 8H4.5M11.5 8H13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Storage settings
+        </button>
+      </div>
+    </div>
+
+    <!-- QUOTA -->
+    <div class="quota-bar-wrap">
+      <div class="quota-label-row">
+        <span class="quota-label">Storage used</span>
+        <span class="quota-used">38.2 GB / 100 GB</span>
+      </div>
+      <div class="quota-track"><div class="quota-fill"></div></div>
+    </div>
+
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-av" style="background:#0e7a8c">JD</div>
+        <div>
+          <div class="sb-uname">Jane Doe</div>
+          <div class="sb-urole">Admin</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="breadcrumb">
+          <a onclick="window.location.href='index.html'" style="color:var(--text-muted);cursor:pointer;text-decoration:none;transition:color .1s" onmouseover="this.style.color='var(--avenza-blue)'" onmouseout="this.style.color='var(--text-muted)'">Blue Marble Hub</a>
+          <span style="margin:0 5px;color:var(--border-2)">›</span>
+          <span id="breadcrumb-current">Files</span>
+        </span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn sm" onclick="openModal('modal-newfolder')">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 8.5v4M6 10.5h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          New folder
+        </button>
+        <button class="btn primary sm" onclick="openModal('modal-upload')">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 5l4-3 4 3M3 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Upload
+        </button>
+        <div class="dd-wrap">
+          <button class="profile-btn" onclick="toggleDrop('dd-profile')">
+            <div class="profile-av" style="background:#0e7a8c">JD</div>
+            <span class="profile-name">Jane Doe</span>
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div class="dropdown" id="dd-profile">
+            <div style="padding:9px 11px 8px;border-bottom:1px solid var(--surface-3);margin-bottom:4px">
+              <div style="font-size:12.5px;font-weight:600;color:var(--text-primary)">Jane Doe</div>
+              <div style="font-size:11.5px;color:var(--text-muted)">jane@acme.com</div>
+            </div>
+            <button class="dd-item" onclick="toast('Opening Hub settings…');closeDrop()">
+              <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Settings
+            </button>
+            <div class="dd-sep"></div>
+            <button class="dd-item" onclick="window.location.href='index.html';closeDrop()">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M6 3H3a1 1 0 00-1 1v8a1 1 0 001 1h3M10 5l3 3-3 3M6 8h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Back to Hub
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- ═══════════════════════════════
+           VIEW: FILES (main browser)
+      ═══════════════════════════════ -->
+      <div class="page active" id="view-files">
+        <!-- Public file warning from Hub req #10 -->
+        <div class="public-warn-banner" id="public-warn" style="display:flex">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M8 2L14.5 13H1.5L8 2Z" stroke="#b45309" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.5V9.5" stroke="#b45309" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#b45309"/></svg>
+            <strong>1 file is publicly shared</strong> — "q2_survey_results.gpkg" is visible to anyone with the link. <a onclick="selectFile('q2-survey');toast('Opening share settings…')" style="cursor:pointer;font-weight:600;text-decoration:underline;margin-left:4px">Review →</a>
+          </div>
+          <button onclick="document.getElementById('public-warn').style.display='none'" style="background:none;border:none;cursor:pointer;color:#92400e;font-size:16px;line-height:1;padding:0 4px" title="Dismiss">×</button>
+        </div>
+
+        <div style="display:flex;gap:16px;height:calc(100% - 50px);min-height:0">
+          <!-- File browser shell -->
+          <div class="filebrowser-shell" style="flex:1;min-width:0">
+            <!-- Left tree -->
+            <div class="fb-tree">
+              <div class="fb-tree-header">
+                Folders
+                <button class="icon-btn" style="width:22px;height:22px;border:none;background:none" title="New folder" onclick="openModal('modal-newfolder')">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="var(--avenza-blue)" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div class="fb-tree-body">
+                <button class="fb-tree-item active" onclick="selectFolder('root')">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                  My Files
+                </button>
+                <button class="fb-tree-item fb-tree-indent" onclick="selectFolder('field-surveys')">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                  Field Surveys 2025
+                </button>
+                <button class="fb-tree-item fb-tree-indent" onclick="selectFolder('basemaps')">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                  Basemaps
+                </button>
+                <button class="fb-tree-item fb-tree-indent" onclick="selectFolder('exports')">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                  Exports
+                </button>
+                <div style="height:1px;background:var(--border);margin:6px 4px"></div>
+                <button class="fb-tree-item" onclick="selectFolder('org')">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M2 13V6l6-3 6 3v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                  ACME Corp storage
+                </button>
+                <button class="fb-tree-item fb-tree-indent" onclick="selectFolder('shared-data')">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                  Shared Data
+                </button>
+                <button class="fb-tree-item fb-tree-indent" onclick="selectFolder('archive')">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                  Archive
+                </button>
+              </div>
+            </div>
+
+            <!-- File listing -->
+            <div class="fb-main">
+              <div class="fb-toolbar">
+                <div class="fb-path">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 13V6l6-3 6 3v7H2z" stroke="var(--text-muted)" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                  <span id="fb-path-label">My Files</span>
+                </div>
+                <div class="fb-search">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="var(--text-muted)" stroke-width="1.4"/><path d="M10.5 10.5L13 13" stroke="var(--text-muted)" stroke-width="1.4" stroke-linecap="round"/></svg>
+                  <input placeholder="Search files…" id="fb-search-input" oninput="filterFiles(this.value)">
+                </div>
+                <button class="btn sm" onclick="toast('Sort applied')">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 4h8M2 8h5M2 12h3M12 3v10M9 10l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Sort
+                </button>
+                <button class="icon-btn" title="List view" onclick="toast('View: List')">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h10M3 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                </button>
+                <button class="icon-btn" title="Grid view" onclick="toast('View: Grid')">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+                </button>
+              </div>
+
+              <div class="fb-table-wrap" id="fb-table-wrap">
+                <table class="fb-table" id="fb-table">
+                  <thead>
+                    <tr>
+                      <th style="width:40px"><input type="checkbox" id="select-all" onchange="toggleSelectAll(this)"></th>
+                      <th>Name</th>
+                      <th>Modified</th>
+                      <th>Size</th>
+                      <th>Sharing</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="fb-tbody">
+                    <!-- Folder rows -->
+                    <tr onclick="selectFile('field-surveys-folder')" id="row-field-surveys-folder">
+                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon folder">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="#c2410c" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                          </div>
+                          <div>
+                            <div class="fb-file-name">Field Surveys 2025</div>
+                            <div class="fb-file-type">Folder · 14 files</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 17, 2026</td>
+                      <td class="fb-size">2.3 GB</td>
+                      <td><span class="share-badge org">Org only</span></td>
+                      <td>
+                        <div class="fb-actions-cell">
+                          <button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button>
+                          <button class="btn xs" onclick="event.stopPropagation();toast('Downloading folder…')">Download</button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('basemaps-folder')" id="row-basemaps-folder">
+                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon folder">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="#c2410c" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                          </div>
+                          <div>
+                            <div class="fb-file-name">Basemaps</div>
+                            <div class="fb-file-type">Folder · 6 files</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 12, 2026</td>
+                      <td class="fb-size">8.7 GB</td>
+                      <td><span class="share-badge org">Org only</span></td>
+                      <td>
+                        <div class="fb-actions-cell">
+                          <button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button>
+                          <button class="btn xs" onclick="event.stopPropagation();toast('Downloading folder…')">Download</button>
+                        </div>
+                      </td>
+                    </tr>
+                    <!-- File rows -->
+                    <tr onclick="selectFile('q2-survey')" id="row-q2-survey">
+                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon gpkg">GPKG</div>
+                          <div>
+                            <div class="fb-file-name">q2_survey_results.gpkg</div>
+                            <div class="fb-file-type">GeoPackage</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 15, 2026</td>
+                      <td class="fb-size">142 MB</td>
+                      <td><span class="share-badge public">Public link</span></td>
+                      <td>
+                        <div class="fb-actions-cell">
+                          <button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button>
+                          <button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('terrain-analysis')" id="row-terrain-analysis">
+                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon gm">GMMP</div>
+                          <div>
+                            <div class="fb-file-name">terrain_analysis_v3.gmmp</div>
+                            <div class="fb-file-type">Global Mapper Project</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 14, 2026</td>
+                      <td class="fb-size">88 MB</td>
+                      <td><span class="share-badge org">Org only</span></td>
+                      <td>
+                        <div class="fb-actions-cell">
+                          <button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button>
+                          <button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('dem-mosaic')" id="row-dem-mosaic">
+                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon tif">TIF</div>
+                          <div>
+                            <div class="fb-file-name">dem_mosaic_30m.tif</div>
+                            <div class="fb-file-type">GeoTIFF Raster</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 10, 2026</td>
+                      <td class="fb-size">1.2 GB</td>
+                      <td><span class="share-badge pw">Password link</span></td>
+                      <td>
+                        <div class="fb-actions-cell">
+                          <button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button>
+                          <button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('field-map')" id="row-field-map">
+                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon pdf">PDF</div>
+                          <div>
+                            <div class="fb-file-name">field_map_2025_06.pdf</div>
+                            <div class="fb-file-type">GeoPDF</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 9, 2026</td>
+                      <td class="fb-size">34 MB</td>
+                      <td><span class="share-badge private">Private</span></td>
+                      <td>
+                        <div class="fb-actions-cell">
+                          <button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button>
+                          <button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('waypoints')" id="row-waypoints">
+                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon kml">KML</div>
+                          <div>
+                            <div class="fb-file-name">waypoints_north_sector.kml</div>
+                            <div class="fb-file-type">KML</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 7, 2026</td>
+                      <td class="fb-size">2.1 MB</td>
+                      <td><span class="share-badge org">Org only</span></td>
+                      <td>
+                        <div class="fb-actions-cell">
+                          <button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button>
+                          <button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('metadata-export')" id="row-metadata-export">
+                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon csv">CSV</div>
+                          <div>
+                            <div class="fb-file-name">metadata_export_jun2026.csv</div>
+                            <div class="fb-file-type">CSV Spreadsheet</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 5, 2026</td>
+                      <td class="fb-size">840 KB</td>
+                      <td><span class="share-badge private">Private</span></td>
+                      <td>
+                        <div class="fb-actions-cell">
+                          <button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button>
+                          <button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Info panel -->
+            <div class="fb-info" id="fb-info">
+              <div class="fb-info-header">
+                <span class="fb-info-title">File details</span>
+                <button class="icon-btn" style="width:22px;height:22px;border:none;background:none" onclick="clearSelection()" title="Close">
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div id="fb-info-content">
+                <div class="fb-info-empty">
+                  <svg width="28" height="28" viewBox="0 0 16 16" fill="none" style="display:block;margin:0 auto 8px;opacity:.3"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 6h5M5.5 8.5h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                  Select a file or folder to see its details
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           VIEW: SHARED WITH ME
+      ═══════════════════════════════ -->
+      <div class="page" id="view-shared">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head">
+            <span class="card-title">Shared with me</span>
+            <span style="font-size:12px;color:var(--text-muted)">3 files and folders</span>
+          </div>
+          <table class="fb-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Shared by</th>
+                <th>Date shared</th>
+                <th>Access</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="toast('Opening shared file…')">
+                <td>
+                  <div class="fb-name-cell">
+                    <div class="fb-icon folder">
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="#c2410c" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div>
+                      <div class="fb-file-name">Q1 Reference Layers</div>
+                      <div class="fb-file-type">Folder · 5 files</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:7px">
+                    <div class="user-av" style="background:#2563eb;color:#fff">MS</div>
+                    Mark Smith
+                  </div>
+                </td>
+                <td class="fb-meta">Jun 10, 2026</td>
+                <td><span class="share-badge org">View & download</span></td>
+                <td><button class="btn xs" onclick="event.stopPropagation();toast('Saving to My Files…')">Save to my files</button></td>
+              </tr>
+              <tr onclick="toast('Opening shared file…')">
+                <td>
+                  <div class="fb-name-cell">
+                    <div class="fb-icon gpkg">GPKG</div>
+                    <div>
+                      <div class="fb-file-name">urban_parcels_final.gpkg</div>
+                      <div class="fb-file-type">GeoPackage · 298 MB</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:7px">
+                    <div class="user-av" style="background:#7c3aed;color:#fff">AL</div>
+                    Amy Lee
+                  </div>
+                </td>
+                <td class="fb-meta">Jun 8, 2026</td>
+                <td><span class="share-badge org">View & download</span></td>
+                <td><button class="btn xs" onclick="event.stopPropagation();toast('Saving to My Files…')">Save to my files</button></td>
+              </tr>
+              <tr onclick="toast('Opening shared file…')">
+                <td>
+                  <div class="fb-name-cell">
+                    <div class="fb-icon tif">TIF</div>
+                    <div>
+                      <div class="fb-file-name">satellite_composite_v2.tif</div>
+                      <div class="fb-file-type">GeoTIFF · 4.1 GB</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:7px">
+                    <div class="user-av" style="background:#0e7a8c;color:#fff">TR</div>
+                    Tom Rees
+                  </div>
+                </td>
+                <td class="fb-meta">May 29, 2026</td>
+                <td><span class="share-badge pw">Password protected</span></td>
+                <td><button class="btn xs" onclick="event.stopPropagation();toast('Saving to My Files…')">Save to my files</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Activity / notifications from Hub req #7, #8 -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Recent sharing activity</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--avenza-blue)"></div>
+            <div>
+              <div class="activity-title">Amy Lee shared "urban_parcels_final.gpkg" with you</div>
+              <div class="activity-meta">Jun 8, 2026 · via Global Mapper upload</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--green)"></div>
+            <div>
+              <div class="activity-title">Mark Smith gave you access to "Q1 Reference Layers"</div>
+              <div class="activity-meta">Jun 10, 2026 · View & download access</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--avenza-teal)"></div>
+            <div>
+              <div class="activity-title">Tom Rees shared "satellite_composite_v2.tif" via password link</div>
+              <div class="activity-meta">May 29, 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           VIEW: STORAGE ADMIN
+      ═══════════════════════════════ -->
+      <div class="page" id="view-admin">
+        <div class="alert info" style="margin-bottom:16px">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#2563eb" stroke-width="1.4"/><path d="M8 7v4M8 5.5v.5" stroke="#2563eb" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Storage settings are inherited from the <strong>Blue Marble Hub</strong>. Changes to user access are applied immediately. <a onclick="window.location.href='index.html'">Manage users in Hub →</a>
+        </div>
+
+        <!-- Storage stats -->
+        <div class="storage-stat-grid">
+          <div class="storage-stat blue">
+            <div class="storage-stat-label">Total storage used</div>
+            <div class="storage-stat-val">38.2 <span style="font-size:14px;font-weight:400">GB</span></div>
+            <div class="storage-stat-sub">of 100 GB plan limit</div>
+          </div>
+          <div class="storage-stat green">
+            <div class="storage-stat-label">Files stored</div>
+            <div class="storage-stat-val">1,284</div>
+            <div class="storage-stat-sub">across 47 folders</div>
+          </div>
+          <div class="storage-stat amber">
+            <div class="storage-stat-label">Public links active</div>
+            <div class="storage-stat-val">1</div>
+            <div class="storage-stat-sub"><span style="color:var(--amber);font-weight:500">Review recommended</span></div>
+          </div>
+        </div>
+
+        <div class="two-col" style="align-items:start">
+          <div>
+            <!-- User access management (Hub req #2, #4, #5, #11) -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-head">
+                <span class="card-title">User drive access</span>
+                <button class="btn sm primary" onclick="openModal('modal-grant-access')">Grant access</button>
+              </div>
+
+              <!-- Public share warning -->
+              <div class="public-warn-banner" style="margin-bottom:12px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2L14.5 13H1.5L8 2Z" stroke="#b45309" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                  "q2_survey_results.gpkg" is publicly shared — this may violate your organisation's data policy.
+                </div>
+                <button class="btn xs danger" onclick="toast('Share revoked. File is now Org only.')">Revoke public access</button>
+              </div>
+
+              <table class="access-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Storage used</th>
+                    <th>Access expires</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:8px">
+                        <div class="user-av" style="background:#0e7a8c;color:#fff">JD</div>
+                        <div>
+                          <div style="font-weight:500">Jane Doe</div>
+                          <div style="font-size:11px;color:var(--text-muted)">jane@acme.com</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="pill info" style="font-size:10.5px">Data Admin</span></td>
+                    <td>
+                      <div style="font-size:12px">14.2 GB</div>
+                      <div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:47%"></div></div>
+                    </td>
+                    <td><span style="color:var(--text-muted);font-size:12px">No expiry</span></td>
+                    <td><button class="btn xs" onclick="toast('Opening user settings…')">Manage</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:8px">
+                        <div class="user-av" style="background:#2563eb;color:#fff">MB</div>
+                        <div>
+                          <div style="font-weight:500">Mary Beth</div>
+                          <div style="font-size:11px;color:var(--text-muted)">mary@acme.com</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="pill neutral" style="font-size:10.5px">Member</span></td>
+                    <td>
+                      <div style="font-size:12px">8.6 GB</div>
+                      <div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:29%"></div></div>
+                    </td>
+                    <td><span style="color:var(--text-muted);font-size:12px">No expiry</span></td>
+                    <td><button class="btn xs" onclick="toast('Opening user settings…')">Manage</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:8px">
+                        <div class="user-av" style="background:#2563eb;color:#fff">MS</div>
+                        <div>
+                          <div style="font-weight:500">Mark Smith</div>
+                          <div style="font-size:11px;color:var(--text-muted)">mark@acme.com</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="pill neutral" style="font-size:10.5px">Member</span></td>
+                    <td>
+                      <div style="font-size:12px">11.1 GB</div>
+                      <div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:37%"></div></div>
+                    </td>
+                    <td>
+                      <span class="pill warn" style="font-size:10.5px">Expires Jul 1</span>
+                    </td>
+                    <td><button class="btn xs" onclick="toast('Opening user settings…')">Manage</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:8px">
+                        <div class="user-av" style="background:#7c3aed;color:#fff">AL</div>
+                        <div>
+                          <div style="font-weight:500">Amy Lee</div>
+                          <div style="font-size:11px;color:var(--text-muted)">amy@acme.com</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="pill neutral" style="font-size:10.5px">Member</span></td>
+                    <td>
+                      <div style="font-size:12px">4.3 GB</div>
+                      <div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:14%"></div></div>
+                    </td>
+                    <td><span style="color:var(--text-muted);font-size:12px">No expiry</span></td>
+                    <td><button class="btn xs" onclick="toast('Opening user settings…')">Manage</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Audit log (Hub req #8) -->
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title">Audit log</span>
+                <button class="btn sm" onclick="toast('Exporting audit log as CSV…')">Export CSV</button>
+              </div>
+              <table class="access-table">
+                <thead>
+                  <tr><th>Timestamp</th><th>User</th><th>Action</th><th>File / Folder</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-17 14:22</td><td>Jane Doe</td><td><span class="pill warn" style="font-size:10px">Made public</span></td><td style="font-size:12px">q2_survey_results.gpkg</td></tr>
+                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-17 11:05</td><td>Amy Lee</td><td><span class="pill active" style="font-size:10px">Uploaded</span></td><td style="font-size:12px">urban_parcels_final.gpkg</td></tr>
+                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-15 09:48</td><td>Mark Smith</td><td><span class="pill info" style="font-size:10px">Shared</span></td><td style="font-size:12px">Q1 Reference Layers</td></tr>
+                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-14 16:33</td><td>Jane Doe</td><td><span class="pill active" style="font-size:10px">Uploaded</span></td><td style="font-size:12px">terrain_analysis_v3.gmmp</td></tr>
+                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-14 16:30</td><td>Jane Doe</td><td><span class="pill active" style="font-size:10px">Uploaded</span></td><td style="font-size:12px">dem_mosaic_30m.tif</td></tr>
+                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-12 10:11</td><td>Mary Beth</td><td style="color:var(--red)"><span class="pill danger" style="font-size:10px">Deleted</span></td><td style="font-size:12px">old_basemap_2024.tif</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right col: billing notice + upcoming -->
+          <div>
+            <div class="card" style="margin-bottom:14px">
+              <div class="card-head">
+                <span class="card-title">Storage plan</span>
+                <button class="btn xs" onclick="window.location.href='index.html'">View in Hub →</button>
+              </div>
+              <div style="text-align:center;padding:8px 0 14px">
+                <div style="font-size:28px;font-weight:600;color:var(--avenza-blue)">38.2</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">of 100 GB used</div>
+                <div style="background:var(--surface-3);border-radius:20px;height:6px;overflow:hidden;margin:0 4px">
+                  <div style="height:100%;background:var(--avenza-blue);width:38%;border-radius:20px"></div>
+                </div>
+              </div>
+              <div style="border-top:1px solid var(--surface-3);padding-top:12px;font-size:12.5px;color:var(--text-secondary)">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Plan</span><span style="font-weight:500">100 GB Org</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Users with access</span><span style="font-weight:500">4</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Renews</span><span style="font-weight:500">Sep 14, 2026</span></div>
+              </div>
+            </div>
+
+            <!-- Future features (Hub req #12) -->
+            <div class="card">
+              <div class="card-head"><span class="card-title">Roadmap</span></div>
+              <div class="coming-soon">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#8896ab" stroke-width="1.4"/><path d="M8 5v4M8 10.5v.5" stroke="#8896ab" stroke-width="1.4" stroke-linecap="round"/></svg>
+                User Groups — grant drive access to a whole group in one action
+              </div>
+              <div class="coming-soon" style="margin-top:8px">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#8896ab" stroke-width="1.4"/><path d="M8 5v4M8 10.5v.5" stroke="#8896ab" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Per-user storage quotas and upgrade flows
+              </div>
+              <div class="coming-soon" style="margin-top:8px">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#8896ab" stroke-width="1.4"/><path d="M8 5v4M8 10.5v.5" stroke="#8896ab" stroke-width="1.4" stroke-linecap="round"/></svg>
+                File versioning — keep past versions with rollback
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-body -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════════════════════
+     MODALS
+═══════════════════════════════ -->
+
+<!-- Upload Modal -->
+<div class="modal-bg" id="modal-upload">
+  <div class="modal">
+    <div class="modal-title">Upload files</div>
+    <div class="modal-sub">Files are uploaded to <strong id="upload-dest-label">My Files</strong>. Geospatial metadata will be extracted automatically.</div>
+
+    <div class="upload-zone" onclick="toast('File picker opened')" id="drop-zone"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="event.preventDefault();this.classList.remove('drag-over');toast('Files dropped — uploading…');closeModal('modal-upload')">
+      <div class="upload-zone-icon">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 5l4-3 4 3M3 12h10" stroke="#084888" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="upload-zone-title">Drag files here, or click to browse</div>
+      <div class="upload-zone-sub">Supports all Global Mapper and Avenza Maps formats: GMMP, GPKG, GeoTIFF, KML, PDF, SHP, and more</div>
+    </div>
+
+    <div class="modal-label">Destination folder</div>
+    <select class="modal-select">
+      <option>My Files /</option>
+      <option>My Files / Field Surveys 2025</option>
+      <option>My Files / Basemaps</option>
+      <option>My Files / Exports</option>
+      <option>ACME Corp storage / Shared Data</option>
+    </select>
+
+    <div class="modal-label">Sharing</div>
+    <select class="modal-select">
+      <option>Organisation only (default)</option>
+      <option>Private — only me</option>
+      <option>Password-protected link</option>
+      <option>Public link</option>
+    </select>
+
+    <div class="modal-row">
+      <button class="btn primary" onclick="toast('Upload started…');closeModal('modal-upload')">Upload</button>
+      <button class="btn" onclick="closeModal('modal-upload')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal-bg" id="modal-share">
+  <div class="modal">
+    <div class="modal-title">Share file</div>
+    <div class="modal-sub" id="share-modal-sub">Set sharing permissions for this file</div>
+
+    <div class="modal-label">Access level</div>
+    <select class="modal-select" id="share-access-level" onchange="updateShareUI(this.value)">
+      <option value="org">Organisation only</option>
+      <option value="pw">Password-protected link</option>
+      <option value="public">Public link</option>
+      <option value="private">Private</option>
+    </select>
+
+    <div id="share-pw-row" style="display:none">
+      <div class="modal-label">Link password</div>
+      <input type="password" class="modal-input" placeholder="Set a password for this link" value="••••••••">
+    </div>
+
+    <div id="share-link-row" style="display:none">
+      <div class="modal-label">Share link</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <input class="modal-input" style="margin:0;flex:1" value="https://drive.bluemarblegeo.com/s/a8xP3q…" readonly>
+        <button class="btn sm" onclick="toast('Link copied to clipboard!')">Copy</button>
+      </div>
+    </div>
+
+    <div id="share-public-warn" style="display:none" class="alert warn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M8 2L14.5 13H1.5L8 2Z" stroke="#b45309" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.5V9.5" stroke="#b45309" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#b45309"/></svg>
+      Public links are visible to anyone. This may violate your organisation's data policy. Your admin will be notified.
+    </div>
+
+    <div class="modal-label">Also share with specific users</div>
+    <input class="modal-input" placeholder="Enter email addresses…">
+
+    <div class="modal-row">
+      <button class="btn primary" onclick="toast('Sharing settings saved.');closeModal('modal-share')">Save sharing</button>
+      <button class="btn" onclick="closeModal('modal-share')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Folder Modal -->
+<div class="modal-bg" id="modal-newfolder">
+  <div class="modal" style="width:400px">
+    <div class="modal-title">New folder</div>
+    <div class="modal-sub">Create a folder to organise your files.</div>
+    <div class="modal-label">Folder name</div>
+    <input class="modal-input" placeholder="e.g. Field Surveys 2026" id="new-folder-name" autofocus>
+    <div class="modal-label">Location</div>
+    <select class="modal-select">
+      <option>My Files /</option>
+      <option>My Files / Field Surveys 2025</option>
+      <option>ACME Corp storage /</option>
+    </select>
+    <div class="modal-row">
+      <button class="btn primary" onclick="createFolder()">Create folder</button>
+      <button class="btn" onclick="closeModal('modal-newfolder')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Grant Access Modal (Admin) -->
+<div class="modal-bg" id="modal-grant-access">
+  <div class="modal">
+    <div class="modal-title">Grant drive access</div>
+    <div class="modal-sub">Add a user to the Collaboration Drive. They must already be a member of your Hub organisation.</div>
+
+    <div class="modal-label">User</div>
+    <select class="modal-select">
+      <option>Tom Rees (tom@acme.com)</option>
+      <option>Priya Nair (priya@acme.com)</option>
+    </select>
+
+    <div class="modal-label">Drive role</div>
+    <select class="modal-select">
+      <option>Member — upload, download, share own files</option>
+      <option>Data Admin — manage all files and user access</option>
+    </select>
+
+    <div class="modal-label">Access expiry</div>
+    <select class="modal-select">
+      <option>No expiry</option>
+      <option>30 days</option>
+      <option>90 days</option>
+      <option>Custom date…</option>
+    </select>
+
+    <div class="modal-row">
+      <button class="btn primary" onclick="toast('Access granted.');closeModal('modal-grant-access')">Grant access</button>
+      <button class="btn" onclick="closeModal('modal-grant-access')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─── TOAST ─── */
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+/* ─── MODAL ─── */
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  document.addEventListener('keydown',escListener);
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+}
+function escListener(e){if(e.key==='Escape'){document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open'));}}
+
+/* ─── DROPDOWN ─── */
+function toggleDrop(id){const el=document.getElementById(id);const was=el.classList.contains('open');closeDrop();if(!was)el.classList.add('open');}
+function closeDrop(){document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('open'));}
+document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))closeDrop();});
+
+/* ─── PROTO VIEW SWITCHER ─── */
+function switchView(view){
+  ['files','shared','admin'].forEach(v=>{
+    document.getElementById('view-'+v).classList.toggle('active',v===view);
+    const btn=document.getElementById('sw-'+v);
+    if(btn)btn.classList.toggle('active',v===view);
+  });
+  const labels={'files':'Files','shared':'Shared with me','admin':'Storage Admin'};
+  document.getElementById('breadcrumb-current').textContent=labels[view]||'Files';
+}
+
+/* ─── SIDEBAR NAV ─── */
+function navSidebar(id){
+  document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('si-'+id);
+  if(el)el.classList.add('active');
+  if(id==='shared'){switchView('shared');}
+  else if(id==='storageadmin'){switchView('admin');}
+  else{switchView('files');}
+  toast('Navigating…');
+}
+function selectFolder(id){
+  document.querySelectorAll('.fb-tree-item').forEach(el=>el.classList.remove('active'));
+  event.target.closest('.fb-tree-item').classList.add('active');
+  const labels={'root':'My Files','field-surveys':'Field Surveys 2025','basemaps':'Basemaps','exports':'Exports','org':'ACME Corp storage','shared-data':'Shared Data','archive':'Archive'};
+  document.getElementById('fb-path-label').textContent=labels[id]||'My Files';
+  toast('Opened folder');
+}
+
+/* ─── FILE SELECTION ─── */
+const FILE_DATA={
+  'field-surveys-folder':{name:'Field Surveys 2025',type:'Folder',modified:'Jun 17, 2026',size:'2.3 GB',sharing:'Organisation only',icon:'folder',crs:null},
+  'basemaps-folder':{name:'Basemaps',type:'Folder',modified:'Jun 12, 2026',size:'8.7 GB',sharing:'Organisation only',icon:'folder',crs:null},
+  'q2-survey':{name:'q2_survey_results.gpkg',type:'GeoPackage',modified:'Jun 15, 2026',size:'142 MB',sharing:'Public link',icon:'gpkg',crs:'EPSG:4326 (WGS 84)',bbox:'43.2°N–44.8°N, 79.3°W–80.1°W'},
+  'terrain-analysis':{name:'terrain_analysis_v3.gmmp',type:'Global Mapper Project',modified:'Jun 14, 2026',size:'88 MB',sharing:'Org only',icon:'gm',crs:'EPSG:32617',bbox:'43.5°N–44.2°N, 79.4°W–80.0°W'},
+  'dem-mosaic':{name:'dem_mosaic_30m.tif',type:'GeoTIFF Raster',modified:'Jun 10, 2026',size:'1.2 GB',sharing:'Password link',icon:'tif',crs:'EPSG:32617 (UTM Zone 17N)',bbox:'43.0°N–45.0°N, 78.5°W–81.0°W'},
+  'field-map':{name:'field_map_2025_06.pdf',type:'GeoPDF',modified:'Jun 9, 2026',size:'34 MB',sharing:'Private',icon:'pdf',crs:'EPSG:4326',bbox:'43.6°N–44.1°N, 79.5°W–79.9°W'},
+  'waypoints':{name:'waypoints_north_sector.kml',type:'KML',modified:'Jun 7, 2026',size:'2.1 MB',sharing:'Org only',icon:'kml',crs:'EPSG:4326',bbox:'44.0°N–44.8°N, 79.3°W–79.8°W'},
+  'metadata-export':{name:'metadata_export_jun2026.csv',type:'CSV',modified:'Jun 5, 2026',size:'840 KB',sharing:'Private',icon:'csv',crs:null,bbox:null},
+};
+
+let selectedFile=null;
+function selectFile(id){
+  if(selectedFile){
+    const prev=document.getElementById('row-'+selectedFile);
+    if(prev)prev.classList.remove('selected');
+  }
+  selectedFile=id;
+  const row=document.getElementById('row-'+id);
+  if(row)row.classList.add('selected');
+
+  const f=FILE_DATA[id];
+  if(!f)return;
+
+  const iconClasses={'folder':'folder','gpkg':'gpkg','gm':'gm','tif':'tif','pdf':'pdf','kml':'kml','csv':'csv'};
+  const ic=iconClasses[f.icon]||'gm';
+  const labelMap={'folder':'📁','gpkg':'GPKG','gm':'GMMP','tif':'TIF','pdf':'PDF','kml':'KML','csv':'CSV'};
+  const label=labelMap[f.icon]||'FILE';
+
+  let geoRows='';
+  if(f.crs)geoRows+=`<div class="fb-info-row"><span class="fb-info-key">CRS</span><span class="fb-info-val">${f.crs}</span></div>`;
+  if(f.bbox)geoRows+=`<div class="fb-info-row"><span class="fb-info-key">Bounding box</span><span class="fb-info-val">${f.bbox}</span></div>`;
+
+  document.getElementById('fb-info-content').innerHTML=`
+    <div class="fb-info-body">
+      <div class="fb-info-icon ${ic}" style="width:56px;height:56px;font-size:13px">${label}</div>
+      <div class="fb-info-filename">${f.name}</div>
+      <div class="fb-info-type">${f.type}</div>
+
+      <div class="fb-info-section">
+        <div class="fb-info-section-label">File details</div>
+        <div class="fb-info-row"><span class="fb-info-key">Size</span><span class="fb-info-val">${f.size}</span></div>
+        <div class="fb-info-row"><span class="fb-info-key">Modified</span><span class="fb-info-val">${f.modified}</span></div>
+        <div class="fb-info-row"><span class="fb-info-key">Sharing</span><span class="fb-info-val">${f.sharing}</span></div>
+      </div>
+
+      ${geoRows?`<div class="fb-info-section"><div class="fb-info-section-label">Geospatial metadata</div>${geoRows}</div>`:''}
+    </div>
+    <div class="fb-info-footer">
+      <button class="btn sm primary" onclick="toast('Downloading ${f.name}…')">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 11l4 3 4-3M3 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Download
+      </button>
+      <button class="btn sm" onclick="openModal('modal-share')">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="13" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="8" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.7L5.5 7.3M10.5 12.3L5.5 8.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Share
+      </button>
+      <button class="btn sm danger" onclick="toast('${f.name} deleted.')">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6 4.5V3h4v1.5M5 4.5l.5 7.5h5l.5-7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Delete
+      </button>
+    </div>
+  `;
+}
+function clearSelection(){
+  if(selectedFile){
+    const row=document.getElementById('row-'+selectedFile);
+    if(row)row.classList.remove('selected');
+    selectedFile=null;
+  }
+  document.getElementById('fb-info-content').innerHTML='<div class="fb-info-empty"><svg width="28" height="28" viewBox="0 0 16 16" fill="none" style="display:block;margin:0 auto 8px;opacity:.3"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 6h5M5.5 8.5h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Select a file or folder to see its details</div>';
+}
+
+/* ─── SELECT ALL ─── */
+function toggleSelectAll(cb){
+  document.querySelectorAll('#fb-tbody input[type=checkbox]').forEach(c=>c.checked=cb.checked);
+  if(cb.checked)toast('All files selected');
+}
+
+/* ─── FILTER ─── */
+function filterFiles(q){
+  const rows=document.querySelectorAll('#fb-tbody tr');
+  rows.forEach(r=>{
+    const name=r.querySelector('.fb-file-name');
+    if(!name){r.style.display='';return;}
+    r.style.display=name.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';
+  });
+}
+
+/* ─── SHARE MODAL LOGIC ─── */
+function updateShareUI(val){
+  document.getElementById('share-pw-row').style.display=val==='pw'?'block':'none';
+  document.getElementById('share-link-row').style.display=(val==='pw'||val==='public')?'block':'none';
+  document.getElementById('share-public-warn').style.display=val==='public'?'flex':'none';
+}
+
+/* ─── NEW FOLDER ─── */
+function createFolder(){
+  const name=document.getElementById('new-folder-name').value.trim()||'New Folder';
+  toast(`Folder "${name}" created.`);
+  closeModal('modal-newfolder');
+}
+
+/* ─── CLOSE ON BACKDROP ─── */
+document.querySelectorAll('.modal-bg').forEach(bg=>{
+  bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');});
+});
+</script>
+</body>
+</html>
