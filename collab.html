@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blue Marble Collaboration Environment</title>
+<title>Blue Marble Blue Marble Drive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -375,6 +375,12 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 /* ─── COMING SOON ─── */
 .coming-soon{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px dashed var(--border-2);border-radius:var(--radius-sm);padding:12px 14px;font-size:12.5px;color:var(--text-muted);margin-top:4px}
 
+/* ─── STAR BUTTON ─── */
+.star-btn{background:none;border:none;cursor:pointer;padding:3px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--border-2);transition:color .12s}
+.star-btn:hover{color:var(--amber)}
+.star-btn.starred{color:var(--amber)}
+.star-btn.starred .star-icon{fill:var(--amber);stroke:var(--amber)}
+
 /* ─── EMPTY STATE ─── */
 .empty-state{text-align:center;padding:48px 24px}
 .empty-state-icon{width:48px;height:48px;border-radius:50%;background:var(--surface-3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
@@ -397,6 +403,9 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
   </button>
   <div class="proto-sep"></div>
   <button class="proto-btn active" id="sw-files" onclick="switchView('files')">Files</button>
+  <button class="proto-btn" id="sw-recent" onclick="switchView('recent')">Recent</button>
+  <button class="proto-btn" id="sw-starred" onclick="switchView('starred')">Starred</button>
+  <button class="proto-btn" id="sw-trash" onclick="switchView('trash')">Trash</button>
   <button class="proto-btn" id="sw-shared" onclick="switchView('shared')">Shared with me</button>
   <button class="proto-btn" id="sw-admin" onclick="switchView('admin')">Storage Admin</button>
   <div class="proto-sep"></div>
@@ -427,8 +436,8 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
         </svg>
       </div>
       <div>
-        <div class="sb-product-name">Collaboration</div>
-        <div class="sb-product-tag">Blue Marble Drive</div>
+        <div class="sb-product-name">Blue Marble Drive</div>
+        <div class="sb-product-tag">Blue Marble Geographics</div>
       </div>
     </div>
 
@@ -638,6 +647,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                   <thead>
                     <tr>
                       <th style="width:40px"><input type="checkbox" id="select-all" onchange="toggleSelectAll(this)"></th>
+                      <th style="width:32px"></th>
                       <th>Name</th>
                       <th>Modified</th>
                       <th>Size</th>
@@ -1157,6 +1167,326 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
         </div>
       </div>
 
+      <!-- ═══════════════════════════════
+           VIEW: RECENT
+      ═══════════════════════════════ -->
+      <div class="page" id="view-recent">
+        <div class="two-col" style="align-items:start">
+
+          <!-- Left: my recent files -->
+          <div>
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title">Recently accessed</span>
+                <span style="font-size:12px;color:var(--text-muted)">Last 30 days</span>
+              </div>
+              <table class="fb-table">
+                <thead>
+                  <tr>
+                    <th style="width:32px"></th>
+                    <th>Name</th>
+                    <th>Accessed</th>
+                    <th>Size</th>
+                    <th>Sharing</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr onclick="toast('Opening file…')">
+                    <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                    <td><div class="fb-name-cell"><div class="fb-icon gm">GMMP</div><div><div class="fb-file-name">terrain_analysis_v3.gmmp</div><div class="fb-file-type">Global Mapper Project</div></div></div></td>
+                    <td><div class="fb-meta">Today, 9:14 AM</div></td>
+                    <td class="fb-size">88 MB</td>
+                    <td><span class="share-badge org">Org only</span></td>
+                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+                  </tr>
+                  <tr onclick="toast('Opening file…')">
+                    <td><button class="star-btn starred" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="var(--amber)" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="var(--amber)" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                    <td><div class="fb-name-cell"><div class="fb-icon gpkg">GPKG</div><div><div class="fb-file-name">q2_survey_results.gpkg</div><div class="fb-file-type">GeoPackage</div></div></div></td>
+                    <td><div class="fb-meta">Today, 8:50 AM</div></td>
+                    <td class="fb-size">142 MB</td>
+                    <td><span class="share-badge public">Public link</span></td>
+                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+                  </tr>
+                  <tr onclick="toast('Opening file…')">
+                    <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                    <td><div class="fb-name-cell"><div class="fb-icon tif">TIF</div><div><div class="fb-file-name">dem_mosaic_30m.tif</div><div class="fb-file-type">GeoTIFF Raster</div></div></div></td>
+                    <td><div class="fb-meta">Yesterday, 4:32 PM</div></td>
+                    <td class="fb-size">1.2 GB</td>
+                    <td><span class="share-badge pw">Password link</span></td>
+                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+                  </tr>
+                  <tr onclick="toast('Opening file…')">
+                    <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                    <td><div class="fb-name-cell"><div class="fb-icon folder"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="#c2410c" stroke-width="1.4" stroke-linejoin="round"/></svg></div><div><div class="fb-file-name">Field Surveys 2025</div><div class="fb-file-type">Folder · 14 files</div></div></div></td>
+                    <td><div class="fb-meta">Yesterday, 2:15 PM</div></td>
+                    <td class="fb-size">2.3 GB</td>
+                    <td><span class="share-badge org">Org only</span></td>
+                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+                  </tr>
+                  <tr onclick="toast('Opening file…')">
+                    <td><button class="star-btn starred" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="var(--amber)" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="var(--amber)" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                    <td><div class="fb-name-cell"><div class="fb-icon kml">KML</div><div><div class="fb-file-name">waypoints_north_sector.kml</div><div class="fb-file-type">KML</div></div></div></td>
+                    <td><div class="fb-meta">Jun 16, 2026</div></td>
+                    <td class="fb-size">2.1 MB</td>
+                    <td><span class="share-badge org">Org only</span></td>
+                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+                  </tr>
+                  <tr onclick="toast('Opening file…')">
+                    <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                    <td><div class="fb-name-cell"><div class="fb-icon pdf">PDF</div><div><div class="fb-file-name">field_map_2025_06.pdf</div><div class="fb-file-type">GeoPDF</div></div></div></td>
+                    <td><div class="fb-meta">Jun 15, 2026</div></td>
+                    <td class="fb-size">34 MB</td>
+                    <td><span class="share-badge private">Private</span></td>
+                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+                  </tr>
+                  <tr onclick="toast('Opening file…')">
+                    <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                    <td><div class="fb-name-cell"><div class="fb-icon csv">CSV</div><div><div class="fb-file-name">metadata_export_jun2026.csv</div><div class="fb-file-type">CSV Spreadsheet</div></div></div></td>
+                    <td><div class="fb-meta">Jun 14, 2026</div></td>
+                    <td class="fb-size">840 KB</td>
+                    <td><span class="share-badge private">Private</span></td>
+                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: team activity feed -->
+          <div>
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title">Team activity</span>
+                <span style="font-size:12px;color:var(--text-muted)">ACME Corp</span>
+              </div>
+              <!-- Today -->
+              <div style="font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Today</div>
+              <div class="activity-item">
+                <div style="width:28px;height:28px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">MB</div>
+                <div>
+                  <div class="activity-title">Mary Beth uploaded <strong>site_boundaries_v2.gpkg</strong></div>
+                  <div class="activity-meta">9:02 AM · Field Surveys 2025</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div style="width:28px;height:28px;border-radius:50%;background:#0e7a8c;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">JD</div>
+                <div>
+                  <div class="activity-title">You shared <strong>q2_survey_results.gpkg</strong> publicly</div>
+                  <div class="activity-meta">8:50 AM · <span style="color:var(--amber);font-weight:500">Public link active</span></div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div style="width:28px;height:28px;border-radius:50%;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">AL</div>
+                <div>
+                  <div class="activity-title">Amy Lee downloaded <strong>dem_mosaic_30m.tif</strong></div>
+                  <div class="activity-meta">8:21 AM</div>
+                </div>
+              </div>
+              <!-- Yesterday -->
+              <div style="font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 8px">Yesterday</div>
+              <div class="activity-item">
+                <div style="width:28px;height:28px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">MS</div>
+                <div>
+                  <div class="activity-title">Mark Smith renamed <strong>survey_jun_DRAFT.gmmp</strong> → <strong>terrain_analysis_v3.gmmp</strong></div>
+                  <div class="activity-meta">Yesterday, 4:10 PM</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div style="width:28px;height:28px;border-radius:50%;background:#0e7a8c;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">JD</div>
+                <div>
+                  <div class="activity-title">You created folder <strong>Exports</strong></div>
+                  <div class="activity-meta">Yesterday, 2:18 PM</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div style="width:28px;height:28px;border-radius:50%;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">AL</div>
+                <div>
+                  <div class="activity-title">Amy Lee shared <strong>urban_parcels_final.gpkg</strong> with you</div>
+                  <div class="activity-meta">Yesterday, 11:05 AM</div>
+                </div>
+              </div>
+              <!-- Jun 16 -->
+              <div style="font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 8px">Jun 16</div>
+              <div class="activity-item">
+                <div style="width:28px;height:28px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">MB</div>
+                <div>
+                  <div class="activity-title">Mary Beth deleted <strong>old_basemap_2024.tif</strong></div>
+                  <div class="activity-meta">Jun 16, 3:44 PM</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div style="width:28px;height:28px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">MS</div>
+                <div>
+                  <div class="activity-title">Mark Smith shared <strong>Q1 Reference Layers</strong> with you</div>
+                  <div class="activity-meta">Jun 16, 10:11 AM</div>
+                </div>
+              </div>
+              <button class="btn sm" style="width:100%;margin-top:12px;justify-content:center" onclick="switchView('admin');setTimeout(()=>document.querySelector('.access-table')?.scrollIntoView({behavior:'smooth'}),100)">
+                View full audit log →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           VIEW: STARRED
+      ═══════════════════════════════ -->
+      <div class="page" id="view-starred">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Starred files</span>
+            <span style="font-size:12px;color:var(--text-muted)">Click the ★ on any file to star it</span>
+          </div>
+          <table class="fb-table" id="starred-table">
+            <thead>
+              <tr>
+                <th style="width:32px"></th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Modified</th>
+                <th>Size</th>
+                <th>Sharing</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="starred-tbody">
+              <tr onclick="toast('Opening file…')" id="starred-row-q2">
+                <td><button class="star-btn starred" onclick="event.stopPropagation();toggleStarRow(this,'starred-row-q2')" title="Unstar"><svg class="star-icon" viewBox="0 0 16 16" fill="var(--amber)" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="var(--amber)" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                <td><div class="fb-name-cell"><div class="fb-icon gpkg">GPKG</div><div><div class="fb-file-name">q2_survey_results.gpkg</div><div class="fb-file-type">GeoPackage</div></div></div></td>
+                <td class="fb-meta">My Files /</td>
+                <td class="fb-meta">Jun 15, 2026</td>
+                <td class="fb-size">142 MB</td>
+                <td><span class="share-badge public">Public link</span></td>
+                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+              </tr>
+              <tr onclick="toast('Opening file…')" id="starred-row-waypoints">
+                <td><button class="star-btn starred" onclick="event.stopPropagation();toggleStarRow(this,'starred-row-waypoints')" title="Unstar"><svg class="star-icon" viewBox="0 0 16 16" fill="var(--amber)" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="var(--amber)" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                <td><div class="fb-name-cell"><div class="fb-icon kml">KML</div><div><div class="fb-file-name">waypoints_north_sector.kml</div><div class="fb-file-type">KML</div></div></div></td>
+                <td class="fb-meta">My Files /</td>
+                <td class="fb-meta">Jun 7, 2026</td>
+                <td class="fb-size">2.1 MB</td>
+                <td><span class="share-badge org">Org only</span></td>
+                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+          <div id="starred-empty" style="display:none" class="empty-state">
+            <div class="empty-state-icon">
+              <svg width="22" height="22" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="var(--text-muted)" stroke-width="1.3" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="empty-state-title">No starred files yet</div>
+            <div class="empty-state-sub">Click the ★ icon on any file or folder to add it here for quick access.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
+           VIEW: TRASH
+      ═══════════════════════════════ -->
+      <div class="page" id="view-trash">
+        <div class="alert warn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M8 2L14.5 13H1.5L8 2Z" stroke="#b45309" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.5V9.5" stroke="#b45309" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#b45309"/></svg>
+          Files in trash are permanently deleted after <strong>30 days</strong>. Permanent deletion cannot be undone.
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Trash</span>
+            <div style="display:flex;gap:8px">
+              <button class="btn sm" onclick="restoreAll()">Restore all</button>
+              <button class="btn sm danger" onclick="emptyTrash()">Empty trash</button>
+            </div>
+          </div>
+
+          <table class="fb-table" id="trash-table">
+            <thead>
+              <tr>
+                <th style="width:40px"><input type="checkbox" id="trash-select-all" onchange="toggleTrashSelectAll(this)"></th>
+                <th>Name</th>
+                <th>Deleted by</th>
+                <th>Deleted on</th>
+                <th>Original location</th>
+                <th>Size</th>
+                <th>Deletes permanently</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="trash-tbody">
+              <tr id="trash-row-1">
+                <td><input type="checkbox" class="trash-check"></td>
+                <td><div class="fb-name-cell"><div class="fb-icon tif">TIF</div><div><div class="fb-file-name">old_basemap_2024.tif</div><div class="fb-file-type">GeoTIFF Raster</div></div></div></td>
+                <td><div style="display:flex;align-items:center;gap:7px"><div class="user-av" style="background:#2563eb;color:#fff;font-size:9px">MB</div>Mary Beth</div></td>
+                <td class="fb-meta">Jun 16, 2026</td>
+                <td class="fb-meta">Basemaps /</td>
+                <td class="fb-size">3.4 GB</td>
+                <td><span class="pill warn" style="font-size:10.5px">Jul 16, 2026</span></td>
+                <td>
+                  <div style="display:flex;gap:4px">
+                    <button class="btn xs" onclick="restoreRow('trash-row-1','old_basemap_2024.tif')">Restore</button>
+                    <button class="btn xs danger" onclick="deleteRowPermanently('trash-row-1','old_basemap_2024.tif')">Delete</button>
+                  </div>
+                </td>
+              </tr>
+              <tr id="trash-row-2">
+                <td><input type="checkbox" class="trash-check"></td>
+                <td><div class="fb-name-cell"><div class="fb-icon csv">CSV</div><div><div class="fb-file-name">field_notes_may_draft.csv</div><div class="fb-file-type">CSV Spreadsheet</div></div></div></td>
+                <td><div style="display:flex;align-items:center;gap:7px"><div class="user-av" style="background:#0e7a8c;color:#fff;font-size:9px">JD</div>Jane Doe</div></td>
+                <td class="fb-meta">Jun 14, 2026</td>
+                <td class="fb-meta">My Files /</td>
+                <td class="fb-size">210 KB</td>
+                <td><span class="pill warn" style="font-size:10.5px">Jul 14, 2026</span></td>
+                <td>
+                  <div style="display:flex;gap:4px">
+                    <button class="btn xs" onclick="restoreRow('trash-row-2','field_notes_may_draft.csv')">Restore</button>
+                    <button class="btn xs danger" onclick="deleteRowPermanently('trash-row-2','field_notes_may_draft.csv')">Delete</button>
+                  </div>
+                </td>
+              </tr>
+              <tr id="trash-row-3">
+                <td><input type="checkbox" class="trash-check"></td>
+                <td><div class="fb-name-cell"><div class="fb-icon gm">GMMP</div><div><div class="fb-file-name">survey_jun_DRAFT.gmmp</div><div class="fb-file-type">Global Mapper Project</div></div></div></td>
+                <td><div style="display:flex;align-items:center;gap:7px"><div class="user-av" style="background:#2563eb;color:#fff;font-size:9px">MS</div>Mark Smith</div></td>
+                <td class="fb-meta">Jun 14, 2026</td>
+                <td class="fb-meta">My Files /</td>
+                <td class="fb-size">61 MB</td>
+                <td><span class="pill warn" style="font-size:10.5px">Jul 14, 2026</span></td>
+                <td>
+                  <div style="display:flex;gap:4px">
+                    <button class="btn xs" onclick="restoreRow('trash-row-3','survey_jun_DRAFT.gmmp')">Restore</button>
+                    <button class="btn xs danger" onclick="deleteRowPermanently('trash-row-3','survey_jun_DRAFT.gmmp')">Delete</button>
+                  </div>
+                </td>
+              </tr>
+              <tr id="trash-row-4">
+                <td><input type="checkbox" class="trash-check"></td>
+                <td><div class="fb-name-cell"><div class="fb-icon pdf">PDF</div><div><div class="fb-file-name">region_overview_2023.pdf</div><div class="fb-file-type">GeoPDF</div></div></div></td>
+                <td><div style="display:flex;align-items:center;gap:7px"><div class="user-av" style="background:#7c3aed;color:#fff;font-size:9px">AL</div>Amy Lee</div></td>
+                <td class="fb-meta">Jun 3, 2026</td>
+                <td class="fb-meta">ACME Corp storage / Archive</td>
+                <td class="fb-size">18 MB</td>
+                <td><span class="pill danger" style="font-size:10.5px">Jul 3, 2026 — 14 days</span></td>
+                <td>
+                  <div style="display:flex;gap:4px">
+                    <button class="btn xs" onclick="restoreRow('trash-row-4','region_overview_2023.pdf')">Restore</button>
+                    <button class="btn xs danger" onclick="deleteRowPermanently('trash-row-4','region_overview_2023.pdf')">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div id="trash-empty" style="display:none" class="empty-state">
+            <div class="empty-state-icon">
+              <svg width="22" height="22" viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6 4.5V3h4v1.5M5 4.5l.5 7.5h5l.5-7.5" stroke="var(--text-muted)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="empty-state-title">Trash is empty</div>
+            <div class="empty-state-sub">Deleted files appear here and are permanently removed after 30 days.</div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /page-body -->
   </div><!-- /main -->
 </div><!-- /app -->
@@ -1272,7 +1602,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 <div class="modal-bg" id="modal-grant-access">
   <div class="modal">
     <div class="modal-title">Grant drive access</div>
-    <div class="modal-sub">Add a user to the Collaboration Drive. They must already be a member of your Hub organisation.</div>
+    <div class="modal-sub">Add a user to the Blue Marble Drive. They must already be a member of your Hub organisation.</div>
 
     <div class="modal-label">User</div>
     <select class="modal-select">
@@ -1329,24 +1659,29 @@ document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))closeDrop
 
 /* ─── PROTO VIEW SWITCHER ─── */
 function switchView(view){
-  ['files','shared','admin'].forEach(v=>{
+  ['files','shared','admin','recent','starred','trash'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('active',v===view);
     const btn=document.getElementById('sw-'+v);
     if(btn)btn.classList.toggle('active',v===view);
   });
-  const labels={'files':'Files','shared':'Shared with me','admin':'Storage Admin'};
+  const labels={'files':'Files','shared':'Shared with me','admin':'Storage Admin','recent':'Recent','starred':'Starred','trash':'Trash'};
   document.getElementById('breadcrumb-current').textContent=labels[view]||'Files';
+
+  // Sync sidebar active state
+  document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
+  const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','admin':'si-storageadmin'};
+  const sid=document.getElementById(sideMap[view]);
+  if(sid)sid.classList.add('active');
 }
 
 /* ─── SIDEBAR NAV ─── */
 function navSidebar(id){
-  document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
-  const el=document.getElementById('si-'+id);
-  if(el)el.classList.add('active');
-  if(id==='shared'){switchView('shared');}
-  else if(id==='storageadmin'){switchView('admin');}
-  else{switchView('files');}
-  toast('Navigating…');
+  if(id==='shared')        switchView('shared');
+  else if(id==='storageadmin') switchView('admin');
+  else if(id==='recent')   switchView('recent');
+  else if(id==='starred')  switchView('starred');
+  else if(id==='trash')    switchView('trash');
+  else                     switchView('files');
 }
 function selectFolder(id){
   document.querySelectorAll('.fb-tree-item').forEach(el=>el.classList.remove('active'));
@@ -1460,7 +1795,70 @@ function createFolder(){
   closeModal('modal-newfolder');
 }
 
-/* ─── CLOSE ON BACKDROP ─── */
+/* ─── STAR TOGGLE (file rows) ─── */
+function toggleStar(btn){
+  const isStarred = btn.classList.toggle('starred');
+  const svg = btn.querySelector('.star-icon');
+  if(isStarred){
+    svg.setAttribute('fill','var(--amber)');
+    svg.setAttribute('stroke','var(--amber)');
+    toast('Added to Starred');
+  } else {
+    svg.setAttribute('fill','none');
+    svg.setAttribute('stroke','currentColor');
+    toast('Removed from Starred');
+  }
+}
+
+/* ─── STAR TOGGLE (starred page — removes row when unstarred) ─── */
+function toggleStarRow(btn, rowId){
+  const row = document.getElementById(rowId);
+  if(row){ row.style.opacity='0'; row.style.transition='opacity .2s'; setTimeout(()=>{ row.remove(); checkStarredEmpty(); },200); }
+  toast('Removed from Starred');
+}
+function checkStarredEmpty(){
+  const tbody = document.getElementById('starred-tbody');
+  const empty = document.getElementById('starred-empty');
+  if(tbody && empty){ empty.style.display = tbody.children.length===0 ? 'block':'none'; }
+}
+
+/* ─── TRASH: RESTORE ─── */
+function restoreRow(rowId, filename){
+  const row = document.getElementById(rowId);
+  if(row){ row.style.opacity='0'; row.style.transition='opacity .2s'; setTimeout(()=>{ row.remove(); checkTrashEmpty(); },200); }
+  toast(`"${filename}" restored to its original location.`);
+}
+function restoreAll(){
+  document.querySelectorAll('#trash-tbody tr').forEach(r=>{ r.style.opacity='0'; r.style.transition='opacity .2s'; });
+  setTimeout(()=>{ document.querySelectorAll('#trash-tbody tr').forEach(r=>r.remove()); checkTrashEmpty(); }, 220);
+  toast('All files restored.');
+}
+
+/* ─── TRASH: PERMANENT DELETE ─── */
+function deleteRowPermanently(rowId, filename){
+  if(!confirm(`Permanently delete "${filename}"? This cannot be undone.`)) return;
+  const row = document.getElementById(rowId);
+  if(row){ row.style.opacity='0'; row.style.transition='opacity .2s'; setTimeout(()=>{ row.remove(); checkTrashEmpty(); },200); }
+  toast(`"${filename}" permanently deleted.`);
+}
+function emptyTrash(){
+  if(!confirm('Permanently delete all files in trash? This cannot be undone.')) return;
+  document.querySelectorAll('#trash-tbody tr').forEach(r=>{ r.style.opacity='0'; r.style.transition='opacity .2s'; });
+  setTimeout(()=>{ document.querySelectorAll('#trash-tbody tr').forEach(r=>r.remove()); checkTrashEmpty(); }, 220);
+  toast('Trash emptied.');
+}
+function checkTrashEmpty(){
+  const tbody = document.getElementById('trash-tbody');
+  const empty = document.getElementById('trash-empty');
+  if(tbody && empty){ empty.style.display = tbody.children.length===0 ? 'block':'none'; }
+}
+
+/* ─── TRASH: SELECT ALL ─── */
+function toggleTrashSelectAll(cb){
+  document.querySelectorAll('.trash-check').forEach(c=>c.checked=cb.checked);
+  if(cb.checked) toast('All trash items selected');
+}
+
 document.querySelectorAll('.modal-bg').forEach(bg=>{
   bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');});
 });
