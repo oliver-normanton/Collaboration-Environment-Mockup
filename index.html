@@ -2181,6 +2181,24 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
             <div class="tick"><div class="tick-dot" style="background:var(--green)"></div><div><div class="tick-title">Logged in from new device</div><div class="tick-meta">Apr 14, 2025 · Chrome · macOS</div></div></div>
           </div>
         </div>
+
+        <!-- Collaboration Environment launch card — user dashboard -->
+        <div class="card" style="margin-top:14px;background:linear-gradient(135deg,#0a2240 0%,#084888 100%);border-color:transparent;position:relative;overflow:hidden;cursor:pointer" onclick="window.location.href='collab.html'">
+          <div style="position:absolute;right:-30px;top:-30px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:42px;height:42px;border-radius:var(--radius-sm);background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="white" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2.5 3.5-2.5 5.5s1 4 2.5 5.5M8 2.5c1.5 1.5 2.5 3.5 2.5 5.5s-1 4-2.5 5.5M2.5 8h11" stroke="white" stroke-width="1.2"/></svg>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Collaboration Drive</div>
+              <div style="font-size:12.5px;color:rgba(255,255,255,.6)">Access and share your team's geospatial files</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);border-radius:var(--radius-sm);padding:6px 12px;font-size:12.5px;font-weight:500;color:#fff;flex-shrink:0">
+              Open Drive
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -5018,7 +5036,27 @@ function renderMyProducts(role){
     <div style="display:grid;grid-template-columns:repeat(${Math.min(ud.unassigned.length,3)},1fr);gap:10px">
       ${ud.unassigned.map(p=>`<div style="background:var(--surface-2);border:1px dashed var(--border-2);border-radius:var(--radius-md);padding:16px 18px;display:flex;align-items:center;gap:12px"><div class="my-prod-icon" style="background:${p.iconBg};color:${p.iconFg};width:36px;height:36px;font-size:11px;flex-shrink:0">${p.icon}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text-muted)">${p.name}</div><div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Not assigned to you</div></div><button class="btn xs" onclick="toast('Access request sent to admin')">Request</button></div>`).join('')}
     </div>`:'';
-  body.innerHTML=`<div style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px">${note}</div>${assignedHTML}${unassignedHTML}`;
+  const collabCard=`
+    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px">
+      <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Connected services</div>
+      <div style="background:linear-gradient(135deg,#0a2240 0%,#084888 100%);border-radius:var(--radius-md);padding:16px 20px;cursor:pointer;position:relative;overflow:hidden" onclick="window.location.href='collab.html'">
+        <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:40px;height:40px;border-radius:var(--radius-sm);background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="white" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2.5 3.5-2.5 5.5s1 4 2.5 5.5M8 2.5c1.5 1.5 2.5 3.5 2.5 5.5s-1 4-2.5 5.5M2.5 8h11" stroke="white" stroke-width="1.2"/></svg>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:13.5px;font-weight:600;color:#fff;margin-bottom:3px">Collaboration Drive</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.6)">Upload, access and share geospatial files with your team — works with Global Mapper and Avenza Maps</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);border-radius:var(--radius-sm);padding:6px 12px;font-size:12.5px;font-weight:500;color:#fff;flex-shrink:0;white-space:nowrap">
+            Open Drive
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  body.innerHTML=`<div style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px">${note}</div>${assignedHTML}${unassignedHTML}${collabCard}`;
 }
 
 /* ═══════════════════════════════════════
