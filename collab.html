@@ -375,6 +375,18 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 /* ─── COMING SOON ─── */
 .coming-soon{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px dashed var(--border-2);border-radius:var(--radius-sm);padding:12px 14px;font-size:12.5px;color:var(--text-muted);margin-top:4px}
 
+/* ─── TOGGLE SWITCH ─── */
+.toggle-wrap{display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0}
+.toggle-input{display:none}
+.toggle-track{width:36px;height:20px;background:var(--border-2);border-radius:20px;position:relative;transition:background .15s;flex-shrink:0}
+.toggle-input:checked + .toggle-track{background:var(--avenza-blue)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .15s}
+.toggle-input:checked + .toggle-track .toggle-thumb{left:19px}
+
+/* ─── FILE TYPE TAG ─── */
+.filetype-tag{display:inline-flex;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);transition:all .12s;font-family:'DM Mono',monospace}
+.filetype-tag.active{background:var(--avenza-blue-lt);color:var(--avenza-blue);border-color:#bfdbfe}
+
 /* ─── STAR BUTTON ─── */
 .star-btn{background:none;border:none;cursor:pointer;padding:3px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--border-2);transition:color .12s}
 .star-btn:hover{color:var(--amber)}
@@ -407,7 +419,8 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
   <button class="proto-btn" id="sw-starred" onclick="switchView('starred')">Starred</button>
   <button class="proto-btn" id="sw-trash" onclick="switchView('trash')">Trash</button>
   <button class="proto-btn" id="sw-shared" onclick="switchView('shared')">Shared with me</button>
-  <button class="proto-btn" id="sw-admin" onclick="switchView('admin')">Storage Admin</button>
+  <button class="proto-btn" id="sw-admin" onclick="switchView('admin')">Storage Settings</button>
+  <button class="proto-btn" id="sw-audit" onclick="switchView('audit')">Audit Log</button>
   <div class="proto-sep"></div>
   <button class="proto-btn" id="sw-upload" onclick="openModal('modal-upload')">
     <svg viewBox="0 0 16 16" fill="none" width="12" height="12"><path d="M8 2v9M4 5l4-3 4 3M3 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -492,6 +505,11 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
         <button class="sb-item" id="si-storageadmin" onclick="switchView('admin')">
           <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M8 2.5V4.5M8 11.5v2M2.5 8H4.5M11.5 8H13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
           Storage settings
+        </button>
+        <button class="sb-item" id="si-audit" onclick="switchView('audit')">
+          <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 5.5h5M5.5 8h5M5.5 10.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Audit log
+          <span style="margin-left:auto;font-size:9.5px;font-weight:600;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.4);letter-spacing:.03em">ADMIN</span>
         </button>
       </div>
     </div>
@@ -1138,14 +1156,20 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
       <!-- ═══════════════════════════════
            VIEW: STORAGE ADMIN
       ═══════════════════════════════ -->
+      <!-- ═══════════════════════════════
+           VIEW: STORAGE SETTINGS (admin only)
+      ═══════════════════════════════ -->
       <div class="page" id="view-admin">
-        <div class="alert info" style="margin-bottom:16px">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#2563eb" stroke-width="1.4"/><path d="M8 7v4M8 5.5v.5" stroke="#2563eb" stroke-width="1.4" stroke-linecap="round"/></svg>
-          Storage settings are inherited from the <strong>Blue Marble Hub</strong>. Changes to user access are applied immediately. <a onclick="window.location.href='index.html'">Manage users in Hub →</a>
+
+        <!-- Admin role banner -->
+        <div style="display:flex;align-items:center;gap:8px;background:var(--avenza-navy);color:rgba(255,255,255,.8);border-radius:var(--radius-md);padding:10px 16px;margin-bottom:20px;font-size:12.5px">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M8 2l1.5 4.5H14l-4.5 3 1.5 4.5L8 11.5 3 14l1.5-4.5L2 6.5h4.5L8 2z" stroke="rgba(255,255,255,.7)" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          <span>You are viewing this as <strong style="color:#fff">Data Admin</strong>. Settings apply to all users in the ACME Corp organisation.</span>
+          <a onclick="window.location.href='index.html'" style="margin-left:auto;color:rgba(255,255,255,.5);cursor:pointer;font-size:11.5px;text-decoration:underline;white-space:nowrap">Manage org in Hub →</a>
         </div>
 
-        <!-- Storage stats -->
-        <div class="storage-stat-grid">
+        <!-- Storage stats strip -->
+        <div class="storage-stat-grid" style="margin-bottom:20px">
           <div class="storage-stat blue">
             <div class="storage-stat-label">Total storage used</div>
             <div class="storage-stat-val">38.2 <span style="font-size:14px;font-weight:400">GB</span></div>
@@ -1165,20 +1189,158 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 
         <div class="two-col" style="align-items:start">
           <div>
-            <!-- User access management (Hub req #2, #4, #5, #11) -->
+
+            <!-- ── SHARING POLICY ── -->
             <div class="card" style="margin-bottom:16px">
+              <div class="card-head">
+                <span class="card-title">Sharing policy</span>
+                <span style="font-size:11.5px;color:var(--text-muted)">Controls what sharing options members can use</span>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:0">
+
+                <!-- Setting row: default sharing -->
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--surface-3)">
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:2px">Default sharing for new uploads</div>
+                    <div style="font-size:11.5px;color:var(--text-muted)">The sharing level applied automatically when a file is uploaded</div>
+                  </div>
+                  <select class="modal-select" style="width:auto;min-width:160px;margin:0" onchange="toast('Setting saved.')">
+                    <option selected>Organisation only</option>
+                    <option>Private (uploader only)</option>
+                  </select>
+                </div>
+
+                <!-- Setting row: allow public links -->
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--surface-3)">
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:2px">Allow public links</div>
+                    <div style="font-size:11.5px;color:var(--text-muted)">Members can create links accessible to anyone, without login</div>
+                  </div>
+                  <label class="toggle-wrap" aria-label="Allow public links">
+                    <input type="checkbox" class="toggle-input" checked onchange="toast(this.checked ? 'Public links enabled.' : 'Public links disabled.')">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  </label>
+                </div>
+
+                <!-- Setting row: allow password links -->
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--surface-3)">
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:2px">Allow password-protected links</div>
+                    <div style="font-size:11.5px;color:var(--text-muted)">Members can share files via links that require a password to access</div>
+                  </div>
+                  <label class="toggle-wrap" aria-label="Allow password links">
+                    <input type="checkbox" class="toggle-input" checked onchange="toast(this.checked ? 'Password links enabled.' : 'Password links disabled.')">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  </label>
+                </div>
+
+                <!-- Setting row: link expiry -->
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--surface-3)">
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:2px">Default link expiry</div>
+                    <div style="font-size:11.5px;color:var(--text-muted)">Shared links expire automatically after this period unless overridden</div>
+                  </div>
+                  <select class="modal-select" style="width:auto;min-width:160px;margin:0" onchange="toast('Setting saved.')">
+                    <option>Never</option>
+                    <option selected>30 days</option>
+                    <option>90 days</option>
+                    <option>1 year</option>
+                  </select>
+                </div>
+
+                <!-- Setting row: notify on public share -->
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0">
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:2px">Notify admin when a file is made public</div>
+                    <div style="font-size:11.5px;color:var(--text-muted)">Sends an email to all Data Admins whenever a public link is created</div>
+                  </div>
+                  <label class="toggle-wrap" aria-label="Notify on public share">
+                    <input type="checkbox" class="toggle-input" checked onchange="toast(this.checked ? 'Notifications enabled.' : 'Notifications disabled.')">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ── FILE MANAGEMENT ── -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-head">
+                <span class="card-title">File management</span>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:0">
+
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--surface-3)">
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:2px">Trash auto-deletion period</div>
+                    <div style="font-size:11.5px;color:var(--text-muted)">Files in trash are permanently deleted after this period</div>
+                  </div>
+                  <select class="modal-select" style="width:auto;min-width:160px;margin:0" onchange="toast('Setting saved.')">
+                    <option>7 days</option>
+                    <option selected>30 days</option>
+                    <option>60 days</option>
+                    <option>90 days</option>
+                  </select>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--surface-3)">
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:2px">Restrict uploadable file types</div>
+                    <div style="font-size:11.5px;color:var(--text-muted)">Limit uploads to specific geospatial formats only</div>
+                  </div>
+                  <label class="toggle-wrap" aria-label="Restrict file types">
+                    <input type="checkbox" class="toggle-input" onchange="toggleFiletypeRestriction(this)">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  </label>
+                </div>
+
+                <div id="filetype-restriction-row" style="padding:12px 0 14px;border-bottom:1px solid var(--surface-3);display:none">
+                  <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Allowed file types</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <span class="filetype-tag active" onclick="toggleFileTag(this)">GMMP</span>
+                    <span class="filetype-tag active" onclick="toggleFileTag(this)">GPKG</span>
+                    <span class="filetype-tag active" onclick="toggleFileTag(this)">GeoTIFF</span>
+                    <span class="filetype-tag active" onclick="toggleFileTag(this)">KML / KMZ</span>
+                    <span class="filetype-tag active" onclick="toggleFileTag(this)">GeoPDF</span>
+                    <span class="filetype-tag active" onclick="toggleFileTag(this)">SHP</span>
+                    <span class="filetype-tag" onclick="toggleFileTag(this)">CSV</span>
+                    <span class="filetype-tag" onclick="toggleFileTag(this)">GeoJSON</span>
+                    <span class="filetype-tag" onclick="toggleFileTag(this)">DXF</span>
+                    <span class="filetype-tag" onclick="toggleFileTag(this)">MBTiles</span>
+                  </div>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0">
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:2px">Maximum file size per upload</div>
+                    <div style="font-size:11.5px;color:var(--text-muted)">Individual file uploads above this size will be rejected</div>
+                  </div>
+                  <select class="modal-select" style="width:auto;min-width:160px;margin:0" onchange="toast('Setting saved.')">
+                    <option>1 GB</option>
+                    <option>5 GB</option>
+                    <option selected>10 GB</option>
+                    <option>No limit</option>
+                  </select>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ── USER ACCESS ── -->
+            <div class="card">
               <div class="card-head">
                 <span class="card-title">User drive access</span>
                 <button class="btn sm primary" onclick="openModal('modal-grant-access')">Grant access</button>
               </div>
 
-              <!-- Public share warning -->
               <div class="public-warn-banner" style="margin-bottom:12px">
                 <div style="display:flex;align-items:center;gap:8px">
                   <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2L14.5 13H1.5L8 2Z" stroke="#b45309" stroke-width="1.4" stroke-linejoin="round"/></svg>
                   "q2_survey_results.gpkg" is publicly shared — this may violate your organisation's data policy.
                 </div>
-                <button class="btn xs danger" onclick="toast('Share revoked. File is now Org only.')">Revoke public access</button>
+                <button class="btn xs danger" onclick="toast('Share revoked. File is now Org only.')">Revoke</button>
               </div>
 
               <table class="access-table">
@@ -1193,76 +1355,30 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                 </thead>
                 <tbody>
                   <tr>
-                    <td>
-                      <div style="display:flex;align-items:center;gap:8px">
-                        <div class="user-av" style="background:#0e7a8c;color:#fff">JD</div>
-                        <div>
-                          <div style="font-weight:500">Jane Doe</div>
-                          <div style="font-size:11px;color:var(--text-muted)">jane@acme.com</div>
-                        </div>
-                      </div>
-                    </td>
+                    <td><div style="display:flex;align-items:center;gap:8px"><div class="user-av" style="background:#0e7a8c;color:#fff">JD</div><div><div style="font-weight:500">Jane Doe</div><div style="font-size:11px;color:var(--text-muted)">jane@acme.com</div></div></div></td>
                     <td><span class="pill info" style="font-size:10.5px">Data Admin</span></td>
-                    <td>
-                      <div style="font-size:12px">14.2 GB</div>
-                      <div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:47%"></div></div>
-                    </td>
+                    <td><div style="font-size:12px">14.2 GB</div><div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:47%"></div></div></td>
                     <td><span style="color:var(--text-muted);font-size:12px">No expiry</span></td>
                     <td><button class="btn xs" onclick="toast('Opening user settings…')">Manage</button></td>
                   </tr>
                   <tr>
-                    <td>
-                      <div style="display:flex;align-items:center;gap:8px">
-                        <div class="user-av" style="background:#2563eb;color:#fff">MB</div>
-                        <div>
-                          <div style="font-weight:500">Mary Beth</div>
-                          <div style="font-size:11px;color:var(--text-muted)">mary@acme.com</div>
-                        </div>
-                      </div>
-                    </td>
+                    <td><div style="display:flex;align-items:center;gap:8px"><div class="user-av" style="background:#2563eb;color:#fff">MB</div><div><div style="font-weight:500">Mary Beth</div><div style="font-size:11px;color:var(--text-muted)">mary@acme.com</div></div></div></td>
                     <td><span class="pill neutral" style="font-size:10.5px">Member</span></td>
-                    <td>
-                      <div style="font-size:12px">8.6 GB</div>
-                      <div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:29%"></div></div>
-                    </td>
+                    <td><div style="font-size:12px">8.6 GB</div><div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:29%"></div></div></td>
                     <td><span style="color:var(--text-muted);font-size:12px">No expiry</span></td>
                     <td><button class="btn xs" onclick="toast('Opening user settings…')">Manage</button></td>
                   </tr>
                   <tr>
-                    <td>
-                      <div style="display:flex;align-items:center;gap:8px">
-                        <div class="user-av" style="background:#2563eb;color:#fff">MS</div>
-                        <div>
-                          <div style="font-weight:500">Mark Smith</div>
-                          <div style="font-size:11px;color:var(--text-muted)">mark@acme.com</div>
-                        </div>
-                      </div>
-                    </td>
+                    <td><div style="display:flex;align-items:center;gap:8px"><div class="user-av" style="background:#2563eb;color:#fff">MS</div><div><div style="font-weight:500">Mark Smith</div><div style="font-size:11px;color:var(--text-muted)">mark@acme.com</div></div></div></td>
                     <td><span class="pill neutral" style="font-size:10.5px">Member</span></td>
-                    <td>
-                      <div style="font-size:12px">11.1 GB</div>
-                      <div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:37%"></div></div>
-                    </td>
-                    <td>
-                      <span class="pill warn" style="font-size:10.5px">Expires Jul 1</span>
-                    </td>
+                    <td><div style="font-size:12px">11.1 GB</div><div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:37%"></div></div></td>
+                    <td><span class="pill warn" style="font-size:10.5px">Expires Jul 1</span></td>
                     <td><button class="btn xs" onclick="toast('Opening user settings…')">Manage</button></td>
                   </tr>
                   <tr>
-                    <td>
-                      <div style="display:flex;align-items:center;gap:8px">
-                        <div class="user-av" style="background:#7c3aed;color:#fff">AL</div>
-                        <div>
-                          <div style="font-weight:500">Amy Lee</div>
-                          <div style="font-size:11px;color:var(--text-muted)">amy@acme.com</div>
-                        </div>
-                      </div>
-                    </td>
+                    <td><div style="display:flex;align-items:center;gap:8px"><div class="user-av" style="background:#7c3aed;color:#fff">AL</div><div><div style="font-weight:500">Amy Lee</div><div style="font-size:11px;color:var(--text-muted)">amy@acme.com</div></div></div></td>
                     <td><span class="pill neutral" style="font-size:10.5px">Member</span></td>
-                    <td>
-                      <div style="font-size:12px">4.3 GB</div>
-                      <div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:14%"></div></div>
-                    </td>
+                    <td><div style="font-size:12px">4.3 GB</div><div style="background:var(--surface-3);border-radius:10px;height:4px;margin-top:3px;overflow:hidden;width:80px"><div style="height:100%;background:var(--avenza-blue);width:14%"></div></div></td>
                     <td><span style="color:var(--text-muted);font-size:12px">No expiry</span></td>
                     <td><button class="btn xs" onclick="toast('Opening user settings…')">Manage</button></td>
                   </tr>
@@ -1270,30 +1386,11 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
               </table>
             </div>
 
-            <!-- Audit log (Hub req #8) -->
-            <div class="card">
-              <div class="card-head">
-                <span class="card-title">Audit log</span>
-                <button class="btn sm" onclick="toast('Exporting audit log as CSV…')">Export CSV</button>
-              </div>
-              <table class="access-table">
-                <thead>
-                  <tr><th>Timestamp</th><th>User</th><th>Action</th><th>File / Folder</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-17 14:22</td><td>Jane Doe</td><td><span class="pill warn" style="font-size:10px">Made public</span></td><td style="font-size:12px">q2_survey_results.gpkg</td></tr>
-                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-17 11:05</td><td>Amy Lee</td><td><span class="pill active" style="font-size:10px">Uploaded</span></td><td style="font-size:12px">urban_parcels_final.gpkg</td></tr>
-                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-15 09:48</td><td>Mark Smith</td><td><span class="pill info" style="font-size:10px">Shared</span></td><td style="font-size:12px">Q1 Reference Layers</td></tr>
-                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-14 16:33</td><td>Jane Doe</td><td><span class="pill active" style="font-size:10px">Uploaded</span></td><td style="font-size:12px">terrain_analysis_v3.gmmp</td></tr>
-                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-14 16:30</td><td>Jane Doe</td><td><span class="pill active" style="font-size:10px">Uploaded</span></td><td style="font-size:12px">dem_mosaic_30m.tif</td></tr>
-                  <tr><td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted)">2026-06-12 10:11</td><td>Mary Beth</td><td style="color:var(--red)"><span class="pill danger" style="font-size:10px">Deleted</span></td><td style="font-size:12px">old_basemap_2024.tif</td></tr>
-                </tbody>
-              </table>
-            </div>
           </div>
 
-          <!-- Right col: billing notice + upcoming -->
+          <!-- Right col -->
           <div>
+            <!-- Storage plan -->
             <div class="card" style="margin-bottom:14px">
               <div class="card-head">
                 <span class="card-title">Storage plan</span>
@@ -1313,28 +1410,136 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
               </div>
             </div>
 
-            <!-- Future features (Hub req #12) -->
+            <!-- Roadmap -->
             <div class="card">
               <div class="card-head"><span class="card-title">Roadmap</span></div>
-              <div class="coming-soon">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#8896ab" stroke-width="1.4"/><path d="M8 5v4M8 10.5v.5" stroke="#8896ab" stroke-width="1.4" stroke-linecap="round"/></svg>
-                User Groups — grant drive access to a whole group in one action
-              </div>
-              <div class="coming-soon" style="margin-top:8px">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#8896ab" stroke-width="1.4"/><path d="M8 5v4M8 10.5v.5" stroke="#8896ab" stroke-width="1.4" stroke-linecap="round"/></svg>
-                Per-user storage quotas and upgrade flows
-              </div>
-              <div class="coming-soon" style="margin-top:8px">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#8896ab" stroke-width="1.4"/><path d="M8 5v4M8 10.5v.5" stroke="#8896ab" stroke-width="1.4" stroke-linecap="round"/></svg>
-                File versioning — keep past versions with rollback
-              </div>
+              <div class="coming-soon"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#8896ab" stroke-width="1.4"/><path d="M8 5v4M8 10.5v.5" stroke="#8896ab" stroke-width="1.4" stroke-linecap="round"/></svg>User Groups — grant drive access to a whole group</div>
+              <div class="coming-soon" style="margin-top:8px"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#8896ab" stroke-width="1.4"/><path d="M8 5v4M8 10.5v.5" stroke="#8896ab" stroke-width="1.4" stroke-linecap="round"/></svg>Per-user storage quotas</div>
+              <div class="coming-soon" style="margin-top:8px"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="#8896ab" stroke-width="1.4"/><path d="M8 5v4M8 10.5v.5" stroke="#8896ab" stroke-width="1.4" stroke-linecap="round"/></svg>File versioning with rollback</div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- ═══════════════════════════════
+           VIEW: AUDIT LOG (admin only)
+      ═══════════════════════════════ -->
+      <div class="page" id="view-audit">
+
+        <!-- Admin gate -->
+        <div style="display:flex;align-items:center;gap:8px;background:var(--avenza-navy);color:rgba(255,255,255,.8);border-radius:var(--radius-md);padding:10px 16px;margin-bottom:20px;font-size:12.5px">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M8 2l1.5 4.5H14l-4.5 3 1.5 4.5L8 11.5 3 14l1.5-4.5L2 6.5h4.5L8 2z" stroke="rgba(255,255,255,.7)" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          <span><strong style="color:#fff">Admin only.</strong> This log records all file and sharing activity across the organisation. Non-admin users cannot access this page.</span>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Audit log</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <!-- Filter -->
+              <select class="modal-select" style="width:auto;min-width:130px;margin:0;padding:5px 10px;font-size:12px" onchange="filterAuditLog(this.value)">
+                <option value="all">All actions</option>
+                <option value="upload">Uploads</option>
+                <option value="share">Sharing</option>
+                <option value="delete">Deletions</option>
+                <option value="public">Made public</option>
+              </select>
+              <select class="modal-select" style="width:auto;min-width:130px;margin:0;padding:5px 10px;font-size:12px" onchange="toast('Filter applied.')">
+                <option>All users</option>
+                <option>Jane Doe</option>
+                <option>Mary Beth</option>
+                <option>Mark Smith</option>
+                <option>Amy Lee</option>
+              </select>
+              <button class="btn sm" onclick="toast('Exporting audit log as CSV…')">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 11l4 3 4-3M3 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <table class="access-table" id="audit-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>File / Folder</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="audit-tbody">
+              <tr data-action="public">
+                <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-17 14:22</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#0e7a8c;color:#fff;width:22px;height:22px;font-size:9px">JD</div>Jane Doe</div></td>
+                <td><span class="pill warn" style="font-size:10px">Made public</span></td>
+                <td style="font-size:12px;font-weight:500">q2_survey_results.gpkg</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">Changed from Org only → Public link</td>
+              </tr>
+              <tr data-action="upload">
+                <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-17 11:05</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#7c3aed;color:#fff;width:22px;height:22px;font-size:9px">AL</div>Amy Lee</div></td>
+                <td><span class="pill active" style="font-size:10px">Uploaded</span></td>
+                <td style="font-size:12px;font-weight:500">urban_parcels_final.gpkg</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">298 MB · ACME Corp storage / Shared Data</td>
+              </tr>
+              <tr data-action="share">
+                <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-15 09:48</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#2563eb;color:#fff;width:22px;height:22px;font-size:9px">MS</div>Mark Smith</div></td>
+                <td><span class="pill info" style="font-size:10px">Shared</span></td>
+                <td style="font-size:12px;font-weight:500">Q1 Reference Layers</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">Shared with Jane Doe · View &amp; download</td>
+              </tr>
+              <tr data-action="upload">
+                <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-14 16:33</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#0e7a8c;color:#fff;width:22px;height:22px;font-size:9px">JD</div>Jane Doe</div></td>
+                <td><span class="pill active" style="font-size:10px">Uploaded</span></td>
+                <td style="font-size:12px;font-weight:500">terrain_analysis_v3.gmmp</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">88 MB · My Files /</td>
+              </tr>
+              <tr data-action="upload">
+                <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-14 16:30</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#0e7a8c;color:#fff;width:22px;height:22px;font-size:9px">JD</div>Jane Doe</div></td>
+                <td><span class="pill active" style="font-size:10px">Uploaded</span></td>
+                <td style="font-size:12px;font-weight:500">dem_mosaic_30m.tif</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">1.2 GB · My Files /</td>
+              </tr>
+              <tr data-action="delete">
+                <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-12 10:11</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#2563eb;color:#fff;width:22px;height:22px;font-size:9px">MB</div>Mary Beth</div></td>
+                <td><span class="pill" style="font-size:10px;background:var(--red-lt);color:var(--red);border:1px solid #fecaca">Deleted</span></td>
+                <td style="font-size:12px;font-weight:500">old_basemap_2024.tif</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">3.4 GB · Moved to trash</td>
+              </tr>
+              <tr data-action="share">
+                <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-10 14:52</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#0e7a8c;color:#fff;width:22px;height:22px;font-size:9px">JD</div>Jane Doe</div></td>
+                <td><span class="pill info" style="font-size:10px">Shared</span></td>
+                <td style="font-size:12px;font-weight:500">dem_mosaic_30m.tif</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">Password link created · Shared with Mark Smith, Amy Lee</td>
+              </tr>
+              <tr data-action="upload">
+                <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-08 09:30</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#2563eb;color:#fff;width:22px;height:22px;font-size:9px">MB</div>Mary Beth</div></td>
+                <td><span class="pill active" style="font-size:10px">Uploaded</span></td>
+                <td style="font-size:12px;font-weight:500">field_map_2025_06.pdf</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">34 MB · My Files /</td>
+              </tr>
+              <tr data-action="share">
+                <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-01 11:14</td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#0e7a8c;color:#fff;width:22px;height:22px;font-size:9px">JD</div>Jane Doe</div></td>
+                <td><span class="pill info" style="font-size:10px">Shared</span></td>
+                <td style="font-size:12px;font-weight:500">waypoints_north_sector.kml</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">Shared with Mary Beth · View only · Expires Jul 1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════
            VIEW: RECENT
+
       ═══════════════════════════════ -->
       <div class="page" id="view-recent">
         <div class="two-col" style="align-items:start">
@@ -1825,29 +2030,47 @@ document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))closeDrop
 
 /* ─── PROTO VIEW SWITCHER ─── */
 function switchView(view){
-  ['files','shared','admin','recent','starred','trash','myshared'].forEach(v=>{
+  ['files','shared','admin','audit','recent','starred','trash','myshared'].forEach(v=>{
     const pg = document.getElementById('view-'+v);
     if(pg) pg.classList.toggle('active',v===view);
     const btn=document.getElementById('sw-'+v);
     if(btn)btn.classList.toggle('active',v===view);
   });
-  const labels={'files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Admin','recent':'Recent','starred':'Starred','trash':'Trash'};
+  const labels={'files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Settings','audit':'Audit Log','recent':'Recent','starred':'Starred','trash':'Trash'};
   document.getElementById('breadcrumb-current').textContent=labels[view]||'Files';
   document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
-  const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','myshared':'si-myshared','admin':'si-storageadmin'};
+  const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','myshared':'si-myshared','admin':'si-storageadmin','audit':'si-audit'};
   const sid=document.getElementById(sideMap[view]);
   if(sid)sid.classList.add('active');
 }
 
 /* ─── SIDEBAR NAV ─── */
 function navSidebar(id){
-  if(id==='shared')        switchView('shared');
-  else if(id==='myshared') switchView('myshared');
+  if(id==='shared')            switchView('shared');
+  else if(id==='myshared')     switchView('myshared');
   else if(id==='storageadmin') switchView('admin');
-  else if(id==='recent')   switchView('recent');
-  else if(id==='starred')  switchView('starred');
-  else if(id==='trash')    switchView('trash');
-  else                     switchView('files');
+  else if(id==='audit')        switchView('audit');
+  else if(id==='recent')       switchView('recent');
+  else if(id==='starred')      switchView('starred');
+  else if(id==='trash')        switchView('trash');
+  else                         switchView('files');
+}
+
+/* ─── SETTINGS HELPERS ─── */
+function toggleFiletypeRestriction(cb){
+  document.getElementById('filetype-restriction-row').style.display = cb.checked ? 'block' : 'none';
+  toast(cb.checked ? 'File type restriction enabled.' : 'File type restriction disabled.');
+}
+function toggleFileTag(el){
+  el.classList.toggle('active');
+  toast('File type list updated.');
+}
+
+/* ─── AUDIT LOG FILTER ─── */
+function filterAuditLog(val){
+  document.querySelectorAll('#audit-tbody tr').forEach(row=>{
+    row.style.display = (val==='all' || row.dataset.action===val) ? '' : 'none';
+  });
 }
 function selectFolder(id){
   document.querySelectorAll('.fb-tree-item').forEach(el=>el.classList.remove('active'));
