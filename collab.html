@@ -269,9 +269,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 .fb-file-type{font-size:11px;color:var(--text-muted);margin-top:1px}
 .fb-meta{font-size:12px;color:var(--text-secondary)}
 .fb-size{font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;font-size:11.5px}
-.fb-actions-cell{display:flex;align-items:center;gap:4px;opacity:0;transition:opacity .1s}
-.fb-table tbody tr:hover .fb-actions-cell{opacity:1}
-.fb-table tbody tr.selected .fb-actions-cell{opacity:1}
+.fb-actions-cell{display:flex;align-items:center;gap:4px;opacity:1}
 
 /* Share badge */
 .share-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10.5px;font-weight:500}
@@ -890,7 +888,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       <td class="fb-size">2.3 GB</td>
                       <td><span class="share-badge org">Org only</span></td>
                       <td>
-                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
                       </td>
                     </tr>
                     <tr onclick="selectFile('basemaps-folder')" id="row-basemaps-folder">
@@ -911,7 +909,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       <td class="fb-size">8.7 GB</td>
                       <td><span class="share-badge org">Org only</span></td>
                       <td>
-                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
                       </td>
                     </tr>
                     <!-- File rows -->
@@ -931,7 +929,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       <td class="fb-size">142 MB</td>
                       <td><span class="share-badge public">Public link</span></td>
                       <td>
-                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
                       </td>
                     </tr>
                     <tr onclick="selectFile('terrain-analysis')" id="row-terrain-analysis">
@@ -950,7 +948,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       <td class="fb-size">88 MB</td>
                       <td><span class="share-badge org">Org only</span></td>
                       <td>
-                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
                       </td>
                     </tr>
                     <tr onclick="selectFile('dem-mosaic')" id="row-dem-mosaic">
@@ -969,7 +967,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       <td class="fb-size">1.2 GB</td>
                       <td><span class="share-badge pw">Password link</span></td>
                       <td>
-                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
                       </td>
                     </tr>
                     <tr onclick="selectFile('field-map')" id="row-field-map">
@@ -988,7 +986,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       <td class="fb-size">34 MB</td>
                       <td><span class="share-badge private">Private</span></td>
                       <td>
-                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
                       </td>
                     </tr>
                     <tr onclick="selectFile('waypoints')" id="row-waypoints">
@@ -1007,7 +1005,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       <td class="fb-size">2.1 MB</td>
                       <td><span class="share-badge org">Org only</span></td>
                       <td>
-                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
                       </td>
                     </tr>
                     <tr onclick="selectFile('metadata-export')" id="row-metadata-export">
@@ -1026,7 +1024,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       <td class="fb-size">840 KB</td>
                       <td><span class="share-badge private">Private</span></td>
                       <td>
-                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
                       </td>
                     </tr>
                   </tbody>
@@ -1137,7 +1135,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <td class="fb-meta">Mar 4, 2026</td>
                 <td class="fb-size">4.2 GB</td>
                 <td><span class="share-badge org" style="font-size:10.5px">Shared Data</span></td>
-                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
               </tr>
               <tr onclick="toast('Opening file…')">
                 <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
@@ -1146,7 +1144,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <td class="fb-meta">Feb 18, 2026</td>
                 <td class="fb-size">88 MB</td>
                 <td><span class="share-badge org" style="font-size:10.5px">Shared Data</span></td>
-                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
               </tr>
               <tr onclick="toast('Opening file…')">
                 <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
@@ -1155,7 +1153,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <td class="fb-meta">Jan 30, 2026</td>
                 <td class="fb-size">420 KB</td>
                 <td><span class="share-badge org" style="font-size:10.5px">Shared Data</span></td>
-                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
               </tr>
               <tr onclick="toast('Opening file…')">
                 <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
@@ -1164,7 +1162,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <td class="fb-meta">Dec 22, 2025</td>
                 <td class="fb-size">540 MB</td>
                 <td><span class="share-badge neutral" style="font-size:10.5px">Archive</span></td>
-                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
               </tr>
               <tr onclick="toast('Opening file…')">
                 <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
@@ -1173,7 +1171,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <td class="fb-meta">Dec 19, 2025</td>
                 <td class="fb-size">22 MB</td>
                 <td><span class="share-badge neutral" style="font-size:10.5px">Archive</span></td>
-                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
               </tr>
             </tbody>
           </table>
@@ -1337,14 +1335,14 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                     <td><div class="fb-name-cell"><div class="fb-icon gm">GMMP</div><div><div class="fb-file-name">personal_notes_survey.gmmp</div><div class="fb-file-type">Global Mapper Project</div></div></div></td>
                     <td class="fb-meta">Jun 18, 2026</td>
                     <td class="fb-size">22 MB</td>
-                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                    <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
                   </tr>
                   <tr onclick="toast('Opening file…')">
                     <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                     <td><div class="fb-name-cell"><div class="fb-icon csv">CSV</div><div><div class="fb-file-name">draft_coordinates_v1.csv</div><div class="fb-file-type">CSV Spreadsheet</div></div></div></td>
                     <td class="fb-meta">Jun 11, 2026</td>
                     <td class="fb-size">48 KB</td>
-                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                    <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
                   </tr>
                 </tbody>
               </table>
@@ -2148,7 +2146,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                     <td><div class="fb-meta">Today, 9:14 AM</div></td>
                     <td class="fb-size">88 MB</td>
                     <td><span class="share-badge org">Org only</span></td>
-                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                    <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
                   </tr>
                   <tr onclick="toast('Opening file…')">
                     <td><button class="star-btn starred" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="var(--amber)" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="var(--amber)" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
@@ -2156,7 +2154,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                     <td><div class="fb-meta">Today, 8:50 AM</div></td>
                     <td class="fb-size">142 MB</td>
                     <td><span class="share-badge public">Public link</span></td>
-                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                    <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
                   </tr>
                   <tr onclick="toast('Opening file…')">
                     <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
@@ -2164,7 +2162,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                     <td><div class="fb-meta">Yesterday, 4:32 PM</div></td>
                     <td class="fb-size">1.2 GB</td>
                     <td><span class="share-badge pw">Password link</span></td>
-                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                    <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
                   </tr>
                   <tr onclick="toast('Opening file…')">
                     <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
@@ -2172,7 +2170,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                     <td><div class="fb-meta">Yesterday, 2:15 PM</div></td>
                     <td class="fb-size">2.3 GB</td>
                     <td><span class="share-badge org">Org only</span></td>
-                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                    <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
                   </tr>
                   <tr onclick="toast('Opening file…')">
                     <td><button class="star-btn starred" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="var(--amber)" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="var(--amber)" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
@@ -2180,7 +2178,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                     <td><div class="fb-meta">Jun 16, 2026</div></td>
                     <td class="fb-size">2.1 MB</td>
                     <td><span class="share-badge org">Org only</span></td>
-                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                    <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
                   </tr>
                   <tr onclick="toast('Opening file…')">
                     <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
@@ -2188,7 +2186,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                     <td><div class="fb-meta">Jun 15, 2026</div></td>
                     <td class="fb-size">34 MB</td>
                     <td><span class="share-badge private">Private</span></td>
-                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                    <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
                   </tr>
                   <tr onclick="toast('Opening file…')">
                     <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
@@ -2196,7 +2194,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                     <td><div class="fb-meta">Jun 14, 2026</div></td>
                     <td class="fb-size">840 KB</td>
                     <td><span class="share-badge private">Private</span></td>
-                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                    <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
                   </tr>
                 </tbody>
               </table>
@@ -2309,7 +2307,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <td class="fb-meta">Jun 15, 2026</td>
                 <td class="fb-size">142 MB</td>
                 <td><span class="share-badge public">Public link</span></td>
-                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
               </tr>
               <tr onclick="toast('Opening file…')" id="starred-row-waypoints">
                 <td><button class="star-btn starred" onclick="event.stopPropagation();toggleStarRow(this,'starred-row-waypoints')" title="Unstar"><svg class="star-icon" viewBox="0 0 16 16" fill="var(--amber)" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="var(--amber)" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
@@ -2318,7 +2316,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <td class="fb-meta">Jun 7, 2026</td>
                 <td class="fb-size">2.1 MB</td>
                 <td><span class="share-badge org">Org only</span></td>
-                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
+                <td><div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div></td>
               </tr>
             </tbody>
           </table>
@@ -2980,7 +2978,7 @@ function openTeam(teamId) {
       <td class="fb-meta">${f.date}</td>
       <td class="fb-size">${f.size}</td>
       <td>
-        <div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
+        <div class="fb-actions-cell"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options">···</button></div>
       </td>
     </tr>`).join('');
 
