@@ -514,16 +514,19 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 
       <div class="sb-group">
         <div class="sb-group-label">Organisation</div>
+        <!-- ACME Corp general storage -->
+        <button class="sb-item" id="si-public" onclick="navSidebar('public')">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 13V6l6-3 6 3v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 13V9.5h4V13" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          ACME Corp files
+        </button>
+        <!-- Teams -->
         <button class="sb-item" id="si-teams" onclick="navSidebar('teams')">
           <svg viewBox="0 0 16 16" fill="none"><path d="M5.5 7a2 2 0 100-4 2 2 0 000 4zM1 13c0-2 1.5-3.5 4.5-3.5M11 9a2 2 0 100-4 2 2 0 000 4zM8 13c.3-2.1 1.6-3 3-3 2 0 4 1 4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
           Teams
         </button>
         <!-- Team quick-links (injected by JS on load) -->
         <div id="sb-team-links"></div>
-        <button class="sb-item" id="si-public" onclick="navSidebar('public')">
-          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2.5 3.5-2.5 5.5s1 4 2.5 5.5M8 2.5c1.5 1.5 2.5 3.5 2.5 5.5s-1 4-2.5 5.5M2.5 8h11" stroke="currentColor" stroke-width="1.2"/></svg>
-          Public files
-        </button>
+        <!-- Private -->
         <button class="sb-item" id="si-private" onclick="navSidebar('private')">
           <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
           Private files
@@ -688,7 +691,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                 <div style="height:1px;background:var(--border);margin:6px 4px"></div>
                 <button class="fb-tree-item" onclick="selectFolder('org')">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M2 13V6l6-3 6 3v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-                  ACME Corp storage
+                  ACME Corp files
                 </button>
                 <button class="fb-tree-item fb-tree-indent" onclick="navSidebar('teams')">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M5.5 7a2 2 0 100-4 2 2 0 000 4zM1 13c0-2 1.5-3.5 4.5-3.5M11 9a2 2 0 100-4 2 2 0 000 4zM8 13c.3-2.1 1.6-3 3-3 2 0 4 1 4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
@@ -948,6 +951,132 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
         </div>
       </div>
 
+
+      <!-- ═══════════════════════════════
+           VIEW: ACME CORP FILES
+      ═══════════════════════════════ -->
+      <div class="page" id="view-public">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:16px;font-weight:600;color:var(--text-primary)">ACME Corp files</div>
+            <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">General organisation storage — visible to all members of ACME Corp</div>
+          </div>
+          <button class="btn primary" onclick="openModal('modal-upload')">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 5l4-3 4 3M3 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Upload to org storage
+          </button>
+        </div>
+
+        <!-- Three-bucket summary -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+          <div class="card" style="cursor:pointer" onclick="navSidebar('public')">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:36px;height:36px;border-radius:var(--radius-sm);background:var(--avenza-blue-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2 13V6l6-3 6 3v7H2z" stroke="var(--avenza-blue)" stroke-width="1.4" stroke-linejoin="round"/></svg>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary)">ACME Corp files</div>
+                <div style="font-size:11.5px;color:var(--text-muted)">Shared with all members</div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="navSidebar('teams')">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:36px;height:36px;border-radius:var(--radius-sm);background:var(--avenza-teal-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M5.5 7a2 2 0 100-4 2 2 0 000 4zM1 13c0-2 1.5-3.5 4.5-3.5M11 9a2 2 0 100-4 2 2 0 000 4zM8 13c.3-2.1 1.6-3 3-3 2 0 4 1 4 3" stroke="var(--avenza-teal)" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Teams</div>
+                <div style="font-size:11.5px;color:var(--text-muted)">Project & group storage</div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="navSidebar('private')">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:36px;height:36px;border-radius:var(--radius-sm);background:var(--surface-3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="17" height="17" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="var(--text-muted)" stroke-width="1.4"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="var(--text-muted)" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Private files</div>
+                <div style="font-size:11.5px;color:var(--text-muted)">Only visible to you</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Org file list -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">All org files</span>
+            <div style="display:flex;gap:8px">
+              <div class="fb-search" style="min-width:200px">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="var(--text-muted)" stroke-width="1.4"/><path d="M10.5 10.5L13 13" stroke="var(--text-muted)" stroke-width="1.4" stroke-linecap="round"/></svg>
+                <input placeholder="Search org files…" style="border:none;background:none;outline:none;font-size:12.5px;color:var(--text-primary);flex:1;font-family:'DM Sans',sans-serif">
+              </div>
+            </div>
+          </div>
+          <table class="fb-table">
+            <thead>
+              <tr>
+                <th style="width:32px"></th>
+                <th>Name</th>
+                <th>Uploaded by</th>
+                <th>Modified</th>
+                <th>Size</th>
+                <th>Location</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="toast('Opening file…')">
+                <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                <td><div class="fb-name-cell"><div class="fb-icon tif">TIF</div><div><div class="fb-file-name">acme_basemap_2026.tif</div><div class="fb-file-type">GeoTIFF Raster</div></div></div></td>
+                <td style="font-size:12.5px;color:var(--text-secondary)">Penny Purchaser</td>
+                <td class="fb-meta">Mar 4, 2026</td>
+                <td class="fb-size">4.2 GB</td>
+                <td><span class="share-badge org" style="font-size:10.5px">Shared Data</span></td>
+                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+              </tr>
+              <tr onclick="toast('Opening file…')">
+                <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                <td><div class="fb-name-cell"><div class="fb-icon gpkg">GPKG</div><div><div class="fb-file-name">admin_boundaries_v3.gpkg</div><div class="fb-file-type">GeoPackage</div></div></div></td>
+                <td style="font-size:12.5px;color:var(--text-secondary)">Penny Purchaser</td>
+                <td class="fb-meta">Feb 18, 2026</td>
+                <td class="fb-size">88 MB</td>
+                <td><span class="share-badge org" style="font-size:10.5px">Shared Data</span></td>
+                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+              </tr>
+              <tr onclick="toast('Opening file…')">
+                <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                <td><div class="fb-name-cell"><div class="fb-icon kml">KML</div><div><div class="fb-file-name">acme_offices_locations.kml</div><div class="fb-file-type">KML</div></div></div></td>
+                <td style="font-size:12.5px;color:var(--text-secondary)">Jane Doe</td>
+                <td class="fb-meta">Jan 30, 2026</td>
+                <td class="fb-size">420 KB</td>
+                <td><span class="share-badge org" style="font-size:10.5px">Shared Data</span></td>
+                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+              </tr>
+              <tr onclick="toast('Opening file…')">
+                <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                <td><div class="fb-name-cell"><div class="fb-icon gpkg">GPKG</div><div><div class="fb-file-name">south_sector_final_2025.gpkg</div><div class="fb-file-type">GeoPackage</div></div></div></td>
+                <td style="font-size:12.5px;color:var(--text-secondary)">Mary Beth</td>
+                <td class="fb-meta">Dec 22, 2025</td>
+                <td class="fb-size">540 MB</td>
+                <td><span class="share-badge neutral" style="font-size:10.5px">Archive</span></td>
+                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+              </tr>
+              <tr onclick="toast('Opening file…')">
+                <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                <td><div class="fb-name-cell"><div class="fb-icon pdf">PDF</div><div><div class="fb-file-name">survey_report_2025_full.pdf</div><div class="fb-file-type">GeoPDF</div></div></div></td>
+                <td style="font-size:12.5px;color:var(--text-secondary)">Jane Doe</td>
+                <td class="fb-meta">Dec 19, 2025</td>
+                <td class="fb-size">22 MB</td>
+                <td><span class="share-badge neutral" style="font-size:10.5px">Archive</span></td>
+                <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <!-- ═══════════════════════════════
            VIEW: TEAMS
@@ -1829,7 +1958,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                 <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#7c3aed;color:#fff;width:22px;height:22px;font-size:9px">AL</div>Amy Lee</div></td>
                 <td><span class="pill active" style="font-size:10px">Uploaded</span></td>
                 <td style="font-size:12px;font-weight:500">urban_parcels_final.gpkg</td>
-                <td style="font-size:11.5px;color:var(--text-muted)">298 MB · ACME Corp storage / Shared Data</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">298 MB · ACME Corp files / Shared Data</td>
               </tr>
               <tr data-action="share">
                 <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-15 09:48</td>
@@ -2304,7 +2433,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
       <option>My Files / Field Surveys 2025</option>
       <option>My Files / Basemaps</option>
       <option>My Files / Exports</option>
-      <option>ACME Corp storage / Shared Data</option>
+      <option>ACME Corp files / Shared Data</option>
     </select>
 
     <div class="modal-label">Sharing</div>
@@ -2375,7 +2504,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
     <select class="modal-select">
       <option>My Files /</option>
       <option>My Files / Field Surveys 2025</option>
-      <option>ACME Corp storage /</option>
+      <option>ACME Corp files /</option>
     </select>
     <div class="modal-row">
       <button class="btn primary" onclick="createFolder()">Create folder</button>
@@ -2477,16 +2606,16 @@ document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))closeDrop
 
 /* ─── PROTO VIEW SWITCHER ─── */
 function switchView(view){
-  ['files','shared','admin','audit','recent','starred','trash','myshared','private','teams'].forEach(v=>{
+  ['files','shared','admin','audit','recent','starred','trash','myshared','private','teams','public'].forEach(v=>{
     const pg = document.getElementById('view-'+v);
     if(pg) pg.classList.toggle('active',v===view);
     const btn=document.getElementById('sw-'+v);
     if(btn)btn.classList.toggle('active',v===view);
   });
-  const labels={'files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Settings','audit':'Audit Log','recent':'Recent','starred':'Starred','trash':'Trash','private':'Private Files','teams':'Teams'};
+  const labels={'files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Settings','audit':'Audit Log','recent':'Recent','starred':'Starred','trash':'Trash','private':'Private Files','teams':'Teams','public':'ACME Corp Files'};
   document.getElementById('breadcrumb-current').textContent=labels[view]||'Files';
   document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
-  const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','myshared':'si-myshared','admin':'si-storageadmin','audit':'si-audit','private':'si-private','teams':'si-teams'};
+  const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','myshared':'si-myshared','admin':'si-storageadmin','audit':'si-audit','private':'si-private','teams':'si-teams','public':'si-public'};
   const sid=document.getElementById(sideMap[view]);
   if(sid)sid.classList.add('active');
 }
@@ -2499,7 +2628,8 @@ function navSidebar(id){
   else if(id==='audit')        switchView('audit');
   else if(id==='private')      switchView('private');
   else if(id==='teams')        switchView('teams');
-  else if(id==='orgfiles')     switchView('teams');
+  else if(id==='orgfiles')     switchView('public');
+  else if(id==='public')       switchView('public');
   else if(id==='recent')       switchView('recent');
   else if(id==='starred')      switchView('starred');
   else if(id==='trash')        switchView('trash');
@@ -2595,7 +2725,7 @@ function switchUser(key) {
 }
 
 function getCurrentView() {
-  const views = ['files','shared','myshared','recent','starred','trash','admin','audit','private','teams'];
+  const views = ['files','shared','myshared','recent','starred','trash','admin','audit','private','teams','public'];
   return views.find(v => {
     const el = document.getElementById('view-' + v);
     return el && el.classList.contains('active');
@@ -2833,7 +2963,7 @@ function filterAuditLog(val){
 function selectFolder(id){
   document.querySelectorAll('.fb-tree-item').forEach(el=>el.classList.remove('active'));
   event.target.closest('.fb-tree-item').classList.add('active');
-  const labels={'root':'My Files','field-surveys':'Field Surveys 2025','basemaps':'Basemaps','exports':'Exports','org':'ACME Corp storage','shared-data':'Shared Data','archive':'Archive'};
+  const labels={'root':'My Files','field-surveys':'Field Surveys 2025','basemaps':'Basemaps','exports':'Exports','org':'ACME Corp Files','shared-data':'Shared Data','archive':'Archive'};
   document.getElementById('fb-path-label').textContent=labels[id]||'My Files';
   toast('Opened folder');
 }
