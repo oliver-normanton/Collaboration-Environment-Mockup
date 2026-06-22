@@ -505,6 +505,66 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 .star-btn.starred{color:var(--amber)}
 .star-btn.starred .star-icon{fill:var(--amber);stroke:var(--amber)}
 
+/* ─── MULTI-SELECT INFO PANEL ─── */
+.multi-select-banner{
+  display:flex;align-items:center;gap:10px;
+  background:var(--avenza-blue);color:#fff;
+  padding:10px 16px;border-radius:var(--radius-sm);
+  font-size:12.5px;font-weight:500;margin-bottom:12px;
+}
+.multi-select-count{
+  font-size:22px;font-weight:700;color:var(--text-primary);
+  text-align:center;margin-bottom:4px;line-height:1;
+}
+.multi-select-label{
+  font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:16px;
+}
+.multi-file-list{
+  display:flex;flex-direction:column;gap:6px;margin-bottom:4px;
+}
+.multi-file-item{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 8px;background:var(--surface-2);
+  border-radius:var(--radius-sm);font-size:12px;color:var(--text-secondary);
+}
+.multi-file-item .fb-icon{width:22px;height:22px;border-radius:4px;font-size:7px;flex-shrink:0}
+
+/* ─── SELECTION ACTION BAR ─── */
+.selection-bar{
+  display:none;align-items:center;gap:8px;
+  padding:8px 14px;background:var(--avenza-blue-lt);
+  border-bottom:1px solid #bfdbfe;flex-shrink:0;
+}
+.selection-bar.visible{display:flex}
+.selection-count{font-size:12.5px;font-weight:600;color:var(--avenza-blue);margin-right:4px}
+
+/* ─── MULTI-SELECT INFO PANEL ─── */
+.multi-select-count{
+  font-size:26px;font-weight:700;color:var(--text-primary);
+  text-align:center;margin-bottom:4px;line-height:1;
+}
+.multi-select-label{
+  font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:16px;
+}
+.multi-file-list{
+  display:flex;flex-direction:column;gap:5px;margin-bottom:4px;max-height:160px;overflow-y:auto;
+}
+.multi-file-item{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 8px;background:var(--surface-2);
+  border-radius:var(--radius-sm);font-size:12px;color:var(--text-secondary);
+}
+.multi-file-item .fb-icon{width:22px;height:22px;border-radius:4px;font-size:7px;flex-shrink:0}
+
+/* ─── SELECTION ACTION BAR ─── */
+.selection-bar{
+  display:none;align-items:center;gap:8px;
+  padding:8px 14px;background:var(--avenza-blue-lt);
+  border-bottom:1px solid #bfdbfe;flex-shrink:0;flex-wrap:wrap;
+}
+.selection-bar.visible{display:flex}
+.selection-count{font-size:12.5px;font-weight:600;color:var(--avenza-blue)}
+
 /* ─── EMPTY STATE ─── */
 .empty-state{text-align:center;padding:48px 24px}
 .empty-state-icon{width:48px;height:48px;border-radius:50%;background:var(--surface-3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
@@ -913,6 +973,30 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
               </div>
 
 
+              <!-- SELECTION ACTION BAR (shown when 2+ rows checked) -->
+              <div class="selection-bar" id="selection-bar">
+                <span class="selection-count" id="selection-count-label">0 selected</span>
+                <button class="btn sm primary" onclick="downloadSelected()">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 11l4 3 4-3M3 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Download all
+                </button>
+                <button class="btn sm" onclick="openModal('modal-share')">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="13" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="8" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.7L5.5 7.3M10.5 12.3L5.5 8.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                  Share
+                </button>
+                <button class="btn sm" onclick="moveSelected()">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 8.5l2 2-2 2M6 10.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Move to…
+                </button>
+                <button class="btn sm danger" onclick="deleteSelected()">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6 4.5V3h4v1.5M5 4.5l.5 7.5h5l.5-7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Delete all
+                </button>
+                <button class="btn sm" style="margin-left:auto" onclick="clearAllCheckboxes()">
+                  Clear selection
+                </button>
+              </div>
+
               <!-- GRID VIEW (hidden by default) -->
               <div id="fb-grid-wrap" style="display:none;flex:1;overflow-y:auto;min-height:0;flex-direction:column">
                 <div class="fb-grid" id="fb-grid"></div>
@@ -933,7 +1017,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                   <tbody id="fb-tbody">
                     <!-- Folder rows -->
                     <tr onclick="selectFile('field-surveys-folder')" id="row-field-surveys-folder">
-                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
@@ -954,7 +1038,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       </td>
                     </tr>
                     <tr onclick="selectFile('basemaps-folder')" id="row-basemaps-folder">
-                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
@@ -976,7 +1060,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                     </tr>
                     <!-- File rows -->
                     <tr onclick="selectFile('q2-survey')" id="row-q2-survey">
-                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
@@ -995,7 +1079,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       </td>
                     </tr>
                     <tr onclick="selectFile('terrain-analysis')" id="row-terrain-analysis">
-                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
@@ -1014,7 +1098,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       </td>
                     </tr>
                     <tr onclick="selectFile('dem-mosaic')" id="row-dem-mosaic">
-                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
@@ -1033,7 +1117,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       </td>
                     </tr>
                     <tr onclick="selectFile('field-map')" id="row-field-map">
-                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
@@ -1052,7 +1136,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       </td>
                     </tr>
                     <tr onclick="selectFile('waypoints')" id="row-waypoints">
-                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
@@ -1071,7 +1155,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       </td>
                     </tr>
                     <tr onclick="selectFile('metadata-export')" id="row-metadata-export">
-                      <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
@@ -1097,7 +1181,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
             <!-- Info panel -->
             <div class="fb-info" id="fb-info">
               <div class="fb-info-header">
-                <span class="fb-info-title">File details</span>
+                <span class="fb-info-title" id="fb-info-title">File details</span>
                 <button class="icon-btn" style="width:22px;height:22px;border:none;background:none" onclick="clearSelection()" title="Close">
                   <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
                 </button>
@@ -3339,42 +3423,43 @@ const FILE_DATA={
   'metadata-export':{name:'metadata_export_jun2026.csv',type:'CSV',modified:'Jun 5, 2026',size:'840 KB',sharing:'Private',icon:'csv',crs:null,bbox:null},
 };
 
-let selectedFile=null;
-function selectFile(id){
-  if(selectedFile){
-    const prev=document.getElementById('row-'+selectedFile);
-    if(prev)prev.classList.remove('selected');
-  }
-  selectedFile=id;
-  const row=document.getElementById('row-'+id);
-  if(row)row.classList.add('selected');
+/* ─── SINGLE FILE SELECTION ─── */
+let selectedFile = null;
 
-  const f=FILE_DATA[id];
-  if(!f)return;
+function selectFile(id) {
+  // Clear row highlights (but keep checkboxes)
+  document.querySelectorAll('#fb-tbody tr.selected').forEach(r => r.classList.remove('selected'));
+  selectedFile = id;
+  const row = document.getElementById('row-' + id);
+  if (row) row.classList.add('selected');
 
-  const iconClasses={'folder':'folder','gpkg':'gpkg','gm':'gm','tif':'tif','pdf':'pdf','kml':'kml','csv':'csv'};
-  const ic=iconClasses[f.icon]||'gm';
-  const labelMap={'folder':'📁','gpkg':'GPKG','gm':'GMMP','tif':'TIF','pdf':'PDF','kml':'KML','csv':'CSV'};
-  const label=labelMap[f.icon]||'FILE';
+  const f = FILE_DATA[id];
+  if (!f) return;
 
-  let geoRows='';
-  if(f.crs)geoRows+=`<div class="fb-info-row"><span class="fb-info-key">CRS</span><span class="fb-info-val">${f.crs}</span></div>`;
-  if(f.bbox)geoRows+=`<div class="fb-info-row"><span class="fb-info-key">Bounding box</span><span class="fb-info-val">${f.bbox}</span></div>`;
+  const iconClasses = {folder:'folder',gpkg:'gpkg',gm:'gm',tif:'tif',pdf:'pdf',kml:'kml',csv:'csv'};
+  const ic = iconClasses[f.icon] || 'gm';
+  const labelMap = {folder:'📁',gpkg:'GPKG',gm:'GMMP',tif:'TIF',pdf:'PDF',kml:'KML',csv:'CSV'};
+  const label = labelMap[f.icon] || 'FILE';
 
-  document.getElementById('fb-info-content').innerHTML=`
+  let geoRows = '';
+  if (f.crs)  geoRows += `<div class="fb-info-row"><span class="fb-info-key">CRS</span><span class="fb-info-val">${f.crs}</span></div>`;
+  if (f.bbox) geoRows += `<div class="fb-info-row"><span class="fb-info-key">Bounding box</span><span class="fb-info-val">${f.bbox}</span></div>`;
+
+  const titleEl = document.getElementById('fb-info-title');
+  if (titleEl) titleEl.textContent = 'File details';
+
+  document.getElementById('fb-info-content').innerHTML = `
     <div class="fb-info-body">
       <div class="fb-info-icon ${ic}" style="width:56px;height:56px;font-size:13px">${label}</div>
       <div class="fb-info-filename">${f.name}</div>
       <div class="fb-info-type">${f.type}</div>
-
       <div class="fb-info-section">
         <div class="fb-info-section-label">File details</div>
         <div class="fb-info-row"><span class="fb-info-key">Size</span><span class="fb-info-val">${f.size}</span></div>
         <div class="fb-info-row"><span class="fb-info-key">Modified</span><span class="fb-info-val">${f.modified}</span></div>
         <div class="fb-info-row"><span class="fb-info-key">Sharing</span><span class="fb-info-val">${f.sharing}</span></div>
       </div>
-
-      ${geoRows?`<div class="fb-info-section"><div class="fb-info-section-label">Geospatial metadata</div>${geoRows}</div>`:''}
+      ${geoRows ? `<div class="fb-info-section"><div class="fb-info-section-label">Geospatial metadata</div>${geoRows}</div>` : ''}
     </div>
     <div class="fb-info-footer">
       <button class="btn sm primary" onclick="toast('Downloading ${f.name}…')">
@@ -3389,22 +3474,152 @@ function selectFile(id){
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6 4.5V3h4v1.5M5 4.5l.5 7.5h5l.5-7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Delete
       </button>
-    </div>
-  `;
+    </div>`;
 }
-function clearSelection(){
-  if(selectedFile){
-    const row=document.getElementById('row-'+selectedFile);
-    if(row)row.classList.remove('selected');
-    selectedFile=null;
+
+function clearSelection() {
+  if (selectedFile) {
+    const row = document.getElementById('row-' + selectedFile);
+    if (row) row.classList.remove('selected');
+    selectedFile = null;
   }
-  document.getElementById('fb-info-content').innerHTML='<div class="fb-info-empty"><svg width="28" height="28" viewBox="0 0 16 16" fill="none" style="display:block;margin:0 auto 8px;opacity:.3"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 6h5M5.5 8.5h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Select a file or folder to see its details</div>';
+  const titleEl = document.getElementById('fb-info-title');
+  if (titleEl) titleEl.textContent = 'File details';
+  document.getElementById('fb-info-content').innerHTML = '<div class="fb-info-empty"><svg width="28" height="28" viewBox="0 0 16 16" fill="none" style="display:block;margin:0 auto 8px;opacity:.3"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 6h5M5.5 8.5h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Select a file or folder to see its details</div>';
+}
+
+/* ─── MULTI-SELECT: checkbox change handler ─── */
+function onCheckboxChange() {
+  const checked = Array.from(document.querySelectorAll('#fb-tbody input[type=checkbox]:checked'));
+  const bar = document.getElementById('selection-bar');
+  const countLabel = document.getElementById('selection-count-label');
+  const selectAllCb = document.getElementById('select-all');
+
+  if (checked.length >= 2) {
+    // Show selection bar
+    bar.classList.add('visible');
+    countLabel.textContent = checked.length + ' selected';
+    // Show multi-select info panel
+    renderMultiSelectPanel(checked);
+    // Clear any single-file row highlight
+    document.querySelectorAll('#fb-tbody tr.selected').forEach(r => r.classList.remove('selected'));
+    selectedFile = null;
+  } else if (checked.length === 1) {
+    // Single checkbox — treat like a row click
+    bar.classList.remove('visible');
+    const row = checked[0].closest('tr');
+    const id = row ? row.id.replace('row-','') : null;
+    if (id) selectFile(id);
+  } else {
+    // Nothing checked
+    bar.classList.remove('visible');
+    clearSelection();
+  }
+
+  // Update select-all indeterminate state
+  const total = document.querySelectorAll('#fb-tbody input[type=checkbox]').length;
+  if (selectAllCb) {
+    selectAllCb.indeterminate = checked.length > 0 && checked.length < total;
+    selectAllCb.checked = checked.length === total && total > 0;
+  }
+}
+
+function renderMultiSelectPanel(checkedBoxes) {
+  const titleEl = document.getElementById('fb-info-title');
+  if (titleEl) titleEl.textContent = checkedBoxes.length + ' items selected';
+
+  const iconClasses = {folder:'folder',gpkg:'gpkg',gm:'gm',tif:'tif',pdf:'pdf',kml:'kml',csv:'csv'};
+
+  // Build list of selected files (up to 6, then "+N more")
+  const items = checkedBoxes.slice(0,6).map(cb => {
+    const row = cb.closest('tr');
+    const name = row ? (row.querySelector('.fb-file-name') || {}).textContent || 'Unknown' : 'Unknown';
+    const iconEl = row && row.querySelector('.fb-icon');
+    const iconCls = iconEl ? iconEl.className.replace('fb-icon ','') : 'gm';
+    const labelMap = {folder:'📁',gpkg:'GPKG',gm:'GMMP',tif:'TIF',pdf:'PDF',kml:'KML',csv:'CSV'};
+    const label = labelMap[iconCls] || 'FILE';
+    const sizeEl = row && row.querySelector('.fb-size');
+    const size = sizeEl ? sizeEl.textContent.trim() : '';
+    return `<div class="multi-file-item">
+      <div class="fb-icon ${iconCls}" style="width:22px;height:22px;border-radius:4px;font-size:7px">${label}</div>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</span>
+      <span style="font-size:11px;color:var(--text-muted);flex-shrink:0">${size}</span>
+    </div>`;
+  }).join('');
+
+  const overflow = checkedBoxes.length > 6
+    ? `<div style="font-size:11.5px;color:var(--text-muted);text-align:center;padding:4px 0">+${checkedBoxes.length - 6} more</div>`
+    : '';
+
+  // Total size (rough sum from text)
+  let totalFiles = checkedBoxes.length;
+
+  document.getElementById('fb-info-content').innerHTML = `
+    <div class="fb-info-body">
+      <div style="text-align:center;padding:16px 0 12px">
+        <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:8px">
+          ${[0,1,2].map(i => `<div class="fb-icon ${['gpkg','gm','tif'][i]}" style="width:32px;height:32px;font-size:8px;border-radius:6px;${i===1?'z-index:1;':''}${i===0?'transform:rotate(-6deg);':i===2?'transform:rotate(6deg);':''}">${['GPKG','GMMP','TIF'][i]}</div>`).join('')}
+        </div>
+        <div class="multi-select-count">${totalFiles}</div>
+        <div class="multi-select-label">${totalFiles === 1 ? 'item' : 'items'} selected</div>
+      </div>
+
+      <div class="fb-info-section">
+        <div class="fb-info-section-label">Selected files</div>
+        <div class="multi-file-list">${items}</div>
+        ${overflow}
+      </div>
+    </div>
+    <div class="fb-info-footer">
+      <button class="btn sm primary" onclick="downloadSelected()">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 11l4 3 4-3M3 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Download all (${totalFiles})
+      </button>
+      <button class="btn sm" onclick="openModal('modal-share')">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="13" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="8" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.7L5.5 7.3M10.5 12.3L5.5 8.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Share all
+      </button>
+      <button class="btn sm" onclick="moveSelected()">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        Move to…
+      </button>
+      <button class="btn sm danger" onclick="deleteSelected()">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6 4.5V3h4v1.5M5 4.5l.5 7.5h5l.5-7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Delete all
+      </button>
+    </div>`;
+}
+
+/* ─── MULTI-SELECT ACTIONS ─── */
+function downloadSelected() {
+  const n = document.querySelectorAll('#fb-tbody input[type=checkbox]:checked').length;
+  toast(`Downloading ${n} file${n===1?'':'s'}…`);
+}
+function moveSelected() {
+  openModal('modal-move');
+}
+function deleteSelected() {
+  const checked = Array.from(document.querySelectorAll('#fb-tbody input[type=checkbox]:checked'));
+  const n = checked.length;
+  checked.forEach(cb => {
+    const row = cb.closest('tr');
+    if (row) { row.style.opacity='0'; row.style.transition='opacity .2s'; setTimeout(()=>row.remove(),200); }
+  });
+  clearAllCheckboxes();
+  toast(`${n} file${n===1?'':'s'} moved to trash.`);
+}
+function clearAllCheckboxes() {
+  document.querySelectorAll('#fb-tbody input[type=checkbox]').forEach(c => c.checked = false);
+  const selectAllCb = document.getElementById('select-all');
+  if (selectAllCb) { selectAllCb.checked = false; selectAllCb.indeterminate = false; }
+  document.getElementById('selection-bar').classList.remove('visible');
+  clearSelection();
 }
 
 /* ─── SELECT ALL ─── */
-function toggleSelectAll(cb){
-  document.querySelectorAll('#fb-tbody input[type=checkbox]').forEach(c=>c.checked=cb.checked);
-  if(cb.checked)toast('All files selected');
+function toggleSelectAll(cb) {
+  document.querySelectorAll('#fb-tbody input[type=checkbox]').forEach(c => c.checked = cb.checked);
+  onCheckboxChange();
 }
 
 /* ─── FILTER ─── */
