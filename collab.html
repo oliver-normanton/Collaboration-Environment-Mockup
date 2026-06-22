@@ -659,6 +659,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                     <!-- Folder rows -->
                     <tr onclick="selectFile('field-surveys-folder')" id="row-field-surveys-folder">
                       <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
                           <div class="fb-icon folder">
@@ -682,6 +683,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                     </tr>
                     <tr onclick="selectFile('basemaps-folder')" id="row-basemaps-folder">
                       <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
                           <div class="fb-icon folder">
@@ -706,6 +708,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                     <!-- File rows -->
                     <tr onclick="selectFile('q2-survey')" id="row-q2-survey">
                       <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
                           <div class="fb-icon gpkg">GPKG</div>
@@ -727,6 +730,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                     </tr>
                     <tr onclick="selectFile('terrain-analysis')" id="row-terrain-analysis">
                       <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
                           <div class="fb-icon gm">GMMP</div>
@@ -748,6 +752,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                     </tr>
                     <tr onclick="selectFile('dem-mosaic')" id="row-dem-mosaic">
                       <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
                           <div class="fb-icon tif">TIF</div>
@@ -769,6 +774,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                     </tr>
                     <tr onclick="selectFile('field-map')" id="row-field-map">
                       <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
                           <div class="fb-icon pdf">PDF</div>
@@ -790,6 +796,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                     </tr>
                     <tr onclick="selectFile('waypoints')" id="row-waypoints">
                       <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
                           <div class="fb-icon kml">KML</div>
@@ -811,6 +818,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                     </tr>
                     <tr onclick="selectFile('metadata-export')" id="row-metadata-export">
                       <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
                           <div class="fb-icon csv">CSV</div>
@@ -850,6 +858,164 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ═══════════════════════════════
+           VIEW: SHARED BY ME
+      ═══════════════════════════════ -->
+      <div class="page" id="view-myshared">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head">
+            <span class="card-title">Shared by me</span>
+            <span style="font-size:12px;color:var(--text-muted)">Files and folders you have shared with others</span>
+          </div>
+
+          <table class="fb-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Shared with</th>
+                <th>Access level</th>
+                <th>Date shared</th>
+                <th>Link type</th>
+                <th>Expires</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="toast('Opening file…')">
+                <td>
+                  <div class="fb-name-cell">
+                    <div class="fb-icon gpkg">GPKG</div>
+                    <div>
+                      <div class="fb-file-name">q2_survey_results.gpkg</div>
+                      <div class="fb-file-type">GeoPackage · 142 MB</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="pill neutral" style="font-size:10.5px">Anyone with link</span>
+                </td>
+                <td><span class="pill active" style="font-size:10.5px">View &amp; download</span></td>
+                <td class="fb-meta">Jun 15, 2026</td>
+                <td><span class="share-badge public">Public link</span></td>
+                <td><span class="pill warn" style="font-size:10.5px">No expiry</span></td>
+                <td>
+                  <div style="display:flex;gap:4px">
+                    <button class="btn xs" onclick="event.stopPropagation();toast('Link copied!')">Copy link</button>
+                    <button class="btn xs danger" onclick="event.stopPropagation();revokeShare(this,'q2_survey_results.gpkg')">Revoke</button>
+                  </div>
+                </td>
+              </tr>
+              <tr onclick="toast('Opening file…')">
+                <td>
+                  <div class="fb-name-cell">
+                    <div class="fb-icon tif">TIF</div>
+                    <div>
+                      <div class="fb-file-name">dem_mosaic_30m.tif</div>
+                      <div class="fb-file-type">GeoTIFF · 1.2 GB</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                    <div style="display:flex;align-items:center;gap:5px">
+                      <div class="user-av" style="background:#2563eb;color:#fff;width:22px;height:22px;font-size:9px">MS</div>
+                      <span style="font-size:12px">Mark Smith</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:5px">
+                      <div class="user-av" style="background:#7c3aed;color:#fff;width:22px;height:22px;font-size:9px">AL</div>
+                      <span style="font-size:12px">Amy Lee</span>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill info" style="font-size:10.5px">View &amp; download</span></td>
+                <td class="fb-meta">Jun 10, 2026</td>
+                <td><span class="share-badge pw">Password link</span></td>
+                <td><span class="pill neutral" style="font-size:10.5px">No expiry</span></td>
+                <td>
+                  <div style="display:flex;gap:4px">
+                    <button class="btn xs" onclick="event.stopPropagation();toast('Link copied!')">Copy link</button>
+                    <button class="btn xs danger" onclick="event.stopPropagation();revokeShare(this,'dem_mosaic_30m.tif')">Revoke</button>
+                  </div>
+                </td>
+              </tr>
+              <tr onclick="toast('Opening file…')">
+                <td>
+                  <div class="fb-name-cell">
+                    <div class="fb-icon folder">
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="#c2410c" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div>
+                      <div class="fb-file-name">Field Surveys 2025</div>
+                      <div class="fb-file-type">Folder · 14 files · 2.3 GB</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="pill neutral" style="font-size:10.5px">Entire organisation</span>
+                </td>
+                <td><span class="pill info" style="font-size:10.5px">View &amp; download</span></td>
+                <td class="fb-meta">Jun 8, 2026</td>
+                <td><span class="share-badge org">Org only</span></td>
+                <td><span class="pill neutral" style="font-size:10.5px">No expiry</span></td>
+                <td>
+                  <div style="display:flex;gap:4px">
+                    <button class="btn xs" onclick="event.stopPropagation();toast('Settings opened…')">Manage</button>
+                    <button class="btn xs danger" onclick="event.stopPropagation();revokeShare(this,'Field Surveys 2025')">Revoke</button>
+                  </div>
+                </td>
+              </tr>
+              <tr onclick="toast('Opening file…')">
+                <td>
+                  <div class="fb-name-cell">
+                    <div class="fb-icon kml">KML</div>
+                    <div>
+                      <div class="fb-file-name">waypoints_north_sector.kml</div>
+                      <div class="fb-file-type">KML · 2.1 MB</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:5px">
+                    <div class="user-av" style="background:#2563eb;color:#fff;width:22px;height:22px;font-size:9px">MB</div>
+                    <span style="font-size:12px">Mary Beth</span>
+                  </div>
+                </td>
+                <td><span class="pill active" style="font-size:10.5px">View only</span></td>
+                <td class="fb-meta">Jun 1, 2026</td>
+                <td><span class="share-badge org">Org only</span></td>
+                <td><span class="pill warn" style="font-size:10.5px">Expires Jul 1</span></td>
+                <td>
+                  <div style="display:flex;gap:4px">
+                    <button class="btn xs" onclick="event.stopPropagation();toast('Settings opened…')">Manage</button>
+                    <button class="btn xs danger" onclick="event.stopPropagation();revokeShare(this,'waypoints_north_sector.kml')">Revoke</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Summary stats -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div class="card">
+            <div class="storage-stat-label">Active shares</div>
+            <div class="storage-stat-val" style="font-size:28px;margin-top:6px">4</div>
+            <div class="storage-stat-sub">files and folders</div>
+          </div>
+          <div class="card">
+            <div class="storage-stat-label">Public links</div>
+            <div class="storage-stat-val" style="font-size:28px;margin-top:6px;color:var(--amber)">1</div>
+            <div class="storage-stat-sub"><a onclick="switchView('files');toast('Showing public file…')" style="color:var(--amber);cursor:pointer;text-decoration:underline;font-size:11.5px">Review →</a></div>
+          </div>
+          <div class="card">
+            <div class="storage-stat-label">Expiring soon</div>
+            <div class="storage-stat-val" style="font-size:28px;margin-top:6px;color:var(--amber)">1</div>
+            <div class="storage-stat-sub">within 30 days</div>
           </div>
         </div>
       </div>
@@ -1659,17 +1825,16 @@ document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))closeDrop
 
 /* ─── PROTO VIEW SWITCHER ─── */
 function switchView(view){
-  ['files','shared','admin','recent','starred','trash'].forEach(v=>{
-    document.getElementById('view-'+v).classList.toggle('active',v===view);
+  ['files','shared','admin','recent','starred','trash','myshared'].forEach(v=>{
+    const pg = document.getElementById('view-'+v);
+    if(pg) pg.classList.toggle('active',v===view);
     const btn=document.getElementById('sw-'+v);
     if(btn)btn.classList.toggle('active',v===view);
   });
-  const labels={'files':'Files','shared':'Shared with me','admin':'Storage Admin','recent':'Recent','starred':'Starred','trash':'Trash'};
+  const labels={'files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Admin','recent':'Recent','starred':'Starred','trash':'Trash'};
   document.getElementById('breadcrumb-current').textContent=labels[view]||'Files';
-
-  // Sync sidebar active state
   document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
-  const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','admin':'si-storageadmin'};
+  const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','myshared':'si-myshared','admin':'si-storageadmin'};
   const sid=document.getElementById(sideMap[view]);
   if(sid)sid.classList.add('active');
 }
@@ -1677,6 +1842,7 @@ function switchView(view){
 /* ─── SIDEBAR NAV ─── */
 function navSidebar(id){
   if(id==='shared')        switchView('shared');
+  else if(id==='myshared') switchView('myshared');
   else if(id==='storageadmin') switchView('admin');
   else if(id==='recent')   switchView('recent');
   else if(id==='starred')  switchView('starred');
@@ -1857,6 +2023,13 @@ function checkTrashEmpty(){
 function toggleTrashSelectAll(cb){
   document.querySelectorAll('.trash-check').forEach(c=>c.checked=cb.checked);
   if(cb.checked) toast('All trash items selected');
+}
+
+/* ─── REVOKE SHARE ─── */
+function revokeShare(btn, filename){
+  const row = btn.closest('tr');
+  if(row){ row.style.opacity='0'; row.style.transition='opacity .2s'; setTimeout(()=>row.remove(), 200); }
+  toast(`Share revoked for "${filename}".`);
 }
 
 document.querySelectorAll('.modal-bg').forEach(bg=>{
