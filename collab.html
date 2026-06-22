@@ -513,6 +513,67 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 
 /* ─── TWO COL ─── */
 .two-col{display:grid;grid-template-columns:1fr 300px;gap:16px}
+
+
+/* ─── VIEW TOGGLE ─── */
+.view-toggle-btn{
+  width:30px;height:30px;border-radius:var(--radius-sm);background:var(--surface);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .12s;flex-shrink:0;color:var(--text-muted)
+}
+.view-toggle-btn:hover{background:var(--surface-2);border-color:var(--border-2);color:var(--text-primary)}
+.view-toggle-btn.active{background:var(--avenza-blue);border-color:var(--avenza-blue);color:#fff}
+
+/* ─── SORT HEADER ─── */
+.fb-table th.sortable{cursor:pointer;user-select:none;white-space:nowrap}
+.fb-table th.sortable:hover{color:var(--avenza-blue)}
+.sort-icon{display:inline-flex;flex-direction:column;gap:1px;margin-left:4px;vertical-align:middle;opacity:.35}
+.sort-icon span{display:block;width:0;height:0;border-left:3.5px solid transparent;border-right:3.5px solid transparent}
+.sort-icon .asc-arrow{border-bottom:4px solid currentColor}
+.sort-icon .desc-arrow{border-top:4px solid currentColor}
+th.sort-asc .sort-icon{opacity:1}
+th.sort-asc .sort-icon .asc-arrow{color:var(--avenza-blue)}
+th.sort-desc .sort-icon{opacity:1}
+th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
+
+/* ─── GRID VIEW ─── */
+.fb-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(148px,1fr));
+  gap:10px;padding:14px;
+}
+.fb-grid-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:14px 12px 12px;cursor:pointer;transition:box-shadow .15s,border-color .15s;
+  display:flex;flex-direction:column;align-items:center;gap:0;position:relative;
+  text-align:center;
+}
+.fb-grid-card:hover{box-shadow:var(--shadow-md);border-color:var(--border-2)}
+.fb-grid-card.selected{border-color:var(--avenza-blue);background:var(--avenza-blue-lt)}
+.fb-grid-icon{
+  width:52px;height:52px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:10px;font-size:11px;font-weight:700;font-family:'DM Mono',monospace
+}
+.fb-grid-name{
+  font-size:12px;font-weight:500;color:var(--text-primary);
+  word-break:break-word;line-height:1.35;margin-bottom:4px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  width:100%;
+}
+.fb-grid-meta{font-size:11px;color:var(--text-muted);margin-bottom:6px}
+.fb-grid-card .star-btn{
+  position:absolute;top:7px;left:8px;width:20px;height:20px;
+  opacity:0;transition:opacity .1s;
+}
+.fb-grid-card:hover .star-btn,
+.fb-grid-card .star-btn.starred{opacity:1}
+.fb-grid-card .file-menu-btn{
+  position:absolute;top:6px;right:6px;width:22px;height:22px;
+  opacity:0;transition:opacity .1s;font-size:14px;
+}
+.fb-grid-card:hover .file-menu-btn{opacity:1}
+.fb-grid-card.selected .file-menu-btn{opacity:1}
 </style>
 </head>
 <body>
@@ -648,7 +709,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
       <div style="margin-bottom:6px;padding:0 2px">
         <div style="font-size:9.5px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;padding:0 8px">Viewing as</div>
         <div class="dd-wrap" style="width:100%">
-          <button class="sb-user" id="user-switcher-btn" onclick=\"toggleDrop('dd-users',this)\" style="width:100%;justify-content:space-between" aria-label="Switch user persona" aria-haspopup="true">
+          <button class="sb-user" id="user-switcher-btn" onclick="toggleDrop('dd-users',this)" style="width:100%;justify-content:space-between" aria-label="Switch user persona" aria-haspopup="true">
             <div style="display:flex;align-items:center;gap:9px">
               <div class="sb-av" id="sb-av-display" style="background:#0e7a8c">JD</div>
               <div>
@@ -700,7 +761,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
       </div>
       <div class="topbar-actions">
         <div class="dd-wrap">
-          <button class="profile-btn" onclick=\"toggleDrop('dd-profile',this)\">
+          <button class="profile-btn" onclick="toggleDrop('dd-profile',this)">
             <div class="profile-av" id="topbar-av" style="background:#0e7a8c">JD</div>
             <span class="profile-name" id="topbar-name">Jane Doe</span>
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -810,7 +871,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 </button>
                 <div style="width:1px;height:20px;background:var(--border);flex-shrink:0"></div>
                 <div class="dd-wrap">
-                  <button class="btn sm" id="sort-btn" onclick=\"toggleDrop('dd-sort',this)\" aria-haspopup="true">
+                  <button class="btn sm" id="sort-btn" onclick="toggleDrop('dd-sort',this)" aria-haspopup="true">
                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 4h8M2 8h5M2 12h3M12 3v10M9 10l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     <span id="sort-label">Name</span>
                     <svg width="9" height="9" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -3456,67 +3517,6 @@ function revokeShare(btn, filename){
   toast(`Share revoked for "${filename}".`);
 }
 
-
-
-/* ─── VIEW TOGGLE ─── */
-.view-toggle-btn{
-  width:30px;height:30px;border-radius:var(--radius-sm);background:var(--surface);
-  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:all .12s;flex-shrink:0;color:var(--text-muted)
-}
-.view-toggle-btn:hover{background:var(--surface-2);border-color:var(--border-2);color:var(--text-primary)}
-.view-toggle-btn.active{background:var(--avenza-blue);border-color:var(--avenza-blue);color:#fff}
-
-/* ─── SORT HEADER ─── */
-.fb-table th.sortable{cursor:pointer;user-select:none;white-space:nowrap}
-.fb-table th.sortable:hover{color:var(--avenza-blue)}
-.sort-icon{display:inline-flex;flex-direction:column;gap:1px;margin-left:4px;vertical-align:middle;opacity:.35}
-.sort-icon span{display:block;width:0;height:0;border-left:3.5px solid transparent;border-right:3.5px solid transparent}
-.sort-icon .asc-arrow{border-bottom:4px solid currentColor}
-.sort-icon .desc-arrow{border-top:4px solid currentColor}
-th.sort-asc .sort-icon{opacity:1}
-th.sort-asc .sort-icon .asc-arrow{color:var(--avenza-blue)}
-th.sort-desc .sort-icon{opacity:1}
-th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
-
-/* ─── GRID VIEW ─── */
-.fb-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(148px,1fr));
-  gap:10px;padding:14px;
-}
-.fb-grid-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
-  padding:14px 12px 12px;cursor:pointer;transition:box-shadow .15s,border-color .15s;
-  display:flex;flex-direction:column;align-items:center;gap:0;position:relative;
-  text-align:center;
-}
-.fb-grid-card:hover{box-shadow:var(--shadow-md);border-color:var(--border-2)}
-.fb-grid-card.selected{border-color:var(--avenza-blue);background:var(--avenza-blue-lt)}
-.fb-grid-icon{
-  width:52px;height:52px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:10px;font-size:11px;font-weight:700;font-family:'DM Mono',monospace
-}
-.fb-grid-name{
-  font-size:12px;font-weight:500;color:var(--text-primary);
-  word-break:break-word;line-height:1.35;margin-bottom:4px;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  width:100%;
-}
-.fb-grid-meta{font-size:11px;color:var(--text-muted);margin-bottom:6px}
-.fb-grid-card .star-btn{
-  position:absolute;top:7px;left:8px;width:20px;height:20px;
-  opacity:0;transition:opacity .1s;
-}
-.fb-grid-card:hover .star-btn,
-.fb-grid-card .star-btn.starred{opacity:1}
-.fb-grid-card .file-menu-btn{
-  position:absolute;top:6px;right:6px;width:22px;height:22px;
-  opacity:0;transition:opacity .1s;font-size:14px;
-}
-.fb-grid-card:hover .file-menu-btn{opacity:1}
-.fb-grid-card.selected .file-menu-btn{opacity:1}
 
 /* ─── FILE CONTEXT MENU ─── */
 let _ctxFile = null;
