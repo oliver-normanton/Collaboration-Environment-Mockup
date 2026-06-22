@@ -375,6 +375,25 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 /* ─── COMING SOON ─── */
 .coming-soon{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px dashed var(--border-2);border-radius:var(--radius-sm);padding:12px 14px;font-size:12.5px;color:var(--text-muted);margin-top:4px}
 
+/* ─── TEAM CARDS ─── */
+.team-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.team-card:hover{box-shadow:var(--shadow-md);border-color:var(--border-2)}
+.team-card-header{padding:16px 18px 14px;display:flex;align-items:flex-start;gap:12px}
+.team-avatar{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;font-family:'DM Sans',sans-serif}
+.team-card-name{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:3px}
+.team-card-desc{font-size:12px;color:var(--text-muted);line-height:1.4}
+.team-card-meta{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-top:1px solid var(--surface-3);background:var(--surface-2)}
+.team-card-stat{font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:5px}
+.team-card-stat strong{color:var(--text-secondary);font-weight:600}
+.team-member-stack{display:flex;margin-left:auto}
+.team-member-av{width:22px;height:22px;border-radius:50%;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;margin-left:-6px;flex-shrink:0}
+.team-member-av:first-child{margin-left:0}
+
+/* ─── TEAM COLOR SWATCH ─── */
+.team-color-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .12s;flex-shrink:0}
+.team-color-swatch.selected{border-color:var(--text-primary);transform:scale(1.15)}
+.team-color-swatch:hover{transform:scale(1.1)}
+
 /* ─── PRIVATE USER TAB (admin picker) ─── */
 .private-user-tab{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);font-family:'DM Sans',sans-serif;transition:all .12s}
 .private-user-tab:hover{border-color:var(--border-2);background:var(--surface-2)}
@@ -495,10 +514,12 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 
       <div class="sb-group">
         <div class="sb-group-label">Organisation</div>
-        <button class="sb-item" id="si-orgfiles" onclick="navSidebar('orgfiles')">
-          <svg viewBox="0 0 16 16" fill="none"><path d="M2 13V6l6-3 6 3v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 13V9.5h4V13" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-          ACME Corp storage
+        <button class="sb-item" id="si-teams" onclick="navSidebar('teams')">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M5.5 7a2 2 0 100-4 2 2 0 000 4zM1 13c0-2 1.5-3.5 4.5-3.5M11 9a2 2 0 100-4 2 2 0 000 4zM8 13c.3-2.1 1.6-3 3-3 2 0 4 1 4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Teams
         </button>
+        <!-- Team quick-links (injected by JS on load) -->
+        <div id="sb-team-links"></div>
         <button class="sb-item" id="si-public" onclick="navSidebar('public')">
           <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2.5 3.5-2.5 5.5s1 4 2.5 5.5M8 2.5c1.5 1.5 2.5 3.5 2.5 5.5s-1 4-2.5 5.5M2.5 8h11" stroke="currentColor" stroke-width="1.2"/></svg>
           Public files
@@ -668,6 +689,10 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
                 <button class="fb-tree-item" onclick="selectFolder('org')">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M2 13V6l6-3 6 3v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
                   ACME Corp storage
+                </button>
+                <button class="fb-tree-item fb-tree-indent" onclick="navSidebar('teams')">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M5.5 7a2 2 0 100-4 2 2 0 000 4zM1 13c0-2 1.5-3.5 4.5-3.5M11 9a2 2 0 100-4 2 2 0 000 4zM8 13c.3-2.1 1.6-3 3-3 2 0 4 1 4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                  Teams
                 </button>
                 <button class="fb-tree-item fb-tree-indent" onclick="selectFolder('shared-data')">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
@@ -923,6 +948,94 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
         </div>
       </div>
 
+
+      <!-- ═══════════════════════════════
+           VIEW: TEAMS
+      ═══════════════════════════════ -->
+      <div class="page" id="view-teams">
+
+        <!-- Toolbar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:16px;font-weight:600;color:var(--text-primary)">Teams</div>
+            <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">Shared storage spaces for groups of people within ACME Corp</div>
+          </div>
+          <button class="btn primary admin-only-action" onclick="openModal('modal-new-team')">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            New team
+          </button>
+        </div>
+
+        <!-- Team cards grid -->
+        <div id="teams-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:24px"></div>
+
+        <!-- Team file browser (shown when a team is selected) -->
+        <div id="team-browser" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <button class="btn sm" onclick="closeTeamBrowser()">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M2 8l4-4M2 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              All teams
+            </button>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div id="tb-team-color-dot" style="width:10px;height:10px;border-radius:50%;background:var(--avenza-blue)"></div>
+              <span style="font-size:15px;font-weight:600;color:var(--text-primary)" id="tb-team-name">Team name</span>
+              <span id="tb-team-role-badge"></span>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="btn sm" onclick="openModal('modal-upload')">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 5l4-3 4 3M3 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Upload
+              </button>
+              <button class="btn sm admin-only-action" id="tb-manage-btn" onclick="openModal('modal-manage-team')">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M3.5 3.5l1 1M11.5 11.5l1 1M3.5 12.5l1-1M11.5 4.5l1-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Manage team
+              </button>
+            </div>
+          </div>
+
+          <!-- Tabs: Files | Members -->
+          <div class="tabs" id="team-tabs">
+            <button class="tab on" id="ttab-files" onclick="switchTeamTab('files')">Files</button>
+            <button class="tab" id="ttab-members" onclick="switchTeamTab('members')">Members</button>
+          </div>
+
+          <!-- Team Files -->
+          <div id="tpanel-files">
+            <div class="card">
+              <table class="fb-table" id="team-files-table">
+                <thead>
+                  <tr>
+                    <th style="width:32px"></th>
+                    <th>Name</th>
+                    <th>Uploaded by</th>
+                    <th>Modified</th>
+                    <th>Size</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="team-files-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Team Members -->
+          <div id="tpanel-members" style="display:none">
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title">Team members</span>
+                <button class="btn sm primary admin-only-action" onclick="toast('Invite sent.')">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                  Add member
+                </button>
+              </div>
+              <table class="access-table" id="team-members-table">
+                <thead><tr><th>Member</th><th>Role</th><th>Added</th><th></th></tr></thead>
+                <tbody id="team-members-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- ═══════════════════════════════
            VIEW: PRIVATE FILES
@@ -2101,6 +2214,73 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
      MODALS
 ═══════════════════════════════ -->
 
+<!-- New Team Modal -->
+<div class="modal-bg" id="modal-new-team">
+  <div class="modal">
+    <div class="modal-title">Create a new team</div>
+    <div class="modal-sub">Teams give a group of people their own shared storage space within ACME Corp.</div>
+
+    <div class="modal-label">Team name</div>
+    <input class="modal-input" placeholder="e.g. Northern Survey Project" id="new-team-name">
+
+    <div class="modal-label">Description <span style="font-weight:400;color:var(--text-muted)">(optional)</span></div>
+    <input class="modal-input" placeholder="What is this team for?">
+
+    <div class="modal-label">Team colour</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px" id="team-color-picker">
+      <button class="team-color-swatch selected" style="background:#084888" data-color="#084888" onclick="selectTeamColor(this)" aria-label="Navy blue"></button>
+      <button class="team-color-swatch" style="background:#0e7a8c" data-color="#0e7a8c" onclick="selectTeamColor(this)" aria-label="Teal"></button>
+      <button class="team-color-swatch" style="background:#166534" data-color="#166534" onclick="selectTeamColor(this)" aria-label="Green"></button>
+      <button class="team-color-swatch" style="background:#b45309" data-color="#b45309" onclick="selectTeamColor(this)" aria-label="Amber"></button>
+      <button class="team-color-swatch" style="background:#7c3aed" data-color="#7c3aed" onclick="selectTeamColor(this)" aria-label="Purple"></button>
+      <button class="team-color-swatch" style="background:#be123c" data-color="#be123c" onclick="selectTeamColor(this)" aria-label="Red"></button>
+      <button class="team-color-swatch" style="background:#374151" data-color="#374151" onclick="selectTeamColor(this)" aria-label="Slate"></button>
+    </div>
+
+    <div class="modal-label">Add initial members</div>
+    <select class="modal-select" multiple style="height:90px">
+      <option>Jane Doe (jane@acme.com)</option>
+      <option>Penny Purchaser (penny@acme.com)</option>
+      <option>Mary Beth (mary@acme.com)</option>
+      <option>Alan Rickman (alan@acme.com)</option>
+    </select>
+    <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;margin-bottom:14px">Hold Ctrl / ⌘ to select multiple</div>
+
+    <div class="modal-row">
+      <button class="btn primary" onclick="createTeam()">Create team</button>
+      <button class="btn" onclick="closeModal('modal-new-team')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manage Team Modal -->
+<div class="modal-bg" id="modal-manage-team">
+  <div class="modal">
+    <div class="modal-title" id="manage-team-title">Manage team</div>
+    <div class="modal-sub">Update team settings and membership.</div>
+
+    <div class="modal-label">Team name</div>
+    <input class="modal-input" id="manage-team-name-input" value="Northern Survey Project">
+
+    <div class="modal-label">Description</div>
+    <input class="modal-input" value="Active survey campaign — Northern sector Q2/Q3 2026">
+
+    <div class="modal-label">Default access for new files</div>
+    <select class="modal-select">
+      <option selected>Team members only</option>
+      <option>Entire organisation</option>
+    </select>
+
+    <div class="modal-row" style="justify-content:space-between">
+      <div style="display:flex;gap:8px">
+        <button class="btn primary" onclick="toast('Team settings saved.');closeModal('modal-manage-team')">Save changes</button>
+        <button class="btn" onclick="closeModal('modal-manage-team')">Cancel</button>
+      </div>
+      <button class="btn danger" onclick="toast('Team archived.');closeModal('modal-manage-team')">Archive team</button>
+    </div>
+  </div>
+</div>
+
 <!-- Upload Modal -->
 <div class="modal-bg" id="modal-upload">
   <div class="modal">
@@ -2297,16 +2477,16 @@ document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))closeDrop
 
 /* ─── PROTO VIEW SWITCHER ─── */
 function switchView(view){
-  ['files','shared','admin','audit','recent','starred','trash','myshared','private'].forEach(v=>{
+  ['files','shared','admin','audit','recent','starred','trash','myshared','private','teams'].forEach(v=>{
     const pg = document.getElementById('view-'+v);
     if(pg) pg.classList.toggle('active',v===view);
     const btn=document.getElementById('sw-'+v);
     if(btn)btn.classList.toggle('active',v===view);
   });
-  const labels={'files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Settings','audit':'Audit Log','recent':'Recent','starred':'Starred','trash':'Trash','private':'Private Files'};
+  const labels={'files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Settings','audit':'Audit Log','recent':'Recent','starred':'Starred','trash':'Trash','private':'Private Files','teams':'Teams'};
   document.getElementById('breadcrumb-current').textContent=labels[view]||'Files';
   document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
-  const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','myshared':'si-myshared','admin':'si-storageadmin','audit':'si-audit','private':'si-private'};
+  const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','myshared':'si-myshared','admin':'si-storageadmin','audit':'si-audit','private':'si-private','teams':'si-teams'};
   const sid=document.getElementById(sideMap[view]);
   if(sid)sid.classList.add('active');
 }
@@ -2318,6 +2498,8 @@ function navSidebar(id){
   else if(id==='storageadmin') switchView('admin');
   else if(id==='audit')        switchView('audit');
   else if(id==='private')      switchView('private');
+  else if(id==='teams')        switchView('teams');
+  else if(id==='orgfiles')     switchView('teams');
   else if(id==='recent')       switchView('recent');
   else if(id==='starred')      switchView('starred');
   else if(id==='trash')        switchView('trash');
@@ -2413,11 +2595,223 @@ function switchUser(key) {
 }
 
 function getCurrentView() {
-  const views = ['files','shared','myshared','recent','starred','trash','admin','audit','private'];
+  const views = ['files','shared','myshared','recent','starred','trash','admin','audit','private','teams'];
   return views.find(v => {
     const el = document.getElementById('view-' + v);
     return el && el.classList.contains('active');
   }) || 'files';
+}
+
+/* ─── TEAMS DATA ─── */
+const TEAMS = [
+  {
+    id:'northern-survey',
+    name:'Northern Survey Project',
+    desc:'Active survey campaign — Northern sector Q2/Q3 2026',
+    color:'#084888',
+    initials:'NS',
+    role:'owner',    // current user's role in this team
+    members:[
+      {name:'Jane Doe',        initials:'JD', color:'#0e7a8c', role:'Owner',  added:'Jan 15, 2026'},
+      {name:'Mary Beth',       initials:'MB', color:'#2563eb', role:'Member', added:'Jan 15, 2026'},
+      {name:'Alan Rickman',    initials:'AR', color:'#7c3aed', role:'Member', added:'Feb 3, 2026'},
+    ],
+    files:[
+      {icon:'gpkg', label:'GPKG', name:'northern_parcels_q2.gpkg',    type:'GeoPackage',           by:'Jane Doe',     date:'Jun 17, 2026', size:'312 MB'},
+      {icon:'tif',  label:'TIF',  name:'sector_north_dem_10m.tif',    type:'GeoTIFF Raster',       by:'Mary Beth',    date:'Jun 14, 2026', size:'980 MB'},
+      {icon:'kml',  label:'KML',  name:'survey_waypoints_jun26.kml',  type:'KML',                  by:'Alan Rickman', date:'Jun 12, 2026', size:'1.4 MB'},
+      {icon:'gm',   label:'GMMP', name:'northern_campaign_v2.gmmp',   type:'Global Mapper Project', by:'Jane Doe',    date:'Jun 9, 2026',  size:'55 MB'},
+    ],
+    storage:'1.3 GB',
+    lastActive:'Today'
+  },
+  {
+    id:'basemap-team',
+    name:'Basemap & Reference Layers',
+    desc:'Shared basemaps, DEMs and reference datasets for the whole org',
+    color:'#0e7a8c',
+    initials:'BM',
+    role:'member',
+    members:[
+      {name:'Penny Purchaser', initials:'PP', color:'#0891b2', role:'Owner',  added:'Nov 2, 2025'},
+      {name:'Jane Doe',        initials:'JD', color:'#0e7a8c', role:'Member', added:'Nov 2, 2025'},
+      {name:'Mary Beth',       initials:'MB', color:'#2563eb', role:'Member', added:'Dec 10, 2025'},
+      {name:'Alan Rickman',    initials:'AR', color:'#7c3aed', role:'Member', added:'Dec 10, 2025'},
+    ],
+    files:[
+      {icon:'tif',  label:'TIF',  name:'acme_basemap_2026.tif',       type:'GeoTIFF Raster',       by:'Penny Purchaser', date:'Mar 4, 2026',  size:'4.2 GB'},
+      {icon:'gpkg', label:'GPKG', name:'admin_boundaries_v3.gpkg',    type:'GeoPackage',            by:'Penny Purchaser', date:'Feb 18, 2026', size:'88 MB'},
+      {icon:'kml',  label:'KML',  name:'acme_offices_locations.kml',  type:'KML',                   by:'Jane Doe',        date:'Jan 30, 2026', size:'420 KB'},
+    ],
+    storage:'4.3 GB',
+    lastActive:'Jun 18'
+  },
+  {
+    id:'archive-2025',
+    name:'2025 Completed Surveys',
+    desc:'Read-only archive of all survey data from the 2025 field season',
+    color:'#374151',
+    initials:'25',
+    role:'guest',
+    members:[
+      {name:'Penny Purchaser', initials:'PP', color:'#0891b2', role:'Owner',  added:'Jan 5, 2026'},
+      {name:'Jane Doe',        initials:'JD', color:'#0e7a8c', role:'Guest',  added:'Jan 5, 2026'},
+      {name:'Mary Beth',       initials:'MB', color:'#2563eb', role:'Guest',  added:'Jan 5, 2026'},
+    ],
+    files:[
+      {icon:'gpkg', label:'GPKG', name:'south_sector_final_2025.gpkg', type:'GeoPackage',           by:'Mary Beth',    date:'Dec 22, 2025', size:'540 MB'},
+      {icon:'pdf',  label:'PDF',  name:'survey_report_2025_full.pdf',  type:'GeoPDF',                by:'Jane Doe',     date:'Dec 19, 2025', size:'22 MB'},
+      {icon:'csv',  label:'CSV',  name:'metadata_archive_2025.csv',    type:'CSV Spreadsheet',       by:'Alan Rickman', date:'Dec 15, 2025', size:'1.1 MB'},
+    ],
+    storage:'563 MB',
+    lastActive:'Jun 2'
+  },
+];
+
+let activeTeam = null;
+
+function renderTeams() {
+  const grid = document.getElementById('teams-grid');
+  if (!grid) return;
+  const rolePills = {
+    owner:  '<span class="pill info"  style="font-size:10px">Owner</span>',
+    member: '<span class="pill teal"  style="font-size:10px">Member</span>',
+    guest:  '<span class="pill neutral" style="font-size:10px">Guest</span>',
+  };
+  grid.innerHTML = TEAMS.map(t => {
+    const memberStack = t.members.slice(0,4).map((m,i) =>
+      `<div class="team-member-av" style="background:${m.color};z-index:${4-i}" title="${m.name}">${m.initials}</div>`
+    ).join('') + (t.members.length > 4 ? `<div class="team-member-av" style="background:var(--surface-3);color:var(--text-muted)">+${t.members.length-4}</div>` : '');
+
+    return `<div class="team-card" onclick="openTeam('${t.id}')">
+      <div class="team-card-header">
+        <div class="team-avatar" style="background:${t.color}">${t.initials}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+            <div class="team-card-name">${t.name}</div>
+            ${rolePills[t.role]||''}
+          </div>
+          <div class="team-card-desc">${t.desc}</div>
+        </div>
+      </div>
+      <div class="team-card-meta">
+        <div style="display:flex;gap:14px">
+          <div class="team-card-stat"><strong>${t.files.length}</strong> files</div>
+          <div class="team-card-stat"><strong>${t.storage}</strong> used</div>
+          <div class="team-card-stat">Active <strong>${t.lastActive}</strong></div>
+        </div>
+        <div class="team-member-stack">${memberStack}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Populate sidebar quick-links
+  renderSidebarTeamLinks();
+}
+
+function renderSidebarTeamLinks() {
+  const wrap = document.getElementById('sb-team-links');
+  if (!wrap) return;
+  wrap.innerHTML = TEAMS.map(t =>
+    `<button class="sb-item fb-tree-indent" id="si-team-${t.id}" onclick="openTeam('${t.id}')" style="padding-left:26px">
+      <span style="width:8px;height:8px;border-radius:50%;background:${t.color};flex-shrink:0;display:inline-block"></span>
+      ${t.name}
+    </button>`
+  ).join('');
+}
+
+function openTeam(teamId) {
+  const t = TEAMS.find(x => x.id === teamId);
+  if (!t) return;
+  activeTeam = t;
+
+  document.getElementById('teams-grid').style.display = 'none';
+  document.getElementById('team-browser').style.display = 'block';
+
+  // Header
+  document.getElementById('tb-team-name').textContent = t.name;
+  document.getElementById('tb-team-color-dot').style.background = t.color;
+  const rolePills = {owner:'<span class="pill info" style="font-size:10.5px">Owner</span>', member:'<span class="pill teal" style="font-size:10.5px">Member</span>', guest:'<span class="pill neutral" style="font-size:10.5px">Guest</span>'};
+  document.getElementById('tb-team-role-badge').innerHTML = rolePills[t.role]||'';
+
+  // Show/hide manage button based on role
+  const manageBtn = document.getElementById('tb-manage-btn');
+  if (manageBtn) manageBtn.style.display = (t.role==='owner' && currentUser.isAdmin) ? '' : 'none';
+
+  // Render files
+  const isGuest = t.role === 'guest';
+  document.getElementById('team-files-tbody').innerHTML = t.files.map(f => `
+    <tr onclick="toast('Opening ${f.name}…')">
+      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+      <td><div class="fb-name-cell"><div class="fb-icon ${f.icon}">${f.label}</div><div><div class="fb-file-name">${f.name}</div><div class="fb-file-type">${f.type}</div></div></div></td>
+      <td><div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-secondary)">${f.by}</div></td>
+      <td class="fb-meta">${f.date}</td>
+      <td class="fb-size">${f.size}</td>
+      <td>
+        <div class="fb-actions-cell" style="opacity:1;gap:4px">
+          <button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button>
+          ${!isGuest ? `<button class="btn xs danger" onclick="event.stopPropagation();toast('File deleted.')">Delete</button>` : `<span class="pill neutral" style="font-size:10px">Read only</span>`}
+        </div>
+      </td>
+    </tr>`).join('');
+
+  // Render members
+  document.getElementById('team-members-tbody').innerHTML = t.members.map(m => `
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="user-av" style="background:${m.color};color:#fff">${m.initials}</div><span style="font-weight:500">${m.name}</span></div></td>
+      <td>${m.role==='Owner' ? '<span class="pill info" style="font-size:10.5px">Owner</span>' : m.role==='Guest' ? '<span class="pill neutral" style="font-size:10.5px">Guest</span>' : '<span class="pill teal" style="font-size:10.5px">Member</span>'}</td>
+      <td class="fb-meta">${m.added}</td>
+      <td>${(t.role==='owner' && currentUser.isAdmin && m.role!=='Owner') ? `<button class="btn xs" onclick="toast('Removed ${m.name} from team.')">Remove</button>` : ''}</td>
+    </tr>`).join('');
+
+  // Reset to Files tab
+  switchTeamTab('files');
+
+  // Highlight sidebar
+  document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
+  const sbItem = document.getElementById('si-team-'+teamId);
+  if (sbItem) sbItem.classList.add('active');
+
+  // Update manage modal team name
+  const inp = document.getElementById('manage-team-name-input');
+  if (inp) inp.value = t.name;
+  const ttitle = document.getElementById('manage-team-title');
+  if (ttitle) ttitle.textContent = 'Manage — ' + t.name;
+}
+
+function closeTeamBrowser() {
+  document.getElementById('teams-grid').style.display = '';
+  document.getElementById('team-browser').style.display = 'none';
+  activeTeam = null;
+  document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('si-teams').classList.add('active');
+}
+
+function switchTeamTab(tab) {
+  document.getElementById('tpanel-files').style.display   = tab==='files'   ? '' : 'none';
+  document.getElementById('tpanel-members').style.display = tab==='members' ? '' : 'none';
+  document.getElementById('ttab-files').className   = 'tab' + (tab==='files'   ? ' on' : '');
+  document.getElementById('ttab-members').className = 'tab' + (tab==='members' ? ' on' : '');
+}
+
+function createTeam() {
+  const name = document.getElementById('new-team-name').value.trim() || 'New Team';
+  const color = document.querySelector('.team-color-swatch.selected')?.dataset.color || '#084888';
+  const initials = name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  TEAMS.unshift({
+    id: 'team-' + Date.now(),
+    name, desc:'', color, initials, role:'owner',
+    members:[{name: currentUser.name, initials: currentUser.initials, color: currentUser.color, role:'Owner', added:'Today'}],
+    files:[], storage:'0 MB', lastActive:'Today'
+  });
+  renderTeams();
+  toast(`Team "${name}" created.`);
+  closeModal('modal-new-team');
+}
+
+function selectTeamColor(el) {
+  document.querySelectorAll('.team-color-swatch').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
 }
 
 /* ─── SETTINGS HELPERS ─── */
@@ -2633,6 +3027,9 @@ function revokeShare(btn, filename){
   if(row){ row.style.opacity='0'; row.style.transition='opacity .2s'; setTimeout(()=>row.remove(), 200); }
   toast(`Share revoked for "${filename}".`);
 }
+
+// Initialise teams on load
+renderTeams();
 
 document.querySelectorAll('.modal-bg').forEach(bg=>{
   bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');});
