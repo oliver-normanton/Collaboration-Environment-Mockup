@@ -159,7 +159,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 /* ─── DROPDOWN ─── */
 .dd-wrap{position:relative}
 .dropdown{
-  position:absolute;top:calc(100% + 6px);right:0;background:var(--surface);border:1px solid var(--border);
+  position:fixed;background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:5px;min-width:190px;z-index:550;display:none
 }
 .dropdown.open{display:block}
@@ -220,11 +220,11 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 .fb-tree-indent{padding-left:18px}
 
 /* Main file list */
-.fb-main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:visible}
+.fb-main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
 .fb-toolbar{
   display:flex;align-items:center;gap:8px;padding:10px 14px;
   border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface);
-  flex-wrap:wrap;position:relative;overflow:visible;z-index:50;
+  flex-wrap:wrap;
 }
 .fb-path{
   display:flex;align-items:center;gap:4px;flex:1;min-width:0;
@@ -648,7 +648,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
       <div style="margin-bottom:6px;padding:0 2px">
         <div style="font-size:9.5px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;padding:0 8px">Viewing as</div>
         <div class="dd-wrap" style="width:100%">
-          <button class="sb-user" id="user-switcher-btn" onclick="toggleDrop('dd-users')" style="width:100%;justify-content:space-between" aria-label="Switch user persona" aria-haspopup="true">
+          <button class="sb-user" id="user-switcher-btn" onclick=\"toggleDrop('dd-users',this)\" style="width:100%;justify-content:space-between" aria-label="Switch user persona" aria-haspopup="true">
             <div style="display:flex;align-items:center;gap:9px">
               <div class="sb-av" id="sb-av-display" style="background:#0e7a8c">JD</div>
               <div>
@@ -700,7 +700,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
       </div>
       <div class="topbar-actions">
         <div class="dd-wrap">
-          <button class="profile-btn" onclick="toggleDrop('dd-profile')">
+          <button class="profile-btn" onclick=\"toggleDrop('dd-profile',this)\">
             <div class="profile-av" id="topbar-av" style="background:#0e7a8c">JD</div>
             <span class="profile-name" id="topbar-name">Jane Doe</span>
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -810,7 +810,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 </button>
                 <div style="width:1px;height:20px;background:var(--border);flex-shrink:0"></div>
                 <div class="dd-wrap">
-                  <button class="btn sm" id="sort-btn" onclick="toggleDrop('dd-sort')" aria-haspopup="true">
+                  <button class="btn sm" id="sort-btn" onclick=\"toggleDrop('dd-sort',this)\" aria-haspopup="true">
                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 4h8M2 8h5M2 12h3M12 3v10M9 10l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     <span id="sort-label">Name</span>
                     <svg width="9" height="9" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2701,7 +2701,31 @@ function closeModal(id){
 function escListener(e){if(e.key==='Escape'){document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open'));}}
 
 /* ─── DROPDOWN ─── */
-function toggleDrop(id){const el=document.getElementById(id);const was=el.classList.contains('open');closeDrop();if(!was)el.classList.add('open');}
+function toggleDrop(id, triggerEl){
+  const el=document.getElementById(id);
+  const was=el.classList.contains('open');
+  closeDrop();
+  if(!was){
+    // Position using fixed coords so it escapes overflow:hidden containers
+    const btn = triggerEl || document.querySelector('[onclick*="' + id + '"]');
+    if(btn){
+      const r = btn.getBoundingClientRect();
+      el.style.top  = (r.bottom + 4) + 'px';
+      // align right edge of dropdown to right edge of button by default
+      const menuW = parseInt(el.style.minWidth) || 190;
+      let left = r.right - menuW;
+      if(left < 8) left = 8;
+      el.style.left = left + 'px';
+      el.style.right = 'auto';
+      // Special cases: dd-users opens upward
+      if(id === 'dd-users'){
+        el.style.top  = 'auto';
+        el.style.bottom = (window.innerHeight - r.top + 4) + 'px';
+      }
+    }
+    el.classList.add('open');
+  }
+}
 function closeDrop(){document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('open'));}
 document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))closeDrop();});
 
