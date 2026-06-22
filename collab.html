@@ -375,6 +375,11 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 /* ─── COMING SOON ─── */
 .coming-soon{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px dashed var(--border-2);border-radius:var(--radius-sm);padding:12px 14px;font-size:12.5px;color:var(--text-muted);margin-top:4px}
 
+/* ─── PRIVATE USER TAB (admin picker) ─── */
+.private-user-tab{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);font-family:'DM Sans',sans-serif;transition:all .12s}
+.private-user-tab:hover{border-color:var(--border-2);background:var(--surface-2)}
+.private-user-tab.active{background:var(--avenza-blue-lt);color:var(--avenza-blue);border-color:#bfdbfe}
+
 /* ─── TOGGLE SWITCH ─── */
 .toggle-wrap{display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0}
 .toggle-input{display:none}
@@ -497,6 +502,10 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
         <button class="sb-item" id="si-public" onclick="navSidebar('public')">
           <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2.5 3.5-2.5 5.5s1 4 2.5 5.5M8 2.5c1.5 1.5 2.5 3.5 2.5 5.5s-1 4-2.5 5.5M2.5 8h11" stroke="currentColor" stroke-width="1.2"/></svg>
           Public files
+        </button>
+        <button class="sb-item" id="si-private" onclick="navSidebar('private')">
+          <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Private files
         </button>
       </div>
 
@@ -914,6 +923,198 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
         </div>
       </div>
 
+
+      <!-- ═══════════════════════════════
+           VIEW: PRIVATE FILES
+      ═══════════════════════════════ -->
+      <div class="page" id="view-private">
+
+        <!-- Privacy notice — changes based on role -->
+        <div id="private-notice-member" style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:11px 15px;margin-bottom:20px;font-size:12.5px;color:var(--text-secondary)">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;color:var(--avenza-teal)"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>Files here are <strong>visible only to you</strong>. Other members cannot see or access your private files. Admins may access them for compliance purposes.</span>
+        </div>
+        <div id="private-notice-admin" style="display:none;align-items:center;gap:10px;background:#fef3c7;border:1px solid #fde68a;border-radius:var(--radius-md);padding:11px 15px;margin-bottom:20px;font-size:12.5px;color:#92400e">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M8 2L14.5 13H1.5L8 2Z" stroke="#b45309" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.5V9.5" stroke="#b45309" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#b45309"/></svg>
+          <span>You are viewing <strong id="private-admin-owner-label">your own</strong> private files as an admin. Private files belong to the individual user — access them only for legitimate compliance purposes.</span>
+        </div>
+
+        <!-- Admin user picker — only visible to admins -->
+        <div id="private-user-picker" style="display:none;margin-bottom:16px">
+          <div class="card" style="padding:14px 18px">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+              <span style="font-size:12.5px;font-weight:600;color:var(--text-primary);flex-shrink:0">Viewing private files for:</span>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="private-user-tab active" id="pvt-tab-self" onclick="selectPrivateUser('self',this)">
+                  <span id="pvt-self-av" style="width:18px;height:18px;border-radius:50%;background:#0e7a8c;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;flex-shrink:0">JD</span>
+                  <span id="pvt-self-name">Jane Doe (me)</span>
+                </button>
+                <button class="private-user-tab" id="pvt-tab-mary" onclick="selectPrivateUser('mary',this)">
+                  <span style="width:18px;height:18px;border-radius:50%;background:#2563eb;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;flex-shrink:0">MB</span>
+                  Mary Beth
+                </button>
+                <button class="private-user-tab" id="pvt-tab-alan" onclick="selectPrivateUser('alan',this)">
+                  <span style="width:18px;height:18px;border-radius:50%;background:#7c3aed;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;flex-shrink:0">AR</span>
+                  Alan Rickman
+                </button>
+                <button class="private-user-tab" id="pvt-tab-penny" onclick="selectPrivateUser('penny',this)">
+                  <span style="width:18px;height:18px;border-radius:50%;background:#0891b2;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;flex-shrink:0">PP</span>
+                  Penny Purchaser
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col" style="align-items:start">
+          <div>
+            <!-- Private file list -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-head">
+                <span class="card-title">Private files</span>
+                <button class="btn sm primary" onclick="openModal('modal-upload')">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 5l4-3 4 3M3 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Upload private file
+                </button>
+              </div>
+              <table class="fb-table">
+                <thead>
+                  <tr>
+                    <th style="width:32px"></th>
+                    <th>Name</th>
+                    <th>Modified</th>
+                    <th>Size</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr onclick="toast('Opening file…')">
+                    <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                    <td><div class="fb-name-cell"><div class="fb-icon gm">GMMP</div><div><div class="fb-file-name">personal_notes_survey.gmmp</div><div class="fb-file-type">Global Mapper Project</div></div></div></td>
+                    <td class="fb-meta">Jun 18, 2026</td>
+                    <td class="fb-size">22 MB</td>
+                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs danger" onclick="event.stopPropagation();toast('File deleted.')">Delete</button></div></td>
+                  </tr>
+                  <tr onclick="toast('Opening file…')">
+                    <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                    <td><div class="fb-name-cell"><div class="fb-icon csv">CSV</div><div><div class="fb-file-name">draft_coordinates_v1.csv</div><div class="fb-file-type">CSV Spreadsheet</div></div></div></td>
+                    <td class="fb-meta">Jun 11, 2026</td>
+                    <td class="fb-size">48 KB</td>
+                    <td><div class="fb-actions-cell" style="opacity:1"><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs danger" onclick="event.stopPropagation();toast('File deleted.')">Delete</button></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right col: Backups -->
+          <div>
+            <div class="card">
+              <div class="card-head">
+                <span class="card-title">Avenza Maps backups</span>
+                <span style="font-size:11.5px;color:var(--text-muted)">Auto-saved from device</span>
+              </div>
+
+              <!-- What is this? -->
+              <div style="display:flex;align-items:flex-start;gap:10px;background:var(--surface-2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--text-muted)">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 7v4M8 5.5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Backups are created automatically when you use <strong style="color:var(--text-secondary)">Backup &amp; Restore</strong> in Avenza Maps. They contain your maps, layers, and placemarks.
+              </div>
+
+              <!-- Backup entry -->
+              <div style="border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:10px">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface)">
+                  <div style="display:flex;align-items:center;gap:11px">
+                    <!-- Avenza Maps icon stand-in -->
+                    <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                      <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="white" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2 3.5-2 5.5s.5 4 2 5.5M8 2.5c1.5 1.5 2 3.5 2 5.5s-.5 4-2 5.5M2.5 8h11" stroke="white" stroke-width="1.1"/><circle cx="8" cy="8" r="1.5" fill="white"/></svg>
+                    </div>
+                    <div>
+                      <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Jane's iPhone 15 Pro</div>
+                      <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Avenza Maps 5.12.1 · iOS 17.5</div>
+                    </div>
+                  </div>
+                  <span class="pill active" style="font-size:10.5px">Latest</span>
+                </div>
+                <div style="border-top:1px solid var(--surface-3);padding:10px 14px;background:var(--surface-2)">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+                    <div>
+                      <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Backed up</div>
+                      <div style="font-size:12.5px;font-weight:500;color:var(--text-primary)">Jun 20, 2026 · 7:14 AM</div>
+                    </div>
+                    <div>
+                      <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Backup size</div>
+                      <div style="font-size:12.5px;font-weight:500;color:var(--text-primary)">314 MB</div>
+                    </div>
+                    <div>
+                      <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Maps included</div>
+                      <div style="font-size:12.5px;font-weight:500;color:var(--text-primary)">12 maps</div>
+                    </div>
+                    <div>
+                      <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Placemarks</div>
+                      <div style="font-size:12.5px;font-weight:500;color:var(--text-primary)">847</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px">
+                    <button class="btn sm" style="flex:1;justify-content:center" onclick="toast('Downloading backup archive…')">
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 11l4 3 4-3M3 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Download .zip
+                    </button>
+                    <button class="btn sm danger" onclick="toast('Backup deleted.')">Delete</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Older backup entry -->
+              <div style="border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:10px">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface)">
+                  <div style="display:flex;align-items:center;gap:11px">
+                    <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                      <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="white" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2 3.5-2 5.5s.5 4 2 5.5M8 2.5c1.5 1.5 2 3.5 2 5.5s-.5 4-2 5.5M2.5 8h11" stroke="white" stroke-width="1.1"/><circle cx="8" cy="8" r="1.5" fill="white"/></svg>
+                    </div>
+                    <div>
+                      <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Jane's iPhone 15 Pro</div>
+                      <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Avenza Maps 5.11.3 · iOS 17.4</div>
+                    </div>
+                  </div>
+                  <span class="pill neutral" style="font-size:10.5px">Previous</span>
+                </div>
+                <div style="border-top:1px solid var(--surface-3);padding:10px 14px;background:var(--surface-2)">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+                    <div>
+                      <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Backed up</div>
+                      <div style="font-size:12.5px;font-weight:500;color:var(--text-primary)">Jun 6, 2026 · 6:52 AM</div>
+                    </div>
+                    <div>
+                      <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Backup size</div>
+                      <div style="font-size:12.5px;font-weight:500;color:var(--text-primary)">298 MB</div>
+                    </div>
+                    <div>
+                      <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Maps included</div>
+                      <div style="font-size:12.5px;font-weight:500;color:var(--text-primary)">11 maps</div>
+                    </div>
+                    <div>
+                      <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Placemarks</div>
+                      <div style="font-size:12.5px;font-weight:500;color:var(--text-primary)">801</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px">
+                    <button class="btn sm" style="flex:1;justify-content:center" onclick="toast('Downloading backup archive…')">
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 11l4 3 4-3M3 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Download .zip
+                    </button>
+                    <button class="btn sm danger" onclick="toast('Backup deleted.')">Delete</button>
+                  </div>
+                </div>
+              </div>
+
+              <div style="font-size:11.5px;color:var(--text-muted);text-align:center;padding-top:4px">
+                Backups are created from Avenza Maps → <strong>Settings → Backup &amp; Restore</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- ═══════════════════════════════
            VIEW: SHARED BY ME
@@ -2096,16 +2297,16 @@ document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))closeDrop
 
 /* ─── PROTO VIEW SWITCHER ─── */
 function switchView(view){
-  ['files','shared','admin','audit','recent','starred','trash','myshared'].forEach(v=>{
+  ['files','shared','admin','audit','recent','starred','trash','myshared','private'].forEach(v=>{
     const pg = document.getElementById('view-'+v);
     if(pg) pg.classList.toggle('active',v===view);
     const btn=document.getElementById('sw-'+v);
     if(btn)btn.classList.toggle('active',v===view);
   });
-  const labels={'files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Settings','audit':'Audit Log','recent':'Recent','starred':'Starred','trash':'Trash'};
+  const labels={'files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Settings','audit':'Audit Log','recent':'Recent','starred':'Starred','trash':'Trash','private':'Private Files'};
   document.getElementById('breadcrumb-current').textContent=labels[view]||'Files';
   document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
-  const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','myshared':'si-myshared','admin':'si-storageadmin','audit':'si-audit'};
+  const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','myshared':'si-myshared','admin':'si-storageadmin','audit':'si-audit','private':'si-private'};
   const sid=document.getElementById(sideMap[view]);
   if(sid)sid.classList.add('active');
 }
@@ -2116,6 +2317,7 @@ function navSidebar(id){
   else if(id==='myshared')     switchView('myshared');
   else if(id==='storageadmin') switchView('admin');
   else if(id==='audit')        switchView('audit');
+  else if(id==='private')      switchView('private');
   else if(id==='recent')       switchView('recent');
   else if(id==='starred')      switchView('starred');
   else if(id==='trash')        switchView('trash');
@@ -2168,6 +2370,28 @@ function switchUser(key) {
   const adminGroup = document.getElementById('sb-admin-group');
   adminGroup.style.display = u.isAdmin ? '' : 'none';
 
+  // ── Private Files: update notices, user picker, and self tab label ──
+  const noticeAdmin  = document.getElementById('private-notice-admin');
+  const noticeMember = document.getElementById('private-notice-member');
+  const userPicker   = document.getElementById('private-user-picker');
+  if (noticeAdmin && noticeMember && userPicker) {
+    noticeAdmin.style.display  = u.isAdmin ? 'flex' : 'none';
+    noticeMember.style.display = u.isAdmin ? 'none' : 'flex';
+    userPicker.style.display   = u.isAdmin ? 'block' : 'none';
+    // Update "me" tab label and avatar
+    const selfAv   = document.getElementById('pvt-self-av');
+    const selfName = document.getElementById('pvt-self-name');
+    if (selfAv)   { selfAv.textContent = u.initials; selfAv.style.background = u.color; }
+    if (selfName) selfName.textContent = u.name + ' (me)';
+    // Reset admin notice label
+    const ownerLabel = document.getElementById('private-admin-owner-label');
+    if (ownerLabel) ownerLabel.textContent = 'your own';
+    // Reset user picker to self tab
+    document.querySelectorAll('.private-user-tab').forEach(t => t.classList.remove('active'));
+    const selfTab = document.getElementById('pvt-tab-self');
+    if (selfTab) selfTab.classList.add('active');
+  }
+
   // ── Admin-only proto bar buttons ──
   ['sw-admin','sw-audit'].forEach(id => {
     const el = document.getElementById(id);
@@ -2189,7 +2413,7 @@ function switchUser(key) {
 }
 
 function getCurrentView() {
-  const views = ['files','shared','myshared','recent','starred','trash','admin','audit'];
+  const views = ['files','shared','myshared','recent','starred','trash','admin','audit','private'];
   return views.find(v => {
     const el = document.getElementById('view-' + v);
     return el && el.classList.contains('active');
@@ -2386,6 +2610,21 @@ function checkTrashEmpty(){
 function toggleTrashSelectAll(cb){
   document.querySelectorAll('.trash-check').forEach(c=>c.checked=cb.checked);
   if(cb.checked) toast('All trash items selected');
+}
+
+/* ─── PRIVATE FILES: admin user picker ─── */
+function selectPrivateUser(key, tabEl) {
+  document.querySelectorAll('.private-user-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  const ownerLabel = document.getElementById('private-admin-owner-label');
+  if (key === 'self') {
+    ownerLabel.textContent = 'your own';
+    toast('Viewing your own private files.');
+  } else {
+    const u = USERS[key];
+    if (ownerLabel && u) ownerLabel.textContent = u.name + "'s";
+    toast('Viewing ' + (u ? u.name : key) + "'s private files (compliance access).");
+  }
 }
 
 /* ─── REVOKE SHARE ─── */
