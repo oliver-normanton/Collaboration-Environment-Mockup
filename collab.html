@@ -634,6 +634,92 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 }
 .fb-grid-card:hover .file-menu-btn{opacity:1}
 .fb-grid-card.selected .file-menu-btn{opacity:1}
+
+/* ─── MAP VIEWER (Felt-inspired, read-only preview) ───
+   New in this pass: a lightweight map preview for geospatial files
+   (GeoPDF, GeoTIFF, GeoPackage, KML, Global Mapper). Deliberately
+   scoped down from a full Felt-style editor — one layer, no drawing/
+   annotation tools, no adding layers. Reuses .fb-info-* classes for
+   the details panel and .btn/.icon-btn for actions rather than
+   inventing new button styles. */
+.mapviewer-wrap{position:relative;height:100%;overflow:hidden;background:var(--surface-3);border-radius:var(--radius-md)}
+.mapviewer-canvas{position:absolute;inset:0;overflow:hidden;transition:background .2s}
+.mapviewer-canvas[data-basemap="light"]{
+  background-color:var(--surface-2);
+  background-image:
+    repeating-linear-gradient(0deg,var(--border) 0 1px,transparent 1px 42px),
+    repeating-linear-gradient(90deg,var(--border) 0 1px,transparent 1px 42px);
+}
+.mapviewer-canvas[data-basemap="terrain"]{background:linear-gradient(165deg,var(--green-lt) 0%,var(--amber-lt) 55%,#f5f3ff 100%)}
+.mapviewer-canvas[data-basemap="satellite"]{background:linear-gradient(150deg,var(--avenza-navy) 0%,var(--avenza-teal) 60%,var(--avenza-navy) 100%)}
+.mapviewer-overlay{width:100%;height:100%;display:block}
+#mv-overlay-group{transition:transform .15s ease,opacity .15s ease;transform-origin:400px 260px}
+
+.mapviewer-topbar{
+  position:absolute;top:14px;left:14px;right:14px;z-index:20;
+  display:flex;align-items:center;gap:12px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  box-shadow:var(--shadow-md);padding:8px 12px;
+}
+.mapviewer-topbar-file{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.mapviewer-file-name{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mapviewer-file-type{font-size:11px;color:var(--text-muted)}
+.mapviewer-topbar-actions{display:flex;gap:8px;flex-shrink:0}
+
+.mapviewer-panel{
+  position:absolute;z-index:15;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);box-shadow:var(--shadow-md);
+}
+.mapviewer-panel-layers{top:66px;left:14px;width:208px;padding:12px}
+.mapviewer-panel-header{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px}
+.mapviewer-panel-subhead{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.mapviewer-panel-divider{height:1px;background:var(--border);margin:12px 0}
+.mapviewer-layer-row{display:flex;align-items:center;gap:8px;padding:6px 7px;border-radius:var(--radius-sm);background:var(--surface-2)}
+.mv-eye-btn{width:24px;height:24px;border-radius:6px;border:none;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--border-2);flex-shrink:0}
+.mv-eye-btn.active{color:var(--avenza-blue)}
+.mv-layer-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0;background:var(--avenza-blue)}
+.mv-layer-name{font-size:12px;color:var(--text-primary);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mapviewer-basemap-row{display:flex;gap:8px}
+.mv-basemap-swatch{
+  width:38px;height:32px;border-radius:6px;border:2px solid transparent;cursor:pointer;
+  box-shadow:inset 0 0 0 1px var(--border);padding:0;
+}
+.mv-basemap-swatch[data-basemap="light"]{background:repeating-linear-gradient(0deg,var(--border) 0 1px,var(--surface-2) 1px 8px)}
+.mv-basemap-swatch[data-basemap="terrain"]{background:linear-gradient(165deg,var(--green-lt),var(--amber-lt))}
+.mv-basemap-swatch[data-basemap="satellite"]{background:linear-gradient(150deg,var(--avenza-navy),var(--avenza-teal))}
+.mv-basemap-swatch.active{border-color:var(--avenza-blue)}
+
+.mapviewer-panel-details{top:66px;right:14px;width:236px;max-height:calc(100% - 130px);display:flex;flex-direction:column;overflow:hidden}
+.mapviewer-panel-details .fb-info-body{padding:12px;overflow-y:auto}
+.mapviewer-panel-details.collapsed{width:auto}
+.mapviewer-panel-details.collapsed .fb-info-body{display:none}
+
+.mapviewer-legend{bottom:14px;left:14px;width:208px;padding:12px}
+.mv-legend-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.mv-legend-row:last-child{margin-bottom:0}
+.mv-legend-text{font-size:11.5px;color:var(--text-secondary)}
+.mv-legend-point{width:10px;height:10px;border-radius:50%;flex-shrink:0;background:var(--red)}
+.mv-legend-line{width:16px;height:0;border-top:2px solid var(--avenza-blue);flex-shrink:0}
+.mv-legend-polygon{width:14px;height:10px;border:2px solid var(--green);background:var(--green-lt);flex-shrink:0}
+.mv-legend-ramp{width:16px;height:10px;border-radius:2px;flex-shrink:0;background:linear-gradient(90deg,#166534,#d97706,#f5f3ff)}
+
+.mapviewer-zoomctl{
+  position:absolute;bottom:54px;right:14px;z-index:15;
+  display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);box-shadow:var(--shadow-md);overflow:hidden;
+}
+.mv-zoom-btn{width:34px;height:32px;border:none;background:none;cursor:pointer;font-size:16px;color:var(--text-secondary);line-height:1;font-family:'DM Sans',sans-serif}
+.mv-zoom-btn:first-child{border-bottom:1px solid var(--border)}
+.mv-zoom-btn:hover{background:var(--surface-2);color:var(--avenza-blue)}
+
+.mapviewer-statusbar{
+  position:absolute;bottom:14px;right:14px;z-index:15;
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:5px 10px;font-size:10.5px;color:var(--text-secondary);box-shadow:var(--shadow-sm);
+}
+.mapviewer-scale-bar{width:30px;height:0;border-top:2px solid var(--text-secondary);display:inline-block;vertical-align:middle}
+.mv-coords{font-family:'DM Mono',monospace;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1059,7 +1145,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                       </td>
                     </tr>
                     <!-- File rows -->
-                    <tr onclick="selectFile('q2-survey')" id="row-q2-survey">
+                    <tr onclick="selectFile('q2-survey')" ondblclick="openMapViewer('q2-survey')" id="row-q2-survey">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
@@ -1078,7 +1164,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                         <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
                       </td>
                     </tr>
-                    <tr onclick="selectFile('terrain-analysis')" id="row-terrain-analysis">
+                    <tr onclick="selectFile('terrain-analysis')" ondblclick="openMapViewer('terrain-analysis')" id="row-terrain-analysis">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
@@ -1097,7 +1183,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                         <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
                       </td>
                     </tr>
-                    <tr onclick="selectFile('dem-mosaic')" id="row-dem-mosaic">
+                    <tr onclick="selectFile('dem-mosaic')" ondblclick="openMapViewer('dem-mosaic')" id="row-dem-mosaic">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
@@ -1116,7 +1202,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                         <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
                       </td>
                     </tr>
-                    <tr onclick="selectFile('field-map')" id="row-field-map">
+                    <tr onclick="selectFile('field-map')" ondblclick="openMapViewer('field-map')" id="row-field-map">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
@@ -1135,7 +1221,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                         <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
                       </td>
                     </tr>
-                    <tr onclick="selectFile('waypoints')" id="row-waypoints">
+                    <tr onclick="selectFile('waypoints')" ondblclick="openMapViewer('waypoints')" id="row-waypoints">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
@@ -2581,6 +2667,94 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
         </div>
       </div>
 
+      <!-- ═══════════════════════════════
+           VIEW: MAP VIEWER (read-only geospatial preview)
+      ═══════════════════════════════ -->
+      <div class="page" id="view-mapviewer">
+        <div class="mapviewer-wrap">
+          <div class="mapviewer-canvas" id="mv-canvas" data-basemap="light">
+            <svg class="mapviewer-overlay" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Map preview canvas">
+              <g id="mv-overlay-group"></g>
+            </svg>
+          </div>
+
+          <!-- Top bar: file identity + primary actions -->
+          <div class="mapviewer-topbar">
+            <button class="btn sm" onclick="closeMapViewer()">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Back to files
+            </button>
+            <div class="mapviewer-topbar-file">
+              <div class="fb-icon gpkg" id="mv-file-icon" style="width:28px;height:28px;font-size:9px">GPKG</div>
+              <div style="min-width:0">
+                <div class="mapviewer-file-name" id="mv-file-name">q2_survey_results.gpkg</div>
+                <div class="mapviewer-file-type" id="mv-file-type">GeoPackage · Read-only preview</div>
+              </div>
+            </div>
+            <div class="mapviewer-topbar-actions">
+              <button class="btn sm" onclick="openModal('modal-share')">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="13" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="8" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.7L5.5 7.3M10.5 12.3L5.5 8.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Share
+              </button>
+              <button class="btn sm primary" id="mv-download-btn" onclick="toast('Downloading ' + (FILE_DATA[_mvFileId] ? FILE_DATA[_mvFileId].name : 'file') + '…')">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 11l4 3 4-3M3 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Download
+              </button>
+            </div>
+          </div>
+
+          <!-- Layers panel -->
+          <div class="mapviewer-panel mapviewer-panel-layers">
+            <div class="mapviewer-panel-header">Layers</div>
+            <div class="mapviewer-layer-row">
+              <button class="mv-eye-btn active" id="mv-layer-toggle" onclick="toggleLayerVisibility()" aria-label="Toggle layer visibility" title="Toggle layer visibility">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-4.5 7-4.5S15 8 15 8s-2.5 4.5-7 4.5S1 8 1 8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.8" stroke="currentColor" stroke-width="1.3"/></svg>
+              </button>
+              <span class="mv-layer-swatch" id="mv-layer-swatch"></span>
+              <span class="mv-layer-name" id="mv-layer-name">q2_survey_results</span>
+            </div>
+            <div class="mapviewer-panel-divider"></div>
+            <div class="mapviewer-panel-subhead">Basemap</div>
+            <div class="mapviewer-basemap-row" role="group" aria-label="Choose basemap style">
+              <button class="mv-basemap-swatch active" data-basemap="light" onclick="setBasemap('light')" title="Light" aria-label="Light basemap"></button>
+              <button class="mv-basemap-swatch" data-basemap="terrain" onclick="setBasemap('terrain')" title="Terrain" aria-label="Terrain basemap"></button>
+              <button class="mv-basemap-swatch" data-basemap="satellite" onclick="setBasemap('satellite')" title="Satellite" aria-label="Satellite basemap"></button>
+            </div>
+          </div>
+
+          <!-- Details panel (reuses fb-info-* patterns from the file browser) -->
+          <div class="mapviewer-panel mapviewer-panel-details" id="mv-details-panel">
+            <div class="fb-info-header">
+              <span class="fb-info-title">Details</span>
+              <button class="icon-btn" style="width:22px;height:22px;border:none;background:none" onclick="toggleDetailsPanel()" title="Collapse details" aria-label="Collapse details panel">
+                <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            <div class="fb-info-body" id="mv-details-body"></div>
+          </div>
+
+          <!-- Legend -->
+          <div class="mapviewer-panel mapviewer-legend" id="mv-legend">
+            <div class="mapviewer-panel-subhead">Legend</div>
+            <div id="mv-legend-body"></div>
+          </div>
+
+          <!-- Zoom controls -->
+          <div class="mapviewer-zoomctl">
+            <button class="mv-zoom-btn" onclick="mvZoomStep(1)" aria-label="Zoom in">+</button>
+            <button class="mv-zoom-btn" onclick="mvZoomStep(-1)" aria-label="Zoom out">−</button>
+          </div>
+
+          <!-- Scale + coordinates -->
+          <div class="mapviewer-statusbar">
+            <span class="mapviewer-scale-bar" aria-hidden="true"></span>
+            <span id="mv-scale-label">5 km</span>
+            <span style="color:var(--border-2)">·</span>
+            <span class="mv-coords" id="mv-coords">43.812° N, 79.622° W</span>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /page-body -->
   </div><!-- /main -->
 </div><!-- /app -->
@@ -3423,6 +3597,161 @@ const FILE_DATA={
   'metadata-export':{name:'metadata_export_jun2026.csv',type:'CSV',modified:'Jun 5, 2026',size:'840 KB',sharing:'Private',icon:'csv',crs:null,bbox:null},
 };
 
+/* ─── MAP VIEWER (Felt-inspired, read-only preview) ───
+   Scoped down deliberately: one layer (the file itself), no adding
+   layers, no drawing/measuring tools. Just enough to see what a file
+   contains before deciding to download or share it. */
+const MV_VIEWABLE = new Set(['gpkg','gm','tif','pdf','kml']);
+const MV_LAYER_META = {
+  gpkg:{label:'Vector · Polygons', color:'#166534', legend:[
+    {swatch:'polygon', color:'#166534', text:'Survey plot boundary'},
+    {swatch:'point',   color:'#084888', text:'Sample point'}
+  ]},
+  gm:{label:'Vector · Contours', color:'#0e7a8c', legend:[
+    {swatch:'line',  color:'#0e7a8c', text:'Elevation contour (5 m interval)'},
+    {swatch:'point', color:'#dc2626', text:'Survey benchmark'}
+  ]},
+  tif:{label:'Raster · Elevation', color:'#7c3aed', legend:[
+    {swatch:'ramp', text:'Elevation, low to high'}
+  ]},
+  pdf:{label:'Vector · Map features', color:'#dc2626', legend:[
+    {swatch:'line',  color:'#084888', text:'Road'},
+    {swatch:'point', color:'#dc2626', text:'Point of interest'}
+  ]},
+  kml:{label:'Vector · Placemarks', color:'#15803d', legend:[
+    {swatch:'point', color:'#dc2626', text:'Waypoint'}
+  ]}
+};
+const MV_ICON_LABEL = {gpkg:'GPKG',gm:'GMMP',tif:'TIF',pdf:'PDF',kml:'KML'};
+const MV_OVERLAY_TEMPLATES = {
+  gpkg:`<rect x="220" y="140" width="180" height="120" rx="4" fill="rgba(22,101,52,.18)" stroke="#166534" stroke-width="2"/>
+        <rect x="430" y="220" width="140" height="150" rx="4" fill="rgba(22,101,52,.18)" stroke="#166534" stroke-width="2"/>
+        <rect x="300" y="320" width="110" height="90" rx="4" fill="rgba(22,101,52,.18)" stroke="#166534" stroke-width="2"/>
+        <circle cx="310" cy="200" r="5" fill="#084888"/><circle cx="480" cy="290" r="5" fill="#084888"/>`,
+  gm:`<path d="M120 420 Q 300 340 480 400 T 720 380" fill="none" stroke="#0e7a8c" stroke-width="2"/>
+      <path d="M140 360 Q 320 280 500 340 T 740 310" fill="none" stroke="#0e7a8c" stroke-width="2"/>
+      <path d="M160 300 Q 340 220 520 280 T 760 240" fill="none" stroke="#0e7a8c" stroke-width="2" stroke-opacity=".7"/>
+      <circle cx="360" cy="300" r="5" fill="#dc2626"/>`,
+  tif:`<defs><linearGradient id="mv-dem-ramp" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0%" stop-color="#166534"/><stop offset="45%" stop-color="#d97706"/><stop offset="100%" stop-color="#f5f3ff"/>
+      </linearGradient></defs>
+      <rect x="120" y="80" width="560" height="360" fill="url(#mv-dem-ramp)" opacity=".75"/>`,
+  pdf:`<path d="M140 460 L 340 200 L 560 260 L 700 120" fill="none" stroke="#084888" stroke-width="3"/>
+       <path d="M180 120 L 400 380" fill="none" stroke="#084888" stroke-width="3"/>
+       <circle cx="340" cy="200" r="6" fill="#dc2626"/><circle cx="560" cy="260" r="6" fill="#dc2626"/><circle cx="400" cy="380" r="6" fill="#dc2626"/>`,
+  kml:`<circle cx="260" cy="180" r="6" fill="#dc2626"/><circle cx="420" cy="240" r="6" fill="#dc2626"/>
+       <circle cx="360" cy="360" r="6" fill="#dc2626"/><circle cx="540" cy="300" r="6" fill="#dc2626"/><circle cx="480" cy="150" r="6" fill="#dc2626"/>`
+};
+
+let _mvFileId = null;
+let _mvReturnView = 'files';
+let mvZoom = 1;
+let mvLayerVisible = true;
+
+function openMapViewer(id){
+  const f = FILE_DATA[id];
+  if(!f) return;
+  if(!MV_VIEWABLE.has(f.icon)){
+    toast('Preview not available for this file type.');
+    return;
+  }
+  _mvFileId = id;
+  const activePage = document.querySelector('.page.active');
+  _mvReturnView = activePage ? activePage.id.replace('view-','') : 'files';
+
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('view-mapviewer').classList.add('active');
+  document.getElementById('breadcrumb-current').textContent = f.name;
+
+  document.getElementById('mv-file-icon').className = 'fb-icon ' + f.icon;
+  document.getElementById('mv-file-icon').textContent = MV_ICON_LABEL[f.icon] || 'FILE';
+  document.getElementById('mv-file-name').textContent = f.name;
+  document.getElementById('mv-file-type').textContent = f.type + ' · Read-only preview';
+  document.getElementById('mv-layer-name').textContent = f.name.replace(/\.[a-z0-9]+$/i,'');
+
+  const meta = MV_LAYER_META[f.icon] || MV_LAYER_META.gpkg;
+  document.getElementById('mv-layer-swatch').style.background = meta.color;
+
+  document.getElementById('mv-legend-body').innerHTML = meta.legend.map(item=>{
+    if(item.swatch==='ramp'){
+      return `<div class="mv-legend-row"><span class="mv-legend-ramp"></span><span class="mv-legend-text">${item.text}</span></div>`;
+    }
+    const shapeClass = item.swatch==='line' ? 'mv-legend-line' : (item.swatch==='polygon' ? 'mv-legend-polygon' : 'mv-legend-point');
+    const styleProp = item.swatch==='point' ? 'background' : 'border-color';
+    return `<div class="mv-legend-row"><span class="${shapeClass}" style="${styleProp}:${item.color}"></span><span class="mv-legend-text">${item.text}</span></div>`;
+  }).join('');
+
+  let geoRows = '';
+  if (f.crs)  geoRows += `<div class="fb-info-row"><span class="fb-info-key">CRS</span><span class="fb-info-val">${f.crs}</span></div>`;
+  if (f.bbox) geoRows += `<div class="fb-info-row"><span class="fb-info-key">Bounding box</span><span class="fb-info-val">${f.bbox}</span></div>`;
+  document.getElementById('mv-details-body').innerHTML = `
+    <div class="fb-info-section">
+      <div class="fb-info-section-label">File details</div>
+      <div class="fb-info-row"><span class="fb-info-key">Size</span><span class="fb-info-val">${f.size}</span></div>
+      <div class="fb-info-row"><span class="fb-info-key">Modified</span><span class="fb-info-val">${f.modified}</span></div>
+      <div class="fb-info-row"><span class="fb-info-key">Sharing</span><span class="fb-info-val">${f.sharing}</span></div>
+    </div>
+    ${geoRows ? `<div class="fb-info-section"><div class="fb-info-section-label">Geospatial metadata</div>${geoRows}</div>` : ''}
+    <div class="fb-info-section">
+      <div class="fb-info-section-label">Layer</div>
+      <div class="fb-info-row"><span class="fb-info-key">Type</span><span class="fb-info-val">${meta.label}</span></div>
+    </div>`;
+
+  document.getElementById('mv-overlay-group').innerHTML = MV_OVERLAY_TEMPLATES[f.icon] || MV_OVERLAY_TEMPLATES.gpkg;
+  document.getElementById('mv-overlay-group').style.opacity = '1';
+  document.getElementById('mv-details-panel').classList.remove('collapsed');
+  mvZoom = 1;
+  mvLayerVisible = true;
+  document.getElementById('mv-layer-toggle').classList.add('active');
+  applyMvZoom();
+  setBasemap('light');
+}
+
+function closeMapViewer(){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const ret = document.getElementById('view-' + _mvReturnView) ? _mvReturnView : 'files';
+  switchView(ret);
+}
+
+function setBasemap(name){
+  document.getElementById('mv-canvas').setAttribute('data-basemap', name);
+  document.querySelectorAll('.mv-basemap-swatch').forEach(b=>b.classList.toggle('active', b.dataset.basemap===name));
+}
+
+function toggleLayerVisibility(){
+  mvLayerVisible = !mvLayerVisible;
+  document.getElementById('mv-overlay-group').style.opacity = mvLayerVisible ? '1' : '0';
+  document.getElementById('mv-layer-toggle').classList.toggle('active', mvLayerVisible);
+}
+
+function toggleDetailsPanel(){
+  document.getElementById('mv-details-panel').classList.toggle('collapsed');
+}
+
+function mvZoomStep(dir){
+  mvZoom = Math.min(2.2, Math.max(0.6, +(mvZoom + dir*0.2).toFixed(1)));
+  applyMvZoom();
+}
+function applyMvZoom(){
+  document.getElementById('mv-overlay-group').style.transform = 'scale(' + mvZoom + ')';
+  const scaleKm = Math.round((5 / mvZoom) * 10) / 10;
+  document.getElementById('mv-scale-label').textContent = scaleKm + ' km';
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  const canvas = document.getElementById('mv-canvas');
+  if(!canvas) return;
+  canvas.addEventListener('mousemove', function(e){
+    const rect = this.getBoundingClientRect();
+    const xPct = (e.clientX - rect.left) / rect.width;
+    const yPct = (e.clientY - rect.top) / rect.height;
+    const lat = 44.8 - yPct * (44.8 - 43.2);
+    const lon = -80.1 + xPct * (80.1 - 79.3);
+    const coordsEl = document.getElementById('mv-coords');
+    if(coordsEl) coordsEl.textContent = Math.abs(lat).toFixed(3) + '° N, ' + Math.abs(lon).toFixed(3) + '° W';
+  });
+});
+
 /* ─── SINGLE FILE SELECTION ─── */
 let selectedFile = null;
 
@@ -3462,7 +3791,11 @@ function selectFile(id) {
       ${geoRows ? `<div class="fb-info-section"><div class="fb-info-section-label">Geospatial metadata</div>${geoRows}</div>` : ''}
     </div>
     <div class="fb-info-footer">
-      <button class="btn sm primary" onclick="toast('Downloading ${f.name}…')">
+      ${MV_VIEWABLE.has(f.icon) ? `<button class="btn sm primary" onclick="openMapViewer('${id}')">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 8s2.5-4.5 6-4.5S14 8 14 8s-2.5 4.5-6 4.5S2 8 2 8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"/></svg>
+        Open
+      </button>` : ''}
+      <button class="btn sm${MV_VIEWABLE.has(f.icon) ? '' : ' primary'}" onclick="toast('Downloading ${f.name}…')">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 11l4 3 4-3M3 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Download
       </button>
@@ -3736,6 +4069,7 @@ function revokeShare(btn, filename){
 /* ─── FILE CONTEXT MENU ─── */
 let _ctxFile = null;
 let _ctxBtn  = null;
+let _ctxId   = null;
 
 function openFileMenu(e, triggerEl) {
   e.stopPropagation();
@@ -3745,6 +4079,7 @@ function openFileMenu(e, triggerEl) {
   // Find file name from row
   const nameEl = row && row.querySelector('.fb-file-name');
   _ctxFile = nameEl ? nameEl.textContent.trim() : 'this file';
+  _ctxId   = row && row.id ? row.id.replace('row-','') : null;
   _ctxBtn  = triggerEl;
 
   // Close any open menu first
@@ -3784,7 +4119,9 @@ function ctxAction(action) {
   const name = _ctxFile || 'file';
   switch(action) {
     case 'open':
-      toast('Opening ' + name + '…'); break;
+      if (_ctxId && FILE_DATA[_ctxId] && MV_VIEWABLE.has(FILE_DATA[_ctxId].icon)) openMapViewer(_ctxId);
+      else toast('Preview not available for this file type.');
+      break;
     case 'download':
       toast('Downloading ' + name + '…'); break;
     case 'rename':
