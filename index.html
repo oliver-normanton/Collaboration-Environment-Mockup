@@ -3038,20 +3038,22 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
      license (.lic/JWT) — the standard installer has no import path for it. -->
 <div class="modal-bg" id="modal-airgap-builds">
   <div class="modal" style="max-width:480px">
-    <div class="modal-title">Download Global Mapper Air-gapped build</div>
+    <div class="modal-title">Download Air-gapped Builds</div>
+    <div class="modal-sub">Choose the build(s) you need. The download will start when you confirm.</div>
     <div id="airgap-builds-picker">
       <div class="m-note warn" style="margin-bottom:14px">
         <strong>&#9888; Use this build on air-gapped machines.</strong> Only the Air-gapped build ships with the module required to import an issued offline license token (JWT). The standard installer cannot import offline licenses.
       </div>
       <div class="modal-label">Build</div>
-      <select class="modal-select" id="airgap-build-sel" size="4" style="height:auto;padding:6px 8px">
-        <option value="Windows 64-bit" selected>Windows 64-bit \u2014 Air-gapped build</option>
-        <option value="macOS (Apple Silicon)">macOS (Apple Silicon) \u2014 Air-gapped build</option>
-        <option value="macOS (Intel)">macOS (Intel) \u2014 Air-gapped build</option>
-        <option value="Linux (Ubuntu/Debian)">Linux (Ubuntu/Debian) \u2014 Air-gapped build</option>
+      <select class="modal-select" id="airgap-build-sel" size="6" multiple onchange="_syncAirgapBuildsButtonLabel()" style="height:auto;padding:6px 8px">
+        <option value="Windows 64-bit" data-app="Global Mapper Desktop" selected>Global Mapper Desktop (Air-gapped) - Windows 64-bit</option>
+        <option value="Windows 64-bit" data-app="Geographic Calculator">Geographic Calculator (Air-gapped) - Windows 64-bit</option>
+        <option value="Windows 64-bit" data-app="MAPublisher">MAPublisher (Air-gapped) - Windows 64-bit</option>
+        <option value="macOS (Apple Silicon)" data-app="MAPublisher">MAPublisher (Air-gapped) - macOS (Apple Silicon)</option>
       </select>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px;margin-bottom:4px">Hold Ctrl (Windows) or \u2318 (Mac) and click to select more than one build.</div>
       <div class="modal-row">
-        <button class="btn primary" style="flex:1" onclick="confirmAirgapBuildDownload()">Download build</button>
+        <button class="btn primary" style="flex:1" id="airgap-builds-download-btn" onclick="confirmAirgapBuildDownload()">Download</button>
         <button class="btn" onclick="closeModal()">Cancel</button>
       </div>
     </div>
@@ -7753,14 +7755,17 @@ function confirmAirgapBundle(){
   toast('\u2713 Generated and downloaded ' + count + ' offline license bundle' + (count!==1?'s':'') + ' as air-gapped-licenses.zip');
 }
 
-// Air-gapped builds are a small, fixed list (this SKU isn't tiered the way
-// Professional/Advanced are), so unlike _installerOptionsFor() there's no
-// tier branching \u2014 just one build per platform.
+// Air-gapped builds are per-application, and platform availability differs
+// by app: MAPublisher ships for both Windows and macOS (Apple Silicon); the
+// other two are Windows-only today. Flat list (same style as
+// _INSTALLER_BASE_OPTIONS) with the app name folded into each label, rather
+// than grouped — matches how the standard installer picker lists Global
+// Mapper / Geographic Calculator / MAPublisher installers together.
 const _AIRGAP_BUILD_OPTIONS = [
-  { value: 'Windows 64-bit',        label: 'Windows 64-bit \u2014 Air-gapped build' },
-  { value: 'macOS (Apple Silicon)', label: 'macOS (Apple Silicon) \u2014 Air-gapped build' },
-  { value: 'macOS (Intel)',         label: 'macOS (Intel) \u2014 Air-gapped build' },
-  { value: 'Linux (Ubuntu/Debian)', label: 'Linux (Ubuntu/Debian) \u2014 Air-gapped build' },
+  { value: 'Windows 64-bit',        app: 'Global Mapper Desktop', label: 'Global Mapper Desktop (Air-gapped) - Windows 64-bit' },
+  { value: 'Windows 64-bit',        app: 'Geographic Calculator', label: 'Geographic Calculator (Air-gapped) - Windows 64-bit' },
+  { value: 'Windows 64-bit',        app: 'MAPublisher',           label: 'MAPublisher (Air-gapped) - Windows 64-bit' },
+  { value: 'macOS (Apple Silicon)', app: 'MAPublisher',           label: 'MAPublisher (Air-gapped) - macOS (Apple Silicon)' },
 ];
 
 // AIR-GAPPED BRANCH: Download opens this instead of the standard installer
@@ -7775,35 +7780,64 @@ function openAirgapBuilds(){
   if(success) success.style.display = 'none';
   const sel = document.getElementById('airgap-build-sel');
   if(sel){
-    sel.innerHTML = _AIRGAP_BUILD_OPTIONS.map(o => '<option value="'+o.value+'">'+o.label+'</option>').join('');
-    // Default to the detected OS's build so the common case is one click.
+    sel.innerHTML = _AIRGAP_BUILD_OPTIONS.map(o => '<option value="'+o.value+'" data-app="'+o.app+'">'+o.label+'</option>').join('');
+    // Default to a single selection matching the detected OS, so the common
+    // case (one build) is still just one click — admin can Ctrl/Cmd-click to
+    // add more. macOS only exists under MAPublisher today, so that's an
+    // unambiguous pick; Windows matches whichever app is listed first
+    // (Global Mapper Desktop), a reasonable default absent other context.
+    Array.prototype.forEach.call(sel.options, o => { o.selected = false; });
     const os = _detectOS() || '';
-    let defaultVal = _AIRGAP_BUILD_OPTIONS[0].value;
-    if(/mac/i.test(os)) defaultVal = 'macOS (Apple Silicon)';
-    else if(/linux/i.test(os)) defaultVal = 'Linux (Ubuntu/Debian)';
-    else if(/windows/i.test(os)) defaultVal = 'Windows 64-bit';
-    sel.value = defaultVal;
+    const wantValue = /mac/i.test(os) ? 'macOS (Apple Silicon)' : 'Windows 64-bit';
+    const defaultOpt = Array.prototype.find.call(sel.options, o => o.value === wantValue);
+    if(defaultOpt) defaultOpt.selected = true;
   }
+  _syncAirgapBuildsButtonLabel();
   document.getElementById('modal-airgap-builds').classList.add('open');
+}
+
+// Keeps the Download button's label (and enabled state) in sync with however
+// many builds are currently selected in the multi-select list.
+function _syncAirgapBuildsButtonLabel(){
+  const sel = document.getElementById('airgap-build-sel');
+  const btn = document.getElementById('airgap-builds-download-btn');
+  if(!sel || !btn) return;
+  const n = sel.selectedOptions ? sel.selectedOptions.length : 0;
+  btn.textContent = n > 1 ? ('Download (' + n + ')') : 'Download';
+  btn.disabled = (n === 0);
 }
 
 function confirmAirgapBuildDownload(){
   const sel = document.getElementById('airgap-build-sel');
-  const choice = sel ? sel.value : _AIRGAP_BUILD_OPTIONS[0].value;
+  const opts = sel && sel.selectedOptions ? Array.prototype.slice.call(sel.selectedOptions) : [];
+  if(!opts.length) return;
+  const picks = opts.map(o => ({ app: o.getAttribute('data-app'), platform: o.value }));
   const now = Date.now();
   const formatted = _formatTodayDateTime();
   const _me = currentUData();
-  downloadHistory.push({
-    product: 'Global Mapper Air-gapped',
-    installer: choice + ' (S3 air-gapped build)',
-    datetime: formatted,
-    timestamp: now,
-    os: _detectOS(),
-    by: (_me && _me.name) ? _me.name : 'Unknown',
-    byEmail: (_me && _me.email) ? _me.email : '',
-    device: _deviceLabel(),
-    address: SESSION_ADDRESS,
-  });
+  const by = (_me && _me.name) ? _me.name : 'Unknown';
+  const byEmail = (_me && _me.email) ? _me.email : '';
+  const os = _detectOS();
+  const device = _deviceLabel();
+
+  if(picks.length === 1){
+    // Single build \u2014 log it the same specific way as before.
+    downloadHistory.push({
+      product: picks[0].app + ' (Air-gapped)',
+      installer: picks[0].platform + ' (S3 air-gapped build)',
+      datetime: formatted, timestamp: now, os: os,
+      by: by, byEmail: byEmail, device: device, address: SESSION_ADDRESS,
+    });
+  } else {
+    // Multiple builds selected at once \u2014 one combined history entry listing
+    // all of them, same pattern as the license-bundle bulk download.
+    downloadHistory.push({
+      product: picks.length + ' Air-gapped builds',
+      installer: picks.map(p => p.app + ' \u2014 ' + p.platform).join(', '),
+      datetime: formatted, timestamp: now, os: os,
+      by: by, byEmail: byEmail, device: device, address: SESSION_ADDRESS,
+    });
+  }
   if(downloadHistory.length > MAX_DOWNLOAD_HISTORY){
     downloadHistory = downloadHistory.slice(-MAX_DOWNLOAD_HISTORY);
   }
@@ -7813,8 +7847,12 @@ function confirmAirgapBuildDownload(){
   const success = document.getElementById('airgap-builds-success');
   const detail = document.getElementById('airgap-builds-success-detail');
   if(detail){
-    detail.innerHTML = 'Your <strong>' + choice + ' Air-gapped build</strong> download will complete shortly. '
-      + 'Remember \u2014 only this build can import an offline license file. You can close this dialog.';
+    detail.innerHTML = picks.length === 1
+      ? ('Your <strong>' + picks[0].app + ' \u2014 ' + picks[0].platform + ' Air-gapped build</strong> download will complete shortly. '
+         + 'Remember \u2014 only Air-gapped builds can import an offline license file. You can close this dialog.')
+      : ('Your <strong>' + picks.length + ' Air-gapped builds</strong> will download shortly: '
+         + picks.map(p => p.app + ' (' + p.platform + ')').join(', ') + '. '
+         + 'Remember \u2014 only Air-gapped builds can import an offline license file. You can close this dialog.');
   }
   if(picker)  picker.style.display = 'none';
   if(success) success.style.display = '';
