@@ -3016,15 +3016,57 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
   </div>
 </div>
 
-<!-- AIR-GAPPED LICENSE BUNDLE (branch only) -->
+<!-- AIR-GAPPED LICENSE BUNDLE (branch only) — reached from Manage on the
+     Licenses page for the Air-gapped row. Lets an admin review the Machine ID
+     captured for each user/app, correct it if needed, then generate and
+     download the offline license (JWT) files as a bundle. -->
 <div class="modal-bg" id="modal-airgap-bundle">
   <div class="modal lg">
     <div class="m-head">
-      <div class="modal-title">Download offline license files</div>
+      <div class="modal-title">Manage offline licenses</div>
       <div class="modal-sub" id="airgap-sub" style="margin-bottom:0"></div>
     </div>
     <div class="m-body" id="airgap-body"></div>
     <div class="m-foot" id="airgap-foot"></div>
+  </div>
+</div>
+
+<!-- AIR-GAPPED BUILD DOWNLOAD (branch only) — reached from Download on the
+     Licenses page for the Air-gapped row. Distinct from the standard
+     installer picker: these builds ship from their own S3 distribution
+     bucket and are the only builds that can import an issued offline
+     license (.lic/JWT) — the standard installer has no import path for it. -->
+<div class="modal-bg" id="modal-airgap-builds">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">Download Global Mapper Air-gapped build</div>
+    <div class="modal-sub">Served from a dedicated, access-controlled distribution bucket — separate from the standard Global Mapper installers.</div>
+    <div id="airgap-builds-picker">
+      <div class="m-note warn" style="margin-bottom:14px">
+        <strong>&#9888; Use this build on offline machines.</strong> Only the Air-gapped build ships with the module required to import an issued offline license (.lic/JWT). The standard installer cannot import offline licenses \u2014 installing it on an air-gapped machine will leave that seat unable to activate.
+      </div>
+      <div class="modal-label">Build</div>
+      <select class="modal-select" id="airgap-build-sel" size="4" style="height:auto;padding:6px 8px">
+        <option value="Windows 64-bit" selected>Windows 64-bit \u2014 Air-gapped build</option>
+        <option value="macOS (Apple Silicon)">macOS (Apple Silicon) \u2014 Air-gapped build</option>
+        <option value="macOS (Intel)">macOS (Intel) \u2014 Air-gapped build</option>
+        <option value="Linux (Ubuntu/Debian)">Linux (Ubuntu/Debian) \u2014 Air-gapped build</option>
+      </select>
+      <div class="modal-row">
+        <button class="btn primary" style="flex:1" onclick="confirmAirgapBuildDownload()">Download build</button>
+        <button class="btn" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+    <!-- Success state shown after the user clicks Download build -->
+    <div id="airgap-builds-success" style="display:none">
+      <div style="text-align:center;padding:18px 0 22px 0">
+        <div style="width:54px;height:54px;border-radius:50%;background:var(--green-lt);color:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px">&#10003;</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Download started</div>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.5;max-width:340px;margin:0 auto" id="airgap-builds-success-detail">Your air-gapped build download will complete shortly. You can close this dialog.</div>
+      </div>
+      <div class="modal-row">
+        <button class="btn primary" style="flex:1" onclick="closeModal()">Close</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -4579,15 +4621,20 @@ function updateDashOrgBanners(){
         +(p.status === 'trial'
           ? '<button class="btn sm" style="margin-right:6px;opacity:.5;cursor:not-allowed" disabled title="Additional seats cannot be added to trial">Add seats</button>'
           : '<button class="btn sm" style="margin-right:6px" onclick="openAddSeats()">Add seats</button>')
-        // AIR-GAPPED BRANCH. Every admin can download the product. For normal
-        // SKUs this is the same installer picker the My Products page uses; for
-        // the air-gapped SKU it instead collects the issued .lic files.
+        // AIR-GAPPED BRANCH. For normal SKUs, Download opens the standard
+        // installer picker and Manage opens the subscription modal (upgrade /
+        // downgrade / cancel). For the air-gapped SKU those two are swapped in
+        // function: Download now fetches the S3-hosted air-gapped build (the
+        // only build that can import an offline license), and Manage opens the
+        // license bundle view where machine IDs are reviewed/corrected and the
+        // offline license (JWT) files are generated and downloaded.
         +(_isAirgapped(p.name)
-          ? '<button class="btn sm" style="margin-right:6px" onclick="openAirgapBundle()">Download</button>'
+          ? '<button class="btn sm" style="margin-right:6px" onclick="openAirgapBuilds()">Download</button>'
           : '<button class="btn sm" style="margin-right:6px" onclick="openInstallProduct(\''+p.name.replace(/'/g,"\\'")+'\')">Download</button>')
         +'<button class="btn sm" style="margin-right:6px" onclick="viewAssignedSeats()">Assigned seats</button>'
-        // Manage opens the tabbed subscription modal (upgrade / downgrade / cancel).
-        +'<button class="btn sm" onclick="openManageSub(\''+p.name.replace(/'/g,"\\'")+'\')">Manage</button>'
+        +(_isAirgapped(p.name)
+          ? '<button class="btn sm" onclick="openAirgapBundle()">Manage</button>'
+          : '<button class="btn sm" onclick="openManageSub(\''+p.name.replace(/'/g,"\\'")+'\')">Manage</button>')
         +'</div>';
     }).join('');
   }
@@ -7252,10 +7299,13 @@ function _airgapLicenceRows(){
   const orgUsers = users.filter(u => (!u.org || u.org === currentOrg) && hasSeat(u));
   const offline = [], roaming = [];
   orgUsers.forEach(u => {
+    // Carry the index into the global users array so the Manage view can write
+    // a corrected Machine ID straight back to the right user/app record.
+    const idx = users.indexOf(u);
     getBundledAppsFor(u).forEach(app => {
       const c = getAppConnectivity(u, app);
       const row = {
-        name: u.name, email: u.email, app: app,
+        idx: idx, name: u.name, email: u.email, app: app,
         machineId: c.machineId || '\u2014',
         issuedOn: c.issuedOn || '\u2014',
         validUntil: c.validUntil || '\u2014',
@@ -7283,19 +7333,25 @@ function openAirgapBundle(){
   let h = '';
   if(!data.offline.length){
     h += '<div class="m-note info">Offline license files are created when an admin issues one from the '
-      +  'Users page (Connectivity \u2192 Request offline license). Once issued, they can be collected '
-      +  'here as a bundle to carry across to air-gapped machines.</div>';
+      +  'Users page (Connectivity \u2192 Request offline license). Once issued, they show up here to '
+      +  'review, correct the Machine ID if needed, and generate/download as a bundle to carry across '
+      +  'to air-gapped machines.</div>';
   } else {
-    h += '<div class="m-note info" style="margin-bottom:14px">Each file is locked to the machine ID it was '
-      +  'issued for. Copy them to the target machines individually \u2014 a file will not activate on '
-      +  'any other machine.</div>'
+    h += '<div class="m-note info" style="margin-bottom:14px">Each file is locked to the Machine ID it is '
+      +  'issued for \u2014 double-check the ID below matches the target machine before generating. A '
+      +  'mismatched ID will not activate.</div>'
       +  '<table class="co-rc"><thead><tr><th>User</th><th>App</th><th>Machine ID</th><th>Valid until</th></tr></thead><tbody>'
       +  data.offline.map(r =>
            '<tr><td><div style="color:var(--text-primary);font-weight:600">'+r.name
          + (r.airgapped ? ' <span class="co-tag" style="margin:0 0 0 6px">Air-gapped</span>' : '')
          + '</div><div style="font-size:11.5px;color:var(--text-muted)">'+r.email+'</div></td>'
          + '<td>'+r.app+'</td>'
-         + '<td style="font-family:ui-monospace,monospace;font-size:11.5px">'+r.machineId+'</td>'
+         // Editable so an admin can correct a mistyped Machine ID here, right
+         // before generation, without leaving this view to go find the user.
+         + '<td><input type="text" class="modal-select" value="'+r.machineId.replace(/"/g,'&quot;')+'" '
+         + 'style="font-family:ui-monospace,monospace;font-size:11.5px;padding:5px 8px;width:150px;margin:0" '
+         + 'aria-label="Machine ID for '+r.name+' \u2014 '+r.app+'" '
+         + 'onchange="_updateAirgapMachineId('+r.idx+',\''+r.app.replace(/'/g,"\\'")+'\',this)"/></td>'
          + '<td>'+r.validUntil+'</td></tr>').join('')
       +  '</tbody></table>';
   }
@@ -7309,7 +7365,7 @@ function openAirgapBundle(){
 
   if(foot) foot.innerHTML = '<button class="btn" onclick="closeAirgapBundle()">Close</button>'
     + (data.offline.length
-        ? '<button class="btn primary" onclick="confirmAirgapBundle('+data.offline.length+')">Download '
+        ? '<button class="btn primary" onclick="confirmAirgapBundle('+data.offline.length+')">Generate &amp; download '
           + data.offline.length + ' license file' + (data.offline.length!==1?'s':'') + '</button>'
         : '<button class="btn primary" disabled>Nothing to download</button>');
 
@@ -7317,6 +7373,30 @@ function openAirgapBundle(){
 }
 
 function closeAirgapBundle(){ document.getElementById('modal-airgap-bundle').classList.remove('open'); }
+
+// Lets an admin correct a Machine ID inline in the Manage view, right before
+// generating the license file, without leaving to go find the user record.
+// Writes straight to the per-app connectivity record so it stays in sync with
+// everywhere else that reads getAppConnectivity() (Users page, this table).
+function _updateAirgapMachineId(idx, appName, inputEl){
+  const u = users[idx];
+  if(!u || !inputEl) return;
+  const newId = inputEl.value.trim();
+  if(!newId){
+    // Don't allow clearing it here — a blank Machine ID would silently drop
+    // this row out of future bundles. Revert and let the admin retype.
+    const c = getAppConnectivity(u, appName);
+    inputEl.value = c.machineId || '';
+    toast('Machine ID can\u2019t be blank \u2014 reverted');
+    return;
+  }
+  if(!u.appConnectivity) u.appConnectivity = {};
+  const existing = u.appConnectivity[appName] || getAppConnectivity(u, appName);
+  u.appConnectivity[appName] = Object.assign({}, existing, { machineId: newId });
+  _stampUserModification(u);
+  savePersisted('users', users);
+  toast('\u2713 Machine ID updated for ' + u.name + ' \u2014 ' + appName);
+}
 
 function confirmAirgapBundle(count){
   // Same record shape as installer downloads so it lists correctly in Download
@@ -7335,7 +7415,74 @@ function confirmAirgapBundle(count){
   });
   savePersisted('downloadHistory', downloadHistory);
   closeAirgapBundle();
-  toast('\u2713 Downloaded ' + count + ' offline license file' + (count!==1?'s':'') + ' as air-gapped-licenses.zip');
+  toast('\u2713 Generated and downloaded ' + count + ' offline license file' + (count!==1?'s':'') + ' as air-gapped-licenses.zip');
+}
+
+// Air-gapped builds are a small, fixed list (this SKU isn't tiered the way
+// Professional/Advanced are), so unlike _installerOptionsFor() there's no
+// tier branching \u2014 just one build per platform.
+const _AIRGAP_BUILD_OPTIONS = [
+  { value: 'Windows 64-bit',        label: 'Windows 64-bit \u2014 Air-gapped build' },
+  { value: 'macOS (Apple Silicon)', label: 'macOS (Apple Silicon) \u2014 Air-gapped build' },
+  { value: 'macOS (Intel)',         label: 'macOS (Intel) \u2014 Air-gapped build' },
+  { value: 'Linux (Ubuntu/Debian)', label: 'Linux (Ubuntu/Debian) \u2014 Air-gapped build' },
+];
+
+// AIR-GAPPED BRANCH: Download opens this instead of the standard installer
+// picker (openInstallProduct). The air-gapped build ships from its own S3
+// distribution bucket and is the only build that can import an admin-issued
+// offline license (.lic/JWT) \u2014 the standard installer has no import path
+// for that file, so the two must not be conflated.
+function openAirgapBuilds(){
+  const picker = document.getElementById('airgap-builds-picker');
+  const success = document.getElementById('airgap-builds-success');
+  if(picker) picker.style.display = '';
+  if(success) success.style.display = 'none';
+  const sel = document.getElementById('airgap-build-sel');
+  if(sel){
+    sel.innerHTML = _AIRGAP_BUILD_OPTIONS.map(o => '<option value="'+o.value+'">'+o.label+'</option>').join('');
+    // Default to the detected OS's build so the common case is one click.
+    const os = _detectOS() || '';
+    let defaultVal = _AIRGAP_BUILD_OPTIONS[0].value;
+    if(/mac/i.test(os)) defaultVal = 'macOS (Apple Silicon)';
+    else if(/linux/i.test(os)) defaultVal = 'Linux (Ubuntu/Debian)';
+    else if(/windows/i.test(os)) defaultVal = 'Windows 64-bit';
+    sel.value = defaultVal;
+  }
+  document.getElementById('modal-airgap-builds').classList.add('open');
+}
+
+function confirmAirgapBuildDownload(){
+  const sel = document.getElementById('airgap-build-sel');
+  const choice = sel ? sel.value : _AIRGAP_BUILD_OPTIONS[0].value;
+  const now = Date.now();
+  const formatted = _formatTodayDateTime();
+  const _me = currentUData();
+  downloadHistory.push({
+    product: 'Global Mapper Air-gapped',
+    installer: choice + ' (S3 air-gapped build)',
+    datetime: formatted,
+    timestamp: now,
+    os: _detectOS(),
+    by: (_me && _me.name) ? _me.name : 'Unknown',
+    byEmail: (_me && _me.email) ? _me.email : '',
+    device: _deviceLabel(),
+    address: SESSION_ADDRESS,
+  });
+  if(downloadHistory.length > MAX_DOWNLOAD_HISTORY){
+    downloadHistory = downloadHistory.slice(-MAX_DOWNLOAD_HISTORY);
+  }
+  savePersisted('downloadHistory', downloadHistory);
+  if(typeof _refreshDownloadActivity === 'function') _refreshDownloadActivity();
+  const picker = document.getElementById('airgap-builds-picker');
+  const success = document.getElementById('airgap-builds-success');
+  const detail = document.getElementById('airgap-builds-success-detail');
+  if(detail){
+    detail.innerHTML = 'Your <strong>' + choice + ' Air-gapped build</strong> download will complete shortly. '
+      + 'Remember \u2014 only this build can import an offline license file. You can close this dialog.';
+  }
+  if(picker)  picker.style.display = 'none';
+  if(success) success.style.display = '';
 }
 
 function backToCart(){ nav('a-order-summary'); }
