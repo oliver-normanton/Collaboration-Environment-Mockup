@@ -3198,12 +3198,15 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
       </div>
     </div>
 
-    <!-- Capability note: a single air-gapped token licenses any application in
-         the Professional tier (Desktop + Geographic Calculator + MAPublisher).
-         Deliberately generic, not personalized \u2014 this is a statement about
-         what the token can do, not about this specific user's holdings.
-         Populated by openOfflineLicense(). -->
-    <div id="offline-bundle-note" style="display:none;font-size:11px;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--surface-3);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:4px"></div>
+    <!-- Application selector: a single System UUID can still cover more than
+         one app, but each app needs its own signed JWT — a JWT isn't valid
+         across apps. The download is one JSON file containing a signed token
+         per selected app; the desktop software reads the piece relevant to
+         whichever app is running. Checkboxes populated by openOfflineLicense()
+         from this user's bundled apps, pre-checked to their current selection. -->
+    <div class="modal-label">Applications to include</div>
+    <div id="offline-app-checklist" style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:4px"></div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:-4px;margin-bottom:12px">Each selected app gets its own signed token inside the license file &mdash; Global Mapper reads whichever token matches the app that's running.</div>
 
     <div class="modal-label">System UUID</div>
     <input class="modal-select" id="offline-machine-id" type="text" placeholder="e.g. 4C4C4544-0046-4310-8058-C2C04F435A31" style="font-family:'DM Mono',monospace"/>
@@ -7326,13 +7329,18 @@ function _airgapLicenceRows(){
   const offline = [];
   orgUsers.forEach(u => {
     // Carry the index into the global users array so the Manage view can write
-    // a corrected System UUID straight back to this user's bundled apps.
+    // a corrected System UUID straight back to this user's selected apps.
     const idx = users.indexOf(u);
     const bundledApps = getBundledAppsFor(u);
     const bundle = bundledApps.length ? _bundleConnectivity(u) : null;
     if(bundle && bundle.state === 'offline'){
+      // "Apps covered" is whichever apps the admin actually selected when
+      // issuing the license (each got its own signed JWT in the file) — not
+      // every app in the bundle, since a JWT only works for the app it was
+      // signed for.
+      const selectedApps = bundledApps.filter(a => getAppConnectivity(u, a).state === 'offline');
       offline.push({
-        idx: idx, name: u.name, email: u.email, apps: bundledApps,
+        idx: idx, name: u.name, email: u.email, apps: selectedApps,
         machineId: bundle.machineId || '\u2014',
         issuedOn: bundle.issuedOn || '\u2014',
         validUntil: bundle.validUntil || '\u2014',
@@ -7461,6 +7469,9 @@ function _saveAirgapUuidEdit(idx){
   if(!u || !input) return;
   const newId = input.value.trim();
   const bundledApps = getBundledAppsFor(u);
+  // Only touch apps actually included in this license (each has its own
+  // signed JWT) — not every app in the user's bundle.
+  const selectedApps = bundledApps.filter(a => getAppConnectivity(u, a).state === 'offline');
   if(!newId){
     // Don't allow clearing it here — a blank System UUID would silently drop
     // this user out of future bundles. Revert and let the admin retype.
@@ -7470,7 +7481,7 @@ function _saveAirgapUuidEdit(idx){
     return;
   }
   if(!u.appConnectivity) u.appConnectivity = {};
-  bundledApps.forEach(app => {
+  selectedApps.forEach(app => {
     const existing = u.appConnectivity[app] || getAppConnectivity(u, app);
     u.appConnectivity[app] = Object.assign({}, existing, { machineId: newId });
   });
@@ -7484,7 +7495,7 @@ function _saveAirgapUuidEdit(idx){
     viewEl.style.display = '';
   }
   if(editEl) editEl.style.display = 'none';
-  toast('\u2713 System UUID updated for ' + u.name + ' (' + bundledApps.length + ' app' + (bundledApps.length!==1?'s':'') + ')');
+  toast('\u2713 System UUID updated for ' + u.name + ' (' + selectedApps.length + ' app' + (selectedApps.length!==1?'s':'') + ')');
 }
 
 // Generates and downloads bundles for every user who hasn't already had
@@ -7931,15 +7942,24 @@ function openOfflineLicense(idx){
   const displayLastDl     = bundle ? bundle.lastDownloadedOn : u.offlineLastDownloadedOn;
   const repApp = bundle ? bundle._repApp : null;
 
-  // No picker to populate anymore — instead, a standing statement of what the
-  // token can do. Deliberately not personalized: this is capability info
-  // about the token itself, shown regardless of which specific apps this
-  // user happens to hold today.
-  const bundleNote = document.getElementById('offline-bundle-note');
-  if(bundleNote){
-    bundleNote.style.display = '';
-    bundleNote.innerHTML = 'This license can activate any application included in the Professional tier: <strong>'
-      + _bundleAppsLabel(bundledApps.length ? bundledApps : PRODUCT_BUNDLES['Global Mapper Air-gapped']) + '</strong>.';
+  // Checklist of this user's bundled apps, pre-checked to whichever ones are
+  // currently included in their offline bundle (all of them for a first-time
+  // request — see default-check logic below). A JWT is only valid for the app
+  // it was signed for, so the admin picks the actual subset to include rather
+  // than every app being granted implicitly.
+  const currentlyOffGrid = bundledApps.filter(a => {
+    const st = getAppConnectivity(u, a).state;
+    return st === 'offline' || st === 'roaming';
+  });
+  const checklist = document.getElementById('offline-app-checklist');
+  if(checklist){
+    checklist.innerHTML = bundledApps.map((app, i) => {
+      const checkedByDefault = displayOffline ? currentlyOffGrid.indexOf(app) !== -1 : true;
+      const cbId = 'offline-app-cb-' + i;
+      return '<label for="'+cbId+'" style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:13px;color:var(--text-primary);cursor:pointer">'
+        + '<input type="checkbox" id="'+cbId+'" class="offline-app-cb" value="'+app.replace(/"/g,'&quot;')+'" '+(checkedByDefault?'checked':'')+' style="width:15px;height:15px;cursor:pointer"/>'
+        + app + '</label>';
+    }).join('');
   }
 
   const modal = document.getElementById('modal-offline-license');
@@ -8161,10 +8181,19 @@ function confirmOfflineLicense(){
   const machineId = (machineInput ? machineInput.value : '').trim();
 
   // ── Validation (applies to all paths) ────────────────────────────────────
-  // No "which app" check (one System UUID covers every bundled app) and no
-  // reason field \u2014 this is a perpetual, sales-qualified air-gapped license,
-  // not a time-boxed exception that needs justifying per request.
+  // No reason field — this is a perpetual, sales-qualified air-gapped
+  // license, not a time-boxed exception that needs justifying per request.
+  // A JWT is only valid for the app it was signed for, so at least one app
+  // must be checked before an admin can submit.
   const bundledApps = getBundledAppsFor(u);
+  const selectedApps = Array.prototype.slice.call(document.querySelectorAll('.offline-app-cb:checked')).map(cb => cb.value);
+  if(bundledApps.length && !selectedApps.length){
+    if(errorBox && errorMsg){
+      errorMsg.textContent = 'Select at least one application to include in the license file.';
+      errorBox.style.display = '';
+    }
+    return;
+  }
   if(!machineId){
     if(errorBox && errorMsg){
       errorMsg.textContent = 'System UUID is required. Please enter the target machine\u2019s hardware UUID.';
@@ -8187,21 +8216,26 @@ function confirmOfflineLicense(){
   const isSelfInitiated = bundle ? (bundleState === 'roaming') : (u.offlineSource === 'self');
   const daysLeft = repApp ? _appDaysRemaining(u, repApp) : _offlineDaysRemaining(u);
   const isExpired = wasOffline && (daysLeft !== null && daysLeft <= 0);
-  const scopeText = bundledApps.length > 1 ? (' \u2014 ' + _bundleAppsLabel(bundledApps)) : '';
+  const scopeText = selectedApps.length ? (' \u2014 ' + _bundleAppsLabel(selectedApps)) : '';
+  // Apps that were previously included but got unchecked this time drop back
+  // to Online \u2014 the admin no longer wants them in the license file.
+  const droppedApps = bundledApps.filter(a => selectedApps.indexOf(a) === -1);
 
   // Path 2 is re-download only for ADMIN-ISSUED offline users. Self-initiated
   // (Roaming) users go to Path 3 so the admin's license becomes authoritative.
   if(wasOffline && !isSelfInitiated && !isExpired){
-    // ── Path 2: Re-download the existing license, for every bundled app ───
+    // ── Path 2: Re-download the existing license, for every selected app ──
     if(bundledApps.length){
       if(!u.appConnectivity) u.appConnectivity = {};
-      bundledApps.forEach(app => {
+      selectedApps.forEach(app => {
         const existing = u.appConnectivity[app] || getAppConnectivity(u, app);
         u.appConnectivity[app] = Object.assign({}, existing, {
+          state: 'offline',
           machineId: machineId,
           lastDownloadedOn: todayStr,
         });
       });
+      droppedApps.forEach(app => { u.appConnectivity[app] = { state: 'online' }; });
     } else {
       u.offlineMachineId = machineId;
       u.offlineLastDownloadedOn = todayStr;
@@ -8246,10 +8280,11 @@ function confirmOfflineLicense(){
   const validUntilStr = _formatFriendlyDate(chosenDate);
 
   if(bundledApps.length){
-    // Write the same license to every bundled app at once; keep u.offline:
-    // true so the aggregate flag stays truthy.
+    // Write the same license to every SELECTED app; apps the admin unchecked
+    // drop back to Online. Keep u.offline: true so the aggregate flag stays
+    // truthy as long as at least one app is included.
     if(!u.appConnectivity) u.appConnectivity = {};
-    bundledApps.forEach(app => {
+    selectedApps.forEach(app => {
       u.appConnectivity[app] = {
         state: 'offline',
         machineId: machineId,
@@ -8259,6 +8294,7 @@ function confirmOfflineLicense(){
         lastDownloadedOn: todayStr,
       };
     });
+    droppedApps.forEach(app => { u.appConnectivity[app] = { state: 'online' }; });
     u.offline = true;
   } else {
     // Legacy path: user with no bundle data at all
