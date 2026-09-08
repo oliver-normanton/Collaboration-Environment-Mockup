@@ -3021,7 +3021,7 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
      captured for each user/app, correct it if needed, then generate and
      download the offline license (JWT) files as a bundle. -->
 <div class="modal-bg" id="modal-airgap-bundle">
-  <div class="modal lg" style="width:820px">
+  <div class="modal lg" style="width:900px">
     <div class="m-head">
       <div class="modal-title">Manage offline licenses</div>
       <div class="modal-sub" id="airgap-sub" style="margin-bottom:0"></div>
@@ -7340,7 +7340,7 @@ function _airgapLicenceRows(){
       // signed for.
       const selectedApps = bundledApps.filter(a => getAppConnectivity(u, a).state === 'offline');
       offline.push({
-        idx: idx, name: u.name, email: u.email, apps: selectedApps,
+        idx: idx, name: u.name, email: u.email, apps: selectedApps, bundledApps: bundledApps,
         machineId: bundle.machineId || '\u2014',
         issuedOn: bundle.issuedOn || '\u2014',
         validUntil: bundle.validUntil || '\u2014',
@@ -7399,12 +7399,60 @@ function openAirgapBundle(){
              ? '<span style="color:var(--green);font-weight:600">Downloaded</span>'
                + (r.downloadedOn ? '<div style="font-size:10.5px;color:var(--text-muted)">'+r.downloadedOn+'</div>' : '')
              : '<span style="color:var(--text-muted)">Not yet downloaded</span>';
+           // Apps covered: view mode lists the apps actually included (one JWT
+           // each); edit mode is a checklist against the user's full bundle so
+           // an admin can add or drop an app from the license before it's
+           // downloaded. Locked once downloaded, same as System UUID.
+           const appsCell = r.alreadyDownloaded
+             ? '<span style="font-size:11.5px">'+r.apps.join(', ')+'</span>'
+             : '<span id="apps-view-'+r.idx+'" style="white-space:nowrap">'
+               + '<span style="font-size:11.5px">'+r.apps.join(', ')+'</span> '
+               + _airgapAppsEditIconBtn(r.idx, safeName)
+               + '</span>'
+               + '<span id="apps-edit-'+r.idx+'" style="display:none">'
+               + '<div id="apps-checklist-'+r.idx+'" style="margin-bottom:4px">'
+               + r.bundledApps.map((app, i) => {
+                   const checked = r.apps.indexOf(app) !== -1;
+                   const cbId = 'apps-cb-'+r.idx+'-'+i;
+                   return '<label for="'+cbId+'" style="display:flex;align-items:center;gap:6px;padding:1px 0;font-size:11.5px;color:var(--text-primary);cursor:pointer;white-space:nowrap">'
+                     + '<input type="checkbox" id="'+cbId+'" class="apps-edit-cb-'+r.idx+'" value="'+app.replace(/"/g,'&quot;')+'" '+(checked?'checked':'')+' style="width:13px;height:13px;cursor:pointer"/>'
+                     + app + '</label>';
+                 }).join('')
+               + '</div>'
+               + '<button class="btn xs primary" onclick="_saveAirgapAppsEdit('+r.idx+')">Save</button> '
+               + '<button class="btn xs" onclick="_cancelAirgapAppsEdit('+r.idx+')">Cancel</button>'
+               + '</span>';
+           // Valid until: view mode shows the date (or —); edit mode is a native
+           // date input capped at the underlying license's end date, same cap
+           // the per-user request modal enforces.
+           const licenseEnd = _licenseEndDateFor(users[r.idx]);
+           const currentValidDate = _parseFriendlyDate(r.validUntil);
+           const validCell = r.alreadyDownloaded
+             ? '<span style="font-size:11.5px">'+r.validUntil+'</span>'
+             : '<span id="valid-view-'+r.idx+'" style="white-space:nowrap">'
+               + '<span style="font-size:11.5px">'+r.validUntil+'</span> '
+               + _airgapValidEditIconBtn(r.idx, safeName)
+               + '</span>'
+               + '<span id="valid-edit-'+r.idx+'" style="display:none">'
+               + '<div style="display:flex;gap:4px;margin-bottom:4px">'
+               + '<button type="button" class="btn xs" id="valid-preset-'+r.idx+'-end" onclick="_setAirgapValidPreset('+r.idx+',\'end\')">Till end of license</button>'
+               + '<button type="button" class="btn xs" id="valid-preset-'+r.idx+'-90" onclick="_setAirgapValidPreset('+r.idx+',\'90\')">90 days</button>'
+               + '<button type="button" class="btn xs" id="valid-preset-'+r.idx+'-30" onclick="_setAirgapValidPreset('+r.idx+',\'30\')">30 days</button>'
+               + '</div>'
+               + '<input type="date" id="valid-input-'+r.idx+'" value="'+(currentValidDate ? _isoDate(currentValidDate) : '')+'" '
+               + (licenseEnd ? 'max="'+_isoDate(licenseEnd)+'" ' : '')
+               + 'onchange="_onAirgapValidDateChange('+r.idx+')" '
+               + 'style="font-size:11.5px;padding:5px 6px;width:132px;margin:0 0 4px;border:1px solid var(--border);border-radius:var(--radius-sm)" '
+               + 'aria-label="Valid until for '+safeName+'"/><br/>'
+               + '<button class="btn xs primary" onclick="_saveAirgapValidEdit('+r.idx+')">Save</button> '
+               + '<button class="btn xs" onclick="_cancelAirgapValidEdit('+r.idx+')">Cancel</button>'
+               + '</span>';
            return '<tr><td><div style="color:var(--text-primary);font-weight:600">'+r.name
              + (r.airgapped ? ' <span class="co-tag" style="margin:0 0 0 6px">Air-gapped</span>' : '')
              + '</div><div style="font-size:11.5px;color:var(--text-muted)">'+r.email+'</div></td>'
-             + '<td style="font-size:11.5px">'+r.apps.join(', ')+'</td>'
+             + '<td>'+appsCell+'</td>'
              + '<td>'+uuidCell+'</td>'
-             + '<td style="font-size:11.5px">'+r.validUntil+'</td>'
+             + '<td>'+validCell+'</td>'
              + '<td style="font-size:11.5px">'+statusCell+'</td></tr>';
          }).join('')
       +  '</tbody></table>';
@@ -7423,15 +7471,20 @@ function openAirgapBundle(){
 
 function closeAirgapBundle(){ document.getElementById('modal-airgap-bundle').classList.remove('open'); }
 
-// Small icon-only edit trigger for the Manage view's System UUID field —
-// a pencil, not a text label, so it reads as a quiet inline affordance rather
-// than a call-to-action competing with Save/Cancel once clicked.
-function _airgapEditIconBtn(idx, safeName){
-  return '<button class="btn xs" onclick="_startAirgapUuidEdit('+idx+')" title="Edit System UUID for '+safeName+'" '
-    + 'aria-label="Edit System UUID for '+safeName+'" style="padding:4px 6px;display:inline-flex;align-items:center;vertical-align:middle">'
+// Small icon-only edit trigger for the Manage view's editable fields — a
+// pencil, not a text label, so it reads as a quiet inline affordance rather
+// than a call-to-action competing with Save/Cancel once clicked. Shared by
+// the System UUID, Apps covered, and Valid until columns.
+function _airgapEditIconBtn(idx, safeName, startFn, fieldLabel){
+  startFn = startFn || '_startAirgapUuidEdit';
+  fieldLabel = fieldLabel || 'System UUID';
+  return '<button class="btn xs" onclick="'+startFn+'('+idx+')" title="Edit '+fieldLabel+' for '+safeName+'" '
+    + 'aria-label="Edit '+fieldLabel+' for '+safeName+'" style="padding:4px 6px;display:inline-flex;align-items:center;vertical-align:middle">'
     + '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5c.4-.4 1-.4 1.4 0l.6.6c.4.4.4 1 0 1.4L5 12l-2.7.7.7-2.7L11.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/><path d="M10.3 3.7l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>'
     + '</button>';
 }
+function _airgapAppsEditIconBtn(idx, safeName){ return _airgapEditIconBtn(idx, safeName, '_startAirgapAppsEdit', 'Apps covered'); }
+function _airgapValidEditIconBtn(idx, safeName){ return _airgapEditIconBtn(idx, safeName, '_startAirgapValidEdit', 'Valid until'); }
 
 // Edit-gated System UUID in the Manage view: the field starts read-only, and
 // an admin must click Edit before it becomes an input. Prevents accidental
@@ -7496,6 +7549,168 @@ function _saveAirgapUuidEdit(idx){
   }
   if(editEl) editEl.style.display = 'none';
   toast('\u2713 System UUID updated for ' + u.name + ' (' + selectedApps.length + ' app' + (selectedApps.length!==1?'s':'') + ')');
+}
+
+// ── Apps covered: edit-gated checklist ───────────────────────────────────
+function _startAirgapAppsEdit(idx){
+  const viewEl = document.getElementById('apps-view-'+idx);
+  const editEl = document.getElementById('apps-edit-'+idx);
+  if(viewEl) viewEl.style.display = 'none';
+  if(editEl) editEl.style.display = '';
+}
+
+function _cancelAirgapAppsEdit(idx){
+  // Full re-render is simplest here \u2014 restores every checkbox to the
+  // last-saved selection without tracking a separate "original" snapshot.
+  openAirgapBundle();
+}
+
+// Adds a signed slot for any newly-checked app (inheriting this bundle's
+// current System UUID and validity so it matches what's already issued) and
+// drops any unchecked app back to Online, mirroring confirmOfflineLicense()'s
+// selected/dropped logic on the Users-page modal.
+function _saveAirgapAppsEdit(idx){
+  const u = users[idx];
+  if(!u) return;
+  const boxes = document.querySelectorAll('.apps-edit-cb-'+idx+':checked');
+  const selectedApps = Array.prototype.slice.call(boxes).map(cb => cb.value);
+  if(!selectedApps.length){
+    toast('Select at least one application \u2014 reverted');
+    openAirgapBundle();
+    return;
+  }
+  const bundledApps = getBundledAppsFor(u);
+  const bundle = _bundleConnectivity(u);
+  const droppedApps = bundledApps.filter(a => selectedApps.indexOf(a) === -1);
+  if(!u.appConnectivity) u.appConnectivity = {};
+  selectedApps.forEach(app => {
+    const existing = u.appConnectivity[app] || getAppConnectivity(u, app);
+    u.appConnectivity[app] = Object.assign({}, existing, {
+      state: 'offline',
+      machineId: existing.machineId || bundle.machineId,
+      issuedOn: existing.issuedOn || bundle.issuedOn,
+      issuedBy: existing.issuedBy || bundle.issuedBy,
+      validUntil: existing.validUntil || bundle.validUntil,
+    });
+  });
+  droppedApps.forEach(app => { u.appConnectivity[app] = { state: 'online' }; });
+  _stampUserModification(u);
+  savePersisted('users', users);
+  toast('\u2713 Apps covered updated for ' + u.name + ' (' + selectedApps.length + ' app' + (selectedApps.length!==1?'s':'') + ')');
+  openAirgapBundle();
+}
+
+// ── Valid until: edit-gated date field, with the same End of license / 90
+// days / 30 days presets as the per-user request modal. Presets are computed
+// per-row against that user's own license end date rather than a single
+// shared global, since the Manage table can have several rows open at once.
+function _airgapValidPresetKey(idx, iso){
+  if(!iso) return '';
+  const chosen = _fromIsoDate(iso);
+  const u = users[idx];
+  const maxDate = u ? _licenseEndDateFor(u) : null;
+  if(!chosen || !maxDate) return '';
+  if(_isoDate(chosen) === _isoDate(maxDate)) return 'end';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d90 = new Date(today.getTime()); d90.setDate(d90.getDate() + 90);
+  const d30 = new Date(today.getTime()); d30.setDate(d30.getDate() + 30);
+  const cap90 = (d90 > maxDate) ? maxDate : d90;
+  const cap30 = (d30 > maxDate) ? maxDate : d30;
+  if(_isoDate(chosen) === _isoDate(cap90)) return '90';
+  if(_isoDate(chosen) === _isoDate(cap30)) return '30';
+  return '';
+}
+
+function _syncAirgapValidPresetActive(idx){
+  const input = document.getElementById('valid-input-'+idx);
+  const key = _airgapValidPresetKey(idx, input ? input.value : '');
+  ['end','90','30'].forEach(k => {
+    const btn = document.getElementById('valid-preset-'+idx+'-'+k);
+    if(!btn) return;
+    if(k === key) btn.classList.add('primary'); else btn.classList.remove('primary');
+  });
+}
+
+function _setAirgapValidPreset(idx, preset){
+  const u = users[idx];
+  const input = document.getElementById('valid-input-'+idx);
+  const maxDate = u ? _licenseEndDateFor(u) : null;
+  if(!input || !maxDate) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  let target;
+  if(preset === 'end'){
+    target = maxDate;
+  } else if(preset === '90'){
+    target = new Date(today.getTime()); target.setDate(target.getDate() + 90);
+    if(target > maxDate) target = maxDate;
+  } else if(preset === '30'){
+    target = new Date(today.getTime()); target.setDate(target.getDate() + 30);
+    if(target > maxDate) target = maxDate;
+  }
+  input.value = _isoDate(target);
+  _syncAirgapValidPresetActive(idx);
+}
+
+function _onAirgapValidDateChange(idx){
+  _syncAirgapValidPresetActive(idx);
+}
+
+function _startAirgapValidEdit(idx){
+  const viewEl = document.getElementById('valid-view-'+idx);
+  const editEl = document.getElementById('valid-edit-'+idx);
+  if(viewEl) viewEl.style.display = 'none';
+  if(editEl) editEl.style.display = '';
+  const input = document.getElementById('valid-input-'+idx);
+  // Default an unset date to "end of license" so the field never opens empty.
+  if(input && !input.value){
+    const licenseEnd = _licenseEndDateFor(users[idx]);
+    if(licenseEnd) input.value = _isoDate(licenseEnd);
+  }
+  _syncAirgapValidPresetActive(idx);
+  if(input) input.focus();
+}
+
+function _cancelAirgapValidEdit(idx){
+  // Full re-render, same reasoning as the Apps editor's cancel — simplest way
+  // to restore the last-saved value without a separate snapshot.
+  openAirgapBundle();
+}
+
+// Applies the new expiry uniformly across every app currently included in
+// this bundle — same "one date across the whole license" model as the
+// per-user request modal, capped at the underlying subscription's end date.
+function _saveAirgapValidEdit(idx){
+  const u = users[idx];
+  const input = document.getElementById('valid-input-'+idx);
+  if(!u || !input) return;
+  const chosenDate = _fromIsoDate(input.value);
+  if(!chosenDate){
+    toast('Enter a valid date \u2014 reverted');
+    openAirgapBundle();
+    return;
+  }
+  const today = new Date(); today.setHours(0,0,0,0);
+  if(chosenDate <= today){
+    toast('Valid-until date must be in the future');
+    return;
+  }
+  const licenseEnd = _licenseEndDateFor(u);
+  if(licenseEnd && chosenDate > licenseEnd){
+    toast('Cannot exceed the license end date (' + _formatFriendlyDate(licenseEnd) + ')');
+    return;
+  }
+  const validUntilStr = _formatFriendlyDate(chosenDate);
+  const bundledApps = getBundledAppsFor(u);
+  const selectedApps = bundledApps.filter(a => getAppConnectivity(u, a).state === 'offline');
+  if(!u.appConnectivity) u.appConnectivity = {};
+  selectedApps.forEach(app => {
+    const existing = u.appConnectivity[app] || getAppConnectivity(u, app);
+    u.appConnectivity[app] = Object.assign({}, existing, { validUntil: validUntilStr });
+  });
+  _stampUserModification(u);
+  savePersisted('users', users);
+  toast('\u2713 Valid-until date updated for ' + u.name + ' (' + validUntilStr + ')');
+  openAirgapBundle();
 }
 
 // Generates and downloads bundles for every user who hasn't already had
