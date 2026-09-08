@@ -3183,7 +3183,7 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
 <div class="modal-bg" id="modal-offline-license">
   <div class="modal" style="max-width:520px">
     <div class="modal-title" id="offline-modal-title">Request offline license</div>
-    <div class="modal-sub" id="offline-modal-sub">Enter the machine details and reason for offline access. The license will be valid for up to 90 days.</div>
+    <div class="modal-sub" id="offline-modal-sub">Enter the machine's System UUID below. The license will be valid for up to 90 days.</div>
 
     <!-- Existing-license summary (view / re-download mode + self-initiated info) -->
     <div id="offline-existing-summary" style="display:none;background:var(--avenza-blue-lt);border:1px solid rgba(37,99,235,.18);border-radius:var(--radius-sm);padding:12px 14px;margin-top:4px;margin-bottom:6px">
@@ -3199,18 +3199,16 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
       </div>
     </div>
 
-    <!-- Bundle coverage note: one offline license now covers every app in the
-         user's bundle (Desktop + Geographic Calculator + MapPublisher where
-         applicable), so there is no per-app choice to make here. Populated by
-         openOfflineLicense() with the specific apps this user holds. -->
+    <!-- Capability note: a single air-gapped token licenses any application in
+         the Professional tier (Desktop + Geographic Calculator + MAPublisher).
+         Deliberately generic, not personalized \u2014 this is a statement about
+         what the token can do, not about this specific user's holdings.
+         Populated by openOfflineLicense(). -->
     <div id="offline-bundle-note" style="display:none;font-size:11px;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--surface-3);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:4px"></div>
 
     <div class="modal-label">System UUID</div>
     <input class="modal-select" id="offline-machine-id" type="text" placeholder="e.g. 4C4C4544-0046-4310-8058-C2C04F435A31" style="font-family:'DM Mono',monospace"/>
-    <div id="offline-machine-hint" style="font-size:11px;color:var(--text-muted);margin-top:-4px;margin-bottom:4px">The target machine's 128-bit hardware UUID (SMBIOS System UUID) &mdash; this is what the license is validated against. Users can retrieve it from Global Mapper under Help &rarr; About.</div>
-
-    <div class="modal-label">Reason for offline access</div>
-    <textarea class="modal-select" id="offline-reason" rows="3" placeholder="e.g. Fieldwork with no reliable connectivity for 4 weeks" style="resize:vertical;min-height:60px;padding:8px 10px"></textarea>
+    <div id="offline-machine-hint" style="font-size:11px;color:var(--text-muted);margin-top:-4px;margin-bottom:4px">The target machine's 128-bit hardware UUID (SMBIOS System UUID) &mdash; this is what the license is validated against. Users can retrieve it from our software after installation, or by querying it from the machine.</div>
 
     <!-- Validity picker: admin chooses a date, capped at license end. Presets
          are quick-set buttons; the date input is the source of truth. -->
@@ -3515,7 +3513,7 @@ const DEFAULT_USERS = [
   {name:'Aaron Flores',email:'aaron.flores@acme.com',initials:'AF',role:'Member',seat:null,createdOn:'',invitedOn:'Jan 26, 2025',status:'invited',color:1,lastLogin:''},
   {name:'Beatrice Yamamoto',email:'beatrice.yamamoto@acme.com',initials:'BY',role:'Member',seat:null,createdOn:'',invitedOn:'Feb 27, 2025',status:'invited',color:2,lastLogin:''},
   {name:'Callum OBrien',email:'callum.obrien@acme.com',initials:'CO',role:'Member',seat:null,createdOn:'',invitedOn:'Mar 28, 2025',status:'invited',color:3,lastLogin:''},
-  {name:'Delia Santos',email:'delia.santos@acme.com',initials:'DS',role:'Member',seats:['Global Mapper Professional','Global Mapper Air-gapped'],createdOn:'May 9, 2025',assignedOn:['May 14, 2025','Jun 14, 2026'],assignedBy:['Mark Smith','Jane Doe'],status:'active',offline:true,appConnectivity:{'Global Mapper Desktop':{state:'offline',validUntil:'Sep 13, 2026',issuedOn:'Jul 30, 2026',issuedBy:'Jane Doe',machineId:'WIN-DS-FIELDLAB-07',reason:'Coastal survey \u2014 offline access needed for GM Desktop only, other apps stay online at HQ.'},'Geographic Calculator':{state:'roaming',validUntil:'Aug 29, 2026',issuedOn:'Jul 30, 2026'},'MapPublisher':{state:'online'}},color:4,lastLogin:'May 4, 2025'},
+  {name:'Delia Santos',email:'delia.santos@acme.com',initials:'DS',role:'Member',seats:['Global Mapper Professional','Global Mapper Air-gapped'],createdOn:'May 9, 2025',assignedOn:['May 14, 2025','Jun 14, 2026'],assignedBy:['Mark Smith','Jane Doe'],status:'active',offline:true,appConnectivity:{'Global Mapper Desktop':{state:'offline',validUntil:'Sep 13, 2026',issuedOn:'Jul 30, 2026',issuedBy:'Jane Doe',machineId:'WIN-DS-FIELDLAB-07',reason:'Coastal survey \u2014 offline access needed for GM Desktop only, other apps stay online at HQ.'},'Geographic Calculator':{state:'roaming',validUntil:'Aug 29, 2026',issuedOn:'Jul 30, 2026'},'MAPublisher':{state:'online'}},color:4,lastLogin:'May 4, 2025'},
   {name:'Emeka Eze',email:'emeka.eze@acme.com',initials:'EE',role:'Member',seat:'Global Mapper Professional',createdOn:'May 10, 2025',assignedOn:'May 14, 2025',assignedBy:'Tom Rees',status:'active',offline:true,offlineSource:'self',offlineIssuedOn:'Jul 30, 2026',offlineValidUntil:'Feb 25, 2027',color:5,lastLogin:'May 3, 2025'},
   {name:'Grant Nakamura',email:'grant.nakamura@acme.com',initials:'GN',role:'Member',seats:['Global Mapper Essentials','Global Mapper Air-gapped'],createdOn:'May 11, 2025',assignedOn:['May 15, 2025','Jun 14, 2026'],assignedBy:['Jane Doe','Jane Doe'],status:'active',color:7,lastLogin:'May 2, 2025'},
   {name:'Holly Davies',email:'holly.davies@acme.com',initials:'HD',role:'Member',seat:null,createdOn:'May 11, 2025',invitedOn:'Mar 5, 2025',status:'invited',color:0,lastLogin:'May 1, 2025'},
@@ -5782,14 +5780,14 @@ function _toggleConnectivityRow(email){
 // Each subscription product internally bundles one or more apps. Connectivity
 // state (Online / Roaming / Offline) is tracked per-app-per-user because a user
 // can be in different states across apps (e.g. Roaming for Desktop while Online
-// for MapPublisher). Essentials is a single-app product; the two higher tiers
+// for MAPublisher). Essentials is a single-app product; the two higher tiers
 // and Trial all bundle three apps.
 const PRODUCT_BUNDLES = {
-  'Global Mapper Professional': ['Global Mapper Desktop', 'Geographic Calculator', 'MapPublisher'],
-  'Global Mapper Advanced':     ['Global Mapper Desktop', 'Geographic Calculator', 'MapPublisher'],
+  'Global Mapper Professional': ['Global Mapper Desktop', 'Geographic Calculator', 'MAPublisher'],
+  'Global Mapper Advanced':     ['Global Mapper Desktop', 'Geographic Calculator', 'MAPublisher'],
   'Global Mapper Essentials':   ['Global Mapper Desktop'],
-  'Global Mapper Trial':        ['Global Mapper Desktop', 'Geographic Calculator', 'MapPublisher'],
-  'Global Mapper Air-gapped':   ['Global Mapper Desktop', 'Geographic Calculator', 'MapPublisher'],
+  'Global Mapper Trial':        ['Global Mapper Desktop', 'Geographic Calculator', 'MAPublisher'],
+  'Global Mapper Air-gapped':   ['Global Mapper Desktop', 'Geographic Calculator', 'MAPublisher'],
 };
 
 // Returns the union of all bundled apps across every seat the user holds. Used
@@ -5862,7 +5860,7 @@ function _bundleConnectivity(u){
   return Object.assign({ _repApp: repApp, _apps: apps }, getAppConnectivity(u, repApp));
 }
 
-// Friendly "Desktop, Geographic Calculator, MapPublisher" list for modal copy.
+// Friendly "Desktop, Geographic Calculator, MAPublisher" list for modal copy.
 function _bundleAppsLabel(apps){
   if(!apps || !apps.length) return '';
   if(apps.length <= 3) return apps.join(', ');
@@ -7742,17 +7740,17 @@ function payNow(productName, amount){
 // simulates the workflow with a confirmation + toast so testers see the intent.
 // ── Offline license workflow ────────────────────────────────────────────────
 // Three paths through the same modal:
-//   REQUEST — user is currently online (u.offline !== true). Admin enters
-//     System UUID + reason, clicks Download license. Backend (Keycloak) confirms
+//   REQUEST — user is currently online (u.offline !== true). Admin enters the
+//     System UUID and clicks Download license. Backend (Keycloak) confirms
 //     the user has no active session, then u.offline flips true.
 //   RE-DOWNLOAD — user is offline with a still-valid license. Admin can pull the
 //     .lic file again (user lost the file, got a new laptop, etc.). System UUID
-//     and reason can be updated but the 90-day clock stays anchored to the
-//     original issue date so re-download can't extend indefinitely.
+//     can be updated but the 90-day clock stays anchored to the original issue
+//     date so re-download can't extend indefinitely.
 //   FRESH ISSUE AFTER EXPIRY — user is offline but past the validity window.
 //     Modal offers to issue a brand-new license with a fresh 90-day window.
 // One license now covers every bundled app at once (Desktop + Geographic
-// Calculator + MapPublisher where applicable) — there is no per-app scoping
+// Calculator + MAPublisher where applicable) — there is no per-app scoping
 // or picker anymore. See _bundleConnectivity() below for how the modal reads
 // a single representative state across the whole bundle.
 let _offlineTargetIdx = null;
@@ -7856,20 +7854,18 @@ function openOfflineLicense(idx){
   const displayIssuedBy   = bundle ? bundle.issuedBy   : u.offlineIssuedBy;
   const displayValidUntil = bundle ? bundle.validUntil : u.offlineValidUntil;
   const displayMachineId  = bundle ? bundle.machineId  : u.offlineMachineId;
-  const displayReason     = bundle ? bundle.reason     : u.offlineReason;
   const displayLastDl     = bundle ? bundle.lastDownloadedOn : u.offlineLastDownloadedOn;
   const repApp = bundle ? bundle._repApp : null;
 
-  // No picker to populate anymore — just surface which apps this license will
-  // cover so the admin knows the scope of what they're about to issue.
+  // No picker to populate anymore — instead, a standing statement of what the
+  // token can do. Deliberately not personalized: this is capability info
+  // about the token itself, shown regardless of which specific apps this
+  // user happens to hold today.
   const bundleNote = document.getElementById('offline-bundle-note');
   if(bundleNote){
-    if(bundledApps.length > 1){
-      bundleNote.style.display = '';
-      bundleNote.innerHTML = 'This license covers all of ' + u.name + '\u2019s bundled apps: <strong>' + _bundleAppsLabel(bundledApps) + '</strong>.';
-    } else {
-      bundleNote.style.display = 'none';
-    }
+    bundleNote.style.display = '';
+    bundleNote.innerHTML = 'This license can activate any application included in the Professional tier: <strong>'
+      + _bundleAppsLabel(bundledApps.length ? bundledApps : PRODUCT_BUNDLES['Global Mapper Air-gapped']) + '</strong>.';
   }
 
   const modal = document.getElementById('modal-offline-license');
@@ -7877,7 +7873,6 @@ function openOfflineLicense(idx){
   const sub = document.getElementById('offline-modal-sub');
   const summary = document.getElementById('offline-existing-summary');
   const machineInput = document.getElementById('offline-machine-id');
-  const reasonInput = document.getElementById('offline-reason');
   const machineHint = document.getElementById('offline-machine-hint');
   const validityBlock = document.getElementById('offline-validity-block');
   const dateInput = document.getElementById('offline-valid-until');
@@ -7918,9 +7913,9 @@ function openOfflineLicense(idx){
       ? 'Cannot exceed license end date (' + _formatFriendlyDate(licenseEnd) + ').'
       : '';
   }
-  // Bundle-scoped titles: with a multi-app bundle, name the apps so the admin
-  // sees the scope of what they're issuing/downloading for.
-  const scopedSuffix = bundledApps.length > 1 ? (' \u2014 ' + _bundleAppsLabel(bundledApps)) : '';
+  // Title stays generic ("Request offline license" / "Offline license") —
+  // no per-user or per-app suffix. Scope is now communicated by the
+  // capability note above the System UUID field instead of the title.
 
   if(displayOffline && !isSelfInitiated){
     // ── VIEW / RE-DOWNLOAD MODE ────────────────────────────────────────────
@@ -7931,11 +7926,11 @@ function openOfflineLicense(idx){
       ? _appDaysRemaining(u, repApp)
       : _offlineDaysRemaining(u);
     const isExpired = (daysLeft !== null && daysLeft <= 0);
-    if(title) title.textContent = 'Offline license \u2014 ' + u.name + scopedSuffix;
+    if(title) title.textContent = 'Offline license';
     if(sub){
       sub.textContent = isExpired
         ? 'The offline license has expired. Issue a new one below.'
-        : 'This user\u2019s offline license is still valid. Re-download the file, or update the machine ID / reason if it has changed.';
+        : 'This offline license is still valid. Re-download the file, or update the System UUID if it has changed.';
     }
     if(summary){
       summary.style.display = '';
@@ -7967,17 +7962,12 @@ function openOfflineLicense(idx){
       }
     }
     // Prefill inputs with the stored values — but leave them EDITABLE so the
-    // admin can update the machine ID if the target machine changed (e.g. IT
+    // admin can update the System UUID if the target machine changed (e.g. IT
     // shipped a new laptop) without going through a full revoke/re-request.
     if(machineInput){
       machineInput.value = displayMachineId || '';
       machineInput.readOnly = false;
       machineInput.style.opacity = '';
-    }
-    if(reasonInput){
-      reasonInput.value = displayReason || '';
-      reasonInput.readOnly = false;
-      reasonInput.style.opacity = '';
     }
     if(machineHint) machineHint.style.display = '';
     // Validity picker behavior differs between re-download and post-expiry paths:
@@ -8020,12 +8010,11 @@ function openOfflineLicense(idx){
     //   (b) User is self-initiated offline (offlineSource='self') — admin is
     //       being asked to issue a downloadable license on top of the user's
     //       self-declared offline status
-    if(title) title.textContent = 'Request offline license' + scopedSuffix;
+    if(title) title.textContent = 'Request offline license';
     if(sub){
-      const forApps = bundledApps.length > 1 ? (' for ' + _bundleAppsLabel(bundledApps)) : '';
       sub.textContent = isSelfInitiated
-        ? (u.name + ' went offline from within the app. Issue a downloadable license file' + forApps + ' below.')
-        : ('Enter the machine details and reason for ' + u.name + forApps + '. The license file will be scoped to that specific machine.');
+        ? 'This user went offline from within the app. Issue a downloadable license file below.'
+        : 'Enter the machine\u2019s System UUID below. The license file will be scoped to that specific machine.';
     }
     // For self-initiated users, show a small info card explaining the identity-
     // system data we have on them (offline-since date, current validity window
@@ -8064,11 +8053,6 @@ function openOfflineLicense(idx){
       machineInput.readOnly = false;
       machineInput.style.opacity = '';
     }
-    if(reasonInput){
-      reasonInput.value = '';
-      reasonInput.readOnly = false;
-      reasonInput.style.opacity = '';
-    }
     if(machineHint) machineHint.style.display = '';
     // Show the validity picker with presets enabled. Default: "Till end of
     // license" (date input pre-filled with the license end date).
@@ -8097,27 +8081,19 @@ function confirmOfflineLicense(){
   if(!u) return;
 
   const machineInput = document.getElementById('offline-machine-id');
-  const reasonInput = document.getElementById('offline-reason');
   const errorBox = document.getElementById('offline-error');
   const errorMsg = document.getElementById('offline-error-msg');
 
   const machineId = (machineInput ? machineInput.value : '').trim();
-  const reason = (reasonInput ? reasonInput.value : '').trim();
 
   // ── Validation (applies to all paths) ────────────────────────────────────
-  // No more "which app" check — one System UUID now covers every bundled app,
-  // so there's nothing left to pick before submitting.
+  // No "which app" check (one System UUID covers every bundled app) and no
+  // reason field \u2014 this is a perpetual, sales-qualified air-gapped license,
+  // not a time-boxed exception that needs justifying per request.
   const bundledApps = getBundledAppsFor(u);
   if(!machineId){
     if(errorBox && errorMsg){
       errorMsg.textContent = 'System UUID is required. Please enter the target machine\u2019s hardware UUID.';
-      errorBox.style.display = '';
-    }
-    return;
-  }
-  if(!reason){
-    if(errorBox && errorMsg){
-      errorMsg.textContent = 'Please enter a reason for the offline license. This is recorded in the audit trail.';
       errorBox.style.display = '';
     }
     return;
@@ -8149,13 +8125,11 @@ function confirmOfflineLicense(){
         const existing = u.appConnectivity[app] || getAppConnectivity(u, app);
         u.appConnectivity[app] = Object.assign({}, existing, {
           machineId: machineId,
-          reason: reason,
           lastDownloadedOn: todayStr,
         });
       });
     } else {
       u.offlineMachineId = machineId;
-      u.offlineReason = reason;
       u.offlineLastDownloadedOn = todayStr;
     }
     _stampUserModification(u);
@@ -8205,7 +8179,6 @@ function confirmOfflineLicense(){
       u.appConnectivity[app] = {
         state: 'offline',
         machineId: machineId,
-        reason: reason,
         issuedOn: todayStr,
         issuedBy: adminName,
         validUntil: validUntilStr,
@@ -8218,7 +8191,6 @@ function confirmOfflineLicense(){
     u.offline = true;
     u.offlineSource = 'admin';
     u.offlineMachineId = machineId;
-    u.offlineReason = reason;
     u.offlineIssuedOn = todayStr;
     u.offlineIssuedBy = adminName;
     u.offlineValidUntil = validUntilStr;
@@ -8340,7 +8312,7 @@ function _refreshDownloadActivity(){
 
 // The install picker options. The base list (Global Mapper installers in every
 // supported language) applies to every product tier. Bundled add-on products —
-// Geographic Calculator and MapPublisher — ship only with the higher tiers
+// Geographic Calculator and MAPublisher — ship only with the higher tiers
 // (Professional and Advanced), so they're conditionally inserted right after
 // Global Mapper : English - msi when the target product qualifies.
 const _INSTALLER_BASE_OPTIONS = [
@@ -8359,8 +8331,8 @@ const _INSTALLER_BASE_OPTIONS = [
 const _INSTALLER_TIER_EXTRAS = [
   { value: 'Geographic Calculator - English', label: 'Geographic Calculator - English' },
   { value: 'Geographic Calculator - msi',     label: 'Geographic Calculator - msi' },
-  { value: 'MapPublisher - Windows',          label: 'MapPublisher - Windows' },
-  { value: 'MapPublisher - macOS',            label: 'MapPublisher - macOS' },
+  { value: 'MAPublisher - Windows',          label: 'MAPublisher - Windows' },
+  { value: 'MAPublisher - macOS',            label: 'MAPublisher - macOS' },
 ];
 
 // Returns the ordered installer option list for a given product name. For higher
@@ -8368,7 +8340,7 @@ const _INSTALLER_TIER_EXTRAS = [
 // so they read as a natural extension of the primary language list.
 // Trial subscribers internally map to the Professional tier, so the trial
 // installer also gets the Pro/Advanced-only add-ons (Geographic Calculator,
-// MapPublisher). Otherwise the trial would give a smaller feature preview
+// MAPublisher). Otherwise the trial would give a smaller feature preview
 // than what conversion to paid delivers.
 function _installerOptionsFor(productName){
   const isHigherTier = /Professional|Advanced|Trial/i.test(productName || '');
@@ -8394,7 +8366,7 @@ function openInstallProduct(productName){
   if(picker) picker.style.display = '';
   if(success) success.style.display = 'none';
   // Rebuild the option list from the tier-aware source so higher-tier products
-  // see the Geographic Calculator + MapPublisher add-ons and lower tiers don't.
+  // see the Geographic Calculator + MAPublisher add-ons and lower tiers don't.
   const sel = document.getElementById('install-installer-sel');
   if(sel){
     const opts = _installerOptionsFor(_currentInstallProduct);
