@@ -3021,7 +3021,7 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
      captured for each user/app, correct it if needed, then generate and
      download the offline license (JWT) files as a bundle. -->
 <div class="modal-bg" id="modal-airgap-bundle">
-  <div class="modal lg">
+  <div class="modal lg" style="width:820px">
     <div class="m-head">
       <div class="modal-title">Manage offline licenses</div>
       <div class="modal-sub" id="airgap-sub" style="margin-bottom:0"></div>
@@ -3039,10 +3039,9 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
 <div class="modal-bg" id="modal-airgap-builds">
   <div class="modal" style="max-width:480px">
     <div class="modal-title">Download Global Mapper Air-gapped build</div>
-    <div class="modal-sub">Served from a dedicated, access-controlled distribution bucket — separate from the standard Global Mapper installers.</div>
     <div id="airgap-builds-picker">
       <div class="m-note warn" style="margin-bottom:14px">
-        <strong>&#9888; Use this build on offline machines.</strong> Only the Air-gapped build ships with the module required to import an issued offline license (.lic/JWT). The standard installer cannot import offline licenses \u2014 installing it on an air-gapped machine will leave that seat unable to activate.
+        <strong>&#9888; Use this build on air-gapped machines.</strong> Only the Air-gapped build ships with the module required to import an issued offline license token (JWT). The standard installer cannot import offline licenses.
       </div>
       <div class="modal-label">Build</div>
       <select class="modal-select" id="airgap-build-sel" size="4" style="height:auto;padding:6px 8px">
@@ -7313,16 +7312,18 @@ function _canRequestOffline(u){
 }
 
 // Every app across the org that currently sits on an admin-issued offline
-// licence, i.e. a real .lic file exists for it. Roaming apps are listed
-// separately because they are self-service and have no admin-issued file.
-// One row per user now, not one per user+app — a single System UUID and a
-// single license bundle now covers every app the user has, so there's
-// nothing left to distinguish per-app in this table. Roaming stays listed
-// per-app in a separate warning note below, since roaming genuinely is
-// still per-app (self-service, independent of any admin-issued bundle).
+// One row per user — a single System UUID and a single license bundle now
+// covers every app the user has. Each row also tracks whether the bundle has
+// already been downloaded (via this view OR via the per-user "Request offline
+// license" modal on the Users page — both write to the same appConnectivity
+// record, so lastDownloadedOn is the single source of truth). Already-
+// downloaded bundles are excluded from the bulk generate action below: the
+// backend treats a license download as one-time, so re-including an already-
+// downloaded bundle in a bulk generate would silently fail or hand out a
+// second token for a seat that's already activated.
 function _airgapLicenceRows(){
   const orgUsers = users.filter(u => (!u.org || u.org === currentOrg) && hasSeat(u));
-  const offline = [], roaming = [];
+  const offline = [];
   orgUsers.forEach(u => {
     // Carry the index into the global users array so the Manage view can write
     // a corrected System UUID straight back to this user's bundled apps.
@@ -7336,18 +7337,12 @@ function _airgapLicenceRows(){
         issuedOn: bundle.issuedOn || '\u2014',
         validUntil: bundle.validUntil || '\u2014',
         airgapped: getSeats(u).some(_isAirgapped),
-      });
-    } else if(bundle && bundle.state === 'roaming'){
-      // Still surfaced per-app here, since one user could have some apps
-      // roaming and others online with no admin bundle issued yet.
-      bundledApps.forEach(app => {
-        if(getAppConnectivity(u, app).state === 'roaming'){
-          roaming.push({ name: u.name, email: u.email, app: app });
-        }
+        alreadyDownloaded: !!bundle.lastDownloadedOn,
+        downloadedOn: bundle.lastDownloadedOn || '',
       });
     }
   });
-  return {offline:offline, roaming:roaming};
+  return {offline:offline};
 }
 
 function openAirgapBundle(){
@@ -7355,6 +7350,7 @@ function openAirgapBundle(){
   const sub  = document.getElementById('airgap-sub');
   const body = document.getElementById('airgap-body');
   const foot = document.getElementById('airgap-foot');
+  const pending = data.offline.filter(r => !r.alreadyDownloaded);
 
   if(sub) sub.textContent = data.offline.length
     ? data.offline.length + ' issued license bundle' + (data.offline.length!==1?'s':'')
@@ -7371,55 +7367,105 @@ function openAirgapBundle(){
     h += '<div class="m-note info" style="margin-bottom:14px">Each bundle is locked to the System UUID it is '
       +  'issued for \u2014 double-check the ID below matches the target machine before generating. A '
       +  'mismatched ID will not activate any app in the bundle.</div>'
-      +  '<table class="co-rc"><thead><tr><th>User</th><th>Apps covered</th><th>System UUID</th><th>Valid until</th></tr></thead><tbody>'
-      +  data.offline.map(r =>
-           '<tr><td><div style="color:var(--text-primary);font-weight:600">'+r.name
-         + (r.airgapped ? ' <span class="co-tag" style="margin:0 0 0 6px">Air-gapped</span>' : '')
-         + '</div><div style="font-size:11.5px;color:var(--text-muted)">'+r.email+'</div></td>'
-         + '<td style="font-size:11.5px">'+r.apps.join(', ')+'</td>'
-         // Editable so an admin can correct a mistyped System UUID here, right
-         // before generation, without leaving this view to go find the user.
-         + '<td><input type="text" class="modal-select" value="'+r.machineId.replace(/"/g,'&quot;')+'" '
-         + 'style="font-family:ui-monospace,monospace;font-size:11.5px;padding:5px 8px;width:150px;margin:0" '
-         + 'aria-label="System UUID for '+r.name+'" '
-         + 'onchange="_updateAirgapMachineId('+r.idx+',this)"/></td>'
-         + '<td>'+r.validUntil+'</td></tr>').join('')
+      +  '<table class="co-rc"><thead><tr><th>User</th><th>Apps covered</th><th>System UUID</th><th>Valid until</th><th>Status</th></tr></thead><tbody>'
+      +  data.offline.map(r => {
+           const safeName = r.name.replace(/'/g,"\\'");
+           // Already-downloaded bundles are shown read-only \u2014 no Edit button, no
+           // re-download route from here. Whoever downloaded it (this view or the
+           // per-user modal on Users page) already has the one-time token; editing
+           // or re-issuing needs a deliberate separate action, not a stray click here.
+           const uuidCell = r.alreadyDownloaded
+             ? '<span style="font-family:ui-monospace,monospace;font-size:11.5px;color:var(--text-secondary)">'+r.machineId+'</span>'
+             : '<span id="uuid-view-'+r.idx+'" style="white-space:nowrap">'
+               + '<span style="font-family:ui-monospace,monospace;font-size:11.5px">'+r.machineId+'</span> '
+               + _airgapEditIconBtn(r.idx, safeName)
+               + '</span>'
+               + '<span id="uuid-edit-'+r.idx+'" style="display:none;white-space:nowrap">'
+               + '<input type="text" id="uuid-input-'+r.idx+'" value="'+r.machineId.replace(/"/g,'&quot;')+'" '
+               + 'style="font-family:ui-monospace,monospace;font-size:11.5px;padding:5px 8px;width:150px;margin:0;border:1px solid var(--border);border-radius:var(--radius-sm)" '
+               + 'aria-label="System UUID for '+safeName+'"/> '
+               + '<button class="btn xs primary" onclick="_saveAirgapUuidEdit('+r.idx+')">Save</button> '
+               + '<button class="btn xs" onclick="_cancelAirgapUuidEdit('+r.idx+')">Cancel</button>'
+               + '</span>';
+           const statusCell = r.alreadyDownloaded
+             ? '<span style="color:var(--green);font-weight:600">Downloaded</span>'
+               + (r.downloadedOn ? '<div style="font-size:10.5px;color:var(--text-muted)">'+r.downloadedOn+'</div>' : '')
+             : '<span style="color:var(--text-muted)">Not yet downloaded</span>';
+           return '<tr><td><div style="color:var(--text-primary);font-weight:600">'+r.name
+             + (r.airgapped ? ' <span class="co-tag" style="margin:0 0 0 6px">Air-gapped</span>' : '')
+             + '</div><div style="font-size:11.5px;color:var(--text-muted)">'+r.email+'</div></td>'
+             + '<td style="font-size:11.5px">'+r.apps.join(', ')+'</td>'
+             + '<td>'+uuidCell+'</td>'
+             + '<td style="font-size:11.5px">'+r.validUntil+'</td>'
+             + '<td style="font-size:11.5px">'+statusCell+'</td></tr>';
+         }).join('')
       +  '</tbody></table>';
-  }
-  if(data.roaming.length){
-    h += '<div class="m-note warn" style="margin-top:14px"><strong>'+data.roaming.length
-      +  ' app' + (data.roaming.length!==1?'s are':' is') + ' roaming.</strong> Roaming is self-service \u2014 '
-      +  'the user took it offline from inside the app, so no admin-issued bundle exists to download. '
-      +  'Those seats are not included above.</div>';
   }
   if(body) body.innerHTML = h;
 
   if(foot) foot.innerHTML = '<button class="btn" onclick="closeAirgapBundle()">Close</button>'
-    + (data.offline.length
-        ? '<button class="btn primary" onclick="confirmAirgapBundle('+data.offline.length+')">Generate &amp; download '
-          + data.offline.length + ' license bundle' + (data.offline.length!==1?'s':'') + '</button>'
-        : '<button class="btn primary" disabled>Nothing to download</button>');
+    + (pending.length
+        ? '<button class="btn primary" onclick="confirmAirgapBundle()">Generate &amp; download '
+          + pending.length + ' license bundle' + (pending.length!==1?'s':'') + '</button>'
+        : '<button class="btn primary" disabled>'
+          + (data.offline.length ? 'All bundles already downloaded' : 'Nothing to download') + '</button>');
 
   document.getElementById('modal-airgap-bundle').classList.add('open');
 }
 
 function closeAirgapBundle(){ document.getElementById('modal-airgap-bundle').classList.remove('open'); }
 
-// Lets an admin correct a System UUID inline in the Manage view, right before
-// generating the license bundle, without leaving to go find the user record.
-// Writes the same UUID to every bundled app's connectivity record so it stays
-// in sync with everywhere else that reads getAppConnectivity() (Users page,
-// this table) — one UUID, one bundle, applied consistently across all apps.
-function _updateAirgapMachineId(idx, inputEl){
+// Small icon-only edit trigger for the Manage view's System UUID field —
+// a pencil, not a text label, so it reads as a quiet inline affordance rather
+// than a call-to-action competing with Save/Cancel once clicked.
+function _airgapEditIconBtn(idx, safeName){
+  return '<button class="btn xs" onclick="_startAirgapUuidEdit('+idx+')" title="Edit System UUID for '+safeName+'" '
+    + 'aria-label="Edit System UUID for '+safeName+'" style="padding:4px 6px;display:inline-flex;align-items:center;vertical-align:middle">'
+    + '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5c.4-.4 1-.4 1.4 0l.6.6c.4.4.4 1 0 1.4L5 12l-2.7.7.7-2.7L11.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/><path d="M10.3 3.7l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>'
+    + '</button>';
+}
+
+// Edit-gated System UUID in the Manage view: the field starts read-only, and
+// an admin must click Edit before it becomes an input. Prevents accidental
+// edits from a stray click in a dense table, and makes "I'm changing this on
+// purpose" an explicit action before it's written back.
+function _startAirgapUuidEdit(idx){
+  const viewEl = document.getElementById('uuid-view-'+idx);
+  const editEl = document.getElementById('uuid-edit-'+idx);
+  if(viewEl) viewEl.style.display = 'none';
+  if(editEl) editEl.style.display = '';
+  const input = document.getElementById('uuid-input-'+idx);
+  if(input){ input.focus(); input.select(); }
+}
+
+function _cancelAirgapUuidEdit(idx){
+  const viewEl = document.getElementById('uuid-view-'+idx);
+  const editEl = document.getElementById('uuid-edit-'+idx);
+  const input = document.getElementById('uuid-input-'+idx);
   const u = users[idx];
-  if(!u || !inputEl) return;
-  const newId = inputEl.value.trim();
+  if(input && u){
+    const bundle = _bundleConnectivity(u);
+    input.value = bundle.machineId || '';
+  }
+  if(editEl) editEl.style.display = 'none';
+  if(viewEl) viewEl.style.display = '';
+}
+
+// Writes the corrected UUID to every bundled app's connectivity record so it
+// stays in sync with everywhere else that reads getAppConnectivity() (Users
+// page, this table) — one UUID, one bundle, applied consistently across all
+// apps — then swaps the row back to read-only view.
+function _saveAirgapUuidEdit(idx){
+  const u = users[idx];
+  const input = document.getElementById('uuid-input-'+idx);
+  if(!u || !input) return;
+  const newId = input.value.trim();
   const bundledApps = getBundledAppsFor(u);
   if(!newId){
     // Don't allow clearing it here — a blank System UUID would silently drop
     // this user out of future bundles. Revert and let the admin retype.
     const bundle = _bundleConnectivity(u);
-    inputEl.value = bundle.machineId || '';
+    input.value = bundle.machineId || '';
     toast('System UUID can\u2019t be blank \u2014 reverted');
     return;
   }
@@ -7430,10 +7476,38 @@ function _updateAirgapMachineId(idx, inputEl){
   });
   _stampUserModification(u);
   savePersisted('users', users);
+  const viewEl = document.getElementById('uuid-view-'+idx);
+  const editEl = document.getElementById('uuid-edit-'+idx);
+  if(viewEl){
+    viewEl.innerHTML = '<span style="font-family:ui-monospace,monospace;font-size:11.5px">'+newId+'</span> '
+      + _airgapEditIconBtn(idx, u.name.replace(/'/g,"\\'"));
+    viewEl.style.display = '';
+  }
+  if(editEl) editEl.style.display = 'none';
   toast('\u2713 System UUID updated for ' + u.name + ' (' + bundledApps.length + ' app' + (bundledApps.length!==1?'s':'') + ')');
 }
 
-function confirmAirgapBundle(count){
+// Generates and downloads bundles for every user who hasn't already had
+// theirs downloaded (whether via this bulk action previously, or via the
+// per-user "Request offline license" modal on the Users page). Marks each as
+// downloaded so a second bulk run \u2014 or a later admin-issued re-download \u2014
+// won't try to re-serve the same one-time token.
+function confirmAirgapBundle(){
+  const pending = _airgapLicenceRows().offline.filter(r => !r.alreadyDownloaded);
+  const count = pending.length;
+  if(!count) return;
+  const todayStr = _formatFriendlyDate(new Date());
+  pending.forEach(r => {
+    const u = users[r.idx];
+    if(!u) return;
+    if(!u.appConnectivity) u.appConnectivity = {};
+    r.apps.forEach(app => {
+      const existing = u.appConnectivity[app] || getAppConnectivity(u, app);
+      u.appConnectivity[app] = Object.assign({}, existing, { lastDownloadedOn: todayStr });
+    });
+    _stampUserModification(u);
+  });
+  savePersisted('users', users);
   // Same record shape as installer downloads so it lists correctly in Download
   // history and in the Recent activity ticks (both read datetime/by/device).
   const _me = currentUData();
