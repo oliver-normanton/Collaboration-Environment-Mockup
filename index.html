@@ -3181,7 +3181,7 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
 <!-- OFFLINE LICENSE (request/view) -->
 <div class="modal-bg" id="modal-offline-license">
   <div class="modal" style="max-width:520px">
-    <div class="modal-title" id="offline-modal-title">Request offline license</div>
+    <div class="modal-title" id="offline-modal-title">Download Air-gapped License</div>
     <div class="modal-sub" id="offline-modal-sub">Enter the machine's System UUID below. The license will be valid for up to 90 days.</div>
 
     <!-- Existing-license summary (view / re-download mode + self-initiated info) -->
@@ -6425,7 +6425,7 @@ function renderUsers(){
           + 'title="Offline licenses require a Global Mapper Air-gapped seat">Online</div>';
       }
       return '<div style="font-weight:600;color:var(--green)">Online</div>'
-        + '<div style="font-size:11px;margin-top:2px"><a href="#" style="color:var(--avenza-blue);text-decoration:underline" onclick="openOfflineLicense('+ri+');return false;">Request offline license</a></div>';
+        + '<div style="font-size:11px;margin-top:2px"><a href="#" style="color:var(--avenza-blue);text-decoration:underline" onclick="openOfflineLicense('+ri+');return false;">Download Air-gapped License</a></div>';
     }
     // Mixed / non-Online — build aggregate header + optional expansion
     const parts = [];
@@ -6446,7 +6446,7 @@ function renderUsers(){
     // admin action). But the ACTION is now bundle-level: one license covers
     // every bundled app, so every row's link opens the same unscoped modal
     // rather than one scoped to that specific app.
-    //   • Online  → Request offline license (opens the bundle-level modal)
+    //   • Online  → Download Air-gapped License (opens the bundle-level modal)
     //   • Roaming → no action (self-service; user must come off roaming first)
     //   • Offline → Download offline license (re-download the bundle)
     const rows = agg.apps.map(app => {
@@ -6459,7 +6459,7 @@ function renderUsers(){
           + (_canRequestOffline(u)
               ? '<a href="#" style="color:var(--avenza-blue);text-decoration:underline;font-size:11px" '
                 + 'onclick="openOfflineLicense('+ri+');return false;" '
-                + 'title="Request an offline license covering all of '+u.name+'\u2019s bundled apps">Request offline license</a>'
+                + 'title="Request an offline license covering all of '+u.name+'\u2019s bundled apps">Download Air-gapped License</a>'
               : '')
           + '</div>';
       }
@@ -7368,7 +7368,7 @@ function openAirgapBundle(){
   let h = '';
   if(!data.offline.length){
     h += '<div class="m-note info">Offline license bundles are created when an admin issues one from the '
-      +  'Users page (Connectivity \u2192 Request offline license). Once issued, they show up here to '
+      +  'Users page (Connectivity \u2192 Download Air-gapped License). Once issued, they show up here to '
       +  'review, correct the System UUID if needed, and generate/download as a bundle to carry across '
       +  'to air-gapped machines.</div>';
   } else {
@@ -7715,7 +7715,7 @@ function _saveAirgapValidEdit(idx){
 
 // Generates and downloads bundles for every user who hasn't already had
 // theirs downloaded (whether via this bulk action previously, or via the
-// per-user "Request offline license" modal on the Users page). Marks each as
+// per-user "Download Air-gapped License" modal on the Users page). Marks each as
 // downloaded so a second bulk run \u2014 or a later admin-issued re-download \u2014
 // won't try to re-serve the same one-time token.
 function confirmAirgapBundle(){
@@ -8222,9 +8222,9 @@ function openOfflineLicense(idx){
       ? 'Cannot exceed license end date (' + _formatFriendlyDate(licenseEnd) + ').'
       : '';
   }
-  // Title stays generic ("Request offline license" / "Offline license") —
-  // no per-user or per-app suffix. Scope is now communicated by the
-  // capability note above the System UUID field instead of the title.
+  // Title stays generic ("Download Air-gapped License") across both request
+  // and re-download states — no per-user or per-app suffix. Scope is
+  // communicated by the app checklist and System UUID field instead.
 
   if(displayOffline && !isSelfInitiated){
     // ── VIEW / RE-DOWNLOAD MODE ────────────────────────────────────────────
@@ -8235,7 +8235,7 @@ function openOfflineLicense(idx){
       ? _appDaysRemaining(u, repApp)
       : _offlineDaysRemaining(u);
     const isExpired = (daysLeft !== null && daysLeft <= 0);
-    if(title) title.textContent = 'Offline license';
+    if(title) title.textContent = 'Download Air-gapped License';
     if(sub){
       sub.textContent = isExpired
         ? 'The offline license has expired. Issue a new one below.'
@@ -8319,7 +8319,7 @@ function openOfflineLicense(idx){
     //   (b) User is self-initiated offline (offlineSource='self') — admin is
     //       being asked to issue a downloadable license on top of the user's
     //       self-declared offline status
-    if(title) title.textContent = 'Request offline license';
+    if(title) title.textContent = 'Download Air-gapped License';
     if(sub){
       sub.textContent = isSelfInitiated
         ? 'This user went offline from within the app. Issue a downloadable license file below.'
