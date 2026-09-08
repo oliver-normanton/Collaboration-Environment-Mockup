@@ -3199,20 +3199,15 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
       </div>
     </div>
 
-    <!-- App selector: shown only when opened from an aggregate/Online cell for a
-         bundled product user. Lets the admin pick which app the offline license
-         is for (each app gets its own Machine ID and license file). Hidden when
-         the modal is already scoped to a specific app (opened from the expansion
-         breakdown) or when the user has only one app. -->
-    <div id="offline-app-picker-row" style="display:none">
-      <div class="modal-label">Which app</div>
-      <select class="modal-select" id="offline-app-picker" onchange="_onOfflineAppPick()"></select>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:-4px;margin-bottom:4px">Offline licenses are issued per app. Choose the app the user needs to work on offline.</div>
-    </div>
+    <!-- Bundle coverage note: one offline license now covers every app in the
+         user's bundle (Desktop + Geographic Calculator + MapPublisher where
+         applicable), so there is no per-app choice to make here. Populated by
+         openOfflineLicense() with the specific apps this user holds. -->
+    <div id="offline-bundle-note" style="display:none;font-size:11px;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--surface-3);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:4px"></div>
 
-    <div class="modal-label">Machine ID</div>
-    <input class="modal-select" id="offline-machine-id" type="text" placeholder="e.g. WIN-A47B2-XL-2024" style="font-family:'DM Mono',monospace"/>
-    <div id="offline-machine-hint" style="font-size:11px;color:var(--text-muted);margin-top:-4px;margin-bottom:4px">Unique hardware identifier from the target machine. Users can retrieve this from Global Mapper under Help &rarr; About.</div>
+    <div class="modal-label">System UUID</div>
+    <input class="modal-select" id="offline-machine-id" type="text" placeholder="e.g. 4C4C4544-0046-4310-8058-C2C04F435A31" style="font-family:'DM Mono',monospace"/>
+    <div id="offline-machine-hint" style="font-size:11px;color:var(--text-muted);margin-top:-4px;margin-bottom:4px">The target machine's 128-bit hardware UUID (SMBIOS System UUID) &mdash; this is what the license is validated against. Users can retrieve it from Global Mapper under Help &rarr; About.</div>
 
     <div class="modal-label">Reason for offline access</div>
     <textarea class="modal-select" id="offline-reason" rows="3" placeholder="e.g. Fieldwork with no reliable connectivity for 4 weeks" style="resize:vertical;min-height:60px;padding:8px 10px"></textarea>
@@ -5849,6 +5844,31 @@ function getConnectivityAggregate(u){
   return { roaming, offline, online, total: apps.length, worst, apps };
 }
 
+// One offline license now covers every app in a user's bundle at once, so the
+// request/re-download modal needs a single representative state rather than
+// one per app. Preference order: an app that already has an admin-issued
+// offline license (most informative for re-download), then a self-initiated
+// Roaming app (admin may be asked to take it over), then just the first
+// bundled app (fully-online case). Once a bundle license has been issued
+// through this flow every app converges to the same state anyway — this
+// preference order only matters for the edge case of a user who roamed a
+// single app from inside it before any admin-issued license existed.
+function _bundleConnectivity(u){
+  const apps = getBundledAppsFor(u);
+  if(!apps.length) return { state: 'online', _repApp: null, _apps: [] };
+  const offlineApp = apps.find(a => getAppConnectivity(u, a).state === 'offline');
+  const roamingApp = apps.find(a => getAppConnectivity(u, a).state === 'roaming');
+  const repApp = offlineApp || roamingApp || apps[0];
+  return Object.assign({ _repApp: repApp, _apps: apps }, getAppConnectivity(u, repApp));
+}
+
+// Friendly "Desktop, Geographic Calculator, MapPublisher" list for modal copy.
+function _bundleAppsLabel(apps){
+  if(!apps || !apps.length) return '';
+  if(apps.length <= 3) return apps.join(', ');
+  return apps.length + ' apps';
+}
+
 // True if the seat can be safely revoked. A seat with any app in Roaming or
 // Offline state has active state on some machine — revoking would strand it.
 // Both Roaming (self-initiated) and Offline (admin-issued) block revoke.
@@ -6421,22 +6441,25 @@ function renderUsers(){
       + '</div>';
     if(!isExpanded) return header;
     // ── Expanded per-app breakdown ─────────────────────────────────────────
-    // Every app row gets an action:
-    //   • Online  → Request offline license (opens modal scoped to this app)
-    //   • Roaming → no action (user must come off roaming first)
-    //   • Offline → Download offline license (opens re-download modal for this app)
+    // Status is still shown per app (Roaming remains genuinely per-app — it's
+    // self-service, triggered from inside the app itself, independent of any
+    // admin action). But the ACTION is now bundle-level: one license covers
+    // every bundled app, so every row's link opens the same unscoped modal
+    // rather than one scoped to that specific app.
+    //   • Online  → Request offline license (opens the bundle-level modal)
+    //   • Roaming → no action (self-service; user must come off roaming first)
+    //   • Offline → Download offline license (re-download the bundle)
     const rows = agg.apps.map(app => {
       const c = getAppConnectivity(u, app);
       if(c.state === 'online'){
-        const safeApp = app.replace(/'/g,"\\'");
         return '<div style="display:flex;align-items:center;gap:6px;padding:2px 0;font-size:11px">'
           + '<span style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></span>'
           + '<span style="flex:1;color:var(--text-secondary)">'+app+'</span>'
           + '<span style="color:var(--green);font-weight:600;margin-right:8px">Online</span>'
           + (_canRequestOffline(u)
               ? '<a href="#" style="color:var(--avenza-blue);text-decoration:underline;font-size:11px" '
-                + 'onclick="openOfflineLicense('+ri+',\''+safeApp+"'"+');return false;" '
-                + 'title="Request an offline license for '+app+'">Request offline license</a>'
+                + 'onclick="openOfflineLicense('+ri+');return false;" '
+                + 'title="Request an offline license covering all of '+u.name+'\u2019s bundled apps">Request offline license</a>'
               : '')
           + '</div>';
       }
@@ -6450,11 +6473,10 @@ function renderUsers(){
       const textColor = isRoaming ? '#a16207' : 'var(--red)';
       let actionHtml = '';
       if(!isRoaming){
-        // Offline app — allow re-download.
-        const safeApp = app.replace(/'/g,"\\'");
+        // Offline app — allow re-download of the whole bundle.
         actionHtml = '<a href="#" style="color:var(--avenza-blue);text-decoration:underline;font-size:11px;margin-left:8px" '
-          + 'onclick="openOfflineLicense('+ri+',\''+safeApp+"'"+');return false;" '
-          + 'title="Re-download the offline license file for '+app+'">Download</a>';
+          + 'onclick="openOfflineLicense('+ri+');return false;" '
+          + 'title="Re-download the offline license bundle for '+u.name+'">Download</a>';
       }
       return '<div style="display:flex;align-items:center;gap:6px;padding:2px 0;font-size:11px">'
         + '<span style="width:8px;height:8px;border-radius:50%;background:'+dotColor+';flex-shrink:0"></span>'
@@ -7295,25 +7317,37 @@ function _canRequestOffline(u){
 // Every app across the org that currently sits on an admin-issued offline
 // licence, i.e. a real .lic file exists for it. Roaming apps are listed
 // separately because they are self-service and have no admin-issued file.
+// One row per user now, not one per user+app — a single System UUID and a
+// single license bundle now covers every app the user has, so there's
+// nothing left to distinguish per-app in this table. Roaming stays listed
+// per-app in a separate warning note below, since roaming genuinely is
+// still per-app (self-service, independent of any admin-issued bundle).
 function _airgapLicenceRows(){
   const orgUsers = users.filter(u => (!u.org || u.org === currentOrg) && hasSeat(u));
   const offline = [], roaming = [];
   orgUsers.forEach(u => {
     // Carry the index into the global users array so the Manage view can write
-    // a corrected Machine ID straight back to the right user/app record.
+    // a corrected System UUID straight back to this user's bundled apps.
     const idx = users.indexOf(u);
-    getBundledAppsFor(u).forEach(app => {
-      const c = getAppConnectivity(u, app);
-      const row = {
-        idx: idx, name: u.name, email: u.email, app: app,
-        machineId: c.machineId || '\u2014',
-        issuedOn: c.issuedOn || '\u2014',
-        validUntil: c.validUntil || '\u2014',
+    const bundledApps = getBundledAppsFor(u);
+    const bundle = bundledApps.length ? _bundleConnectivity(u) : null;
+    if(bundle && bundle.state === 'offline'){
+      offline.push({
+        idx: idx, name: u.name, email: u.email, apps: bundledApps,
+        machineId: bundle.machineId || '\u2014',
+        issuedOn: bundle.issuedOn || '\u2014',
+        validUntil: bundle.validUntil || '\u2014',
         airgapped: getSeats(u).some(_isAirgapped),
-      };
-      if(c.state === 'offline') offline.push(row);
-      else if(c.state === 'roaming') roaming.push(row);
-    });
+      });
+    } else if(bundle && bundle.state === 'roaming'){
+      // Still surfaced per-app here, since one user could have some apps
+      // roaming and others online with no admin bundle issued yet.
+      bundledApps.forEach(app => {
+        if(getAppConnectivity(u, app).state === 'roaming'){
+          roaming.push({ name: u.name, email: u.email, app: app });
+        }
+      });
+    }
   });
   return {offline:offline, roaming:roaming};
 }
@@ -7325,48 +7359,47 @@ function openAirgapBundle(){
   const foot = document.getElementById('airgap-foot');
 
   if(sub) sub.textContent = data.offline.length
-    ? data.offline.length + ' issued license file' + (data.offline.length!==1?'s':'')
-      + ' across ' + new Set(data.offline.map(r=>r.email)).size + ' user'
-      + (new Set(data.offline.map(r=>r.email)).size!==1?'s':'') + ' in this account.'
-    : 'No offline license files have been issued in this account yet.';
+    ? data.offline.length + ' issued license bundle' + (data.offline.length!==1?'s':'')
+      + ' in this account.'
+    : 'No offline license bundles have been issued in this account yet.';
 
   let h = '';
   if(!data.offline.length){
-    h += '<div class="m-note info">Offline license files are created when an admin issues one from the '
+    h += '<div class="m-note info">Offline license bundles are created when an admin issues one from the '
       +  'Users page (Connectivity \u2192 Request offline license). Once issued, they show up here to '
-      +  'review, correct the Machine ID if needed, and generate/download as a bundle to carry across '
+      +  'review, correct the System UUID if needed, and generate/download as a bundle to carry across '
       +  'to air-gapped machines.</div>';
   } else {
-    h += '<div class="m-note info" style="margin-bottom:14px">Each file is locked to the Machine ID it is '
+    h += '<div class="m-note info" style="margin-bottom:14px">Each bundle is locked to the System UUID it is '
       +  'issued for \u2014 double-check the ID below matches the target machine before generating. A '
-      +  'mismatched ID will not activate.</div>'
-      +  '<table class="co-rc"><thead><tr><th>User</th><th>App</th><th>Machine ID</th><th>Valid until</th></tr></thead><tbody>'
+      +  'mismatched ID will not activate any app in the bundle.</div>'
+      +  '<table class="co-rc"><thead><tr><th>User</th><th>Apps covered</th><th>System UUID</th><th>Valid until</th></tr></thead><tbody>'
       +  data.offline.map(r =>
            '<tr><td><div style="color:var(--text-primary);font-weight:600">'+r.name
          + (r.airgapped ? ' <span class="co-tag" style="margin:0 0 0 6px">Air-gapped</span>' : '')
          + '</div><div style="font-size:11.5px;color:var(--text-muted)">'+r.email+'</div></td>'
-         + '<td>'+r.app+'</td>'
-         // Editable so an admin can correct a mistyped Machine ID here, right
+         + '<td style="font-size:11.5px">'+r.apps.join(', ')+'</td>'
+         // Editable so an admin can correct a mistyped System UUID here, right
          // before generation, without leaving this view to go find the user.
          + '<td><input type="text" class="modal-select" value="'+r.machineId.replace(/"/g,'&quot;')+'" '
          + 'style="font-family:ui-monospace,monospace;font-size:11.5px;padding:5px 8px;width:150px;margin:0" '
-         + 'aria-label="Machine ID for '+r.name+' \u2014 '+r.app+'" '
-         + 'onchange="_updateAirgapMachineId('+r.idx+',\''+r.app.replace(/'/g,"\\'")+'\',this)"/></td>'
+         + 'aria-label="System UUID for '+r.name+'" '
+         + 'onchange="_updateAirgapMachineId('+r.idx+',this)"/></td>'
          + '<td>'+r.validUntil+'</td></tr>').join('')
       +  '</tbody></table>';
   }
   if(data.roaming.length){
     h += '<div class="m-note warn" style="margin-top:14px"><strong>'+data.roaming.length
       +  ' app' + (data.roaming.length!==1?'s are':' is') + ' roaming.</strong> Roaming is self-service \u2014 '
-      +  'the user took it offline from inside the app, so no admin-issued file exists to download. '
-      +  'Those seats are not included in this bundle.</div>';
+      +  'the user took it offline from inside the app, so no admin-issued bundle exists to download. '
+      +  'Those seats are not included above.</div>';
   }
   if(body) body.innerHTML = h;
 
   if(foot) foot.innerHTML = '<button class="btn" onclick="closeAirgapBundle()">Close</button>'
     + (data.offline.length
         ? '<button class="btn primary" onclick="confirmAirgapBundle('+data.offline.length+')">Generate &amp; download '
-          + data.offline.length + ' license file' + (data.offline.length!==1?'s':'') + '</button>'
+          + data.offline.length + ' license bundle' + (data.offline.length!==1?'s':'') + '</button>'
         : '<button class="btn primary" disabled>Nothing to download</button>');
 
   document.getElementById('modal-airgap-bundle').classList.add('open');
@@ -7374,28 +7407,32 @@ function openAirgapBundle(){
 
 function closeAirgapBundle(){ document.getElementById('modal-airgap-bundle').classList.remove('open'); }
 
-// Lets an admin correct a Machine ID inline in the Manage view, right before
-// generating the license file, without leaving to go find the user record.
-// Writes straight to the per-app connectivity record so it stays in sync with
-// everywhere else that reads getAppConnectivity() (Users page, this table).
-function _updateAirgapMachineId(idx, appName, inputEl){
+// Lets an admin correct a System UUID inline in the Manage view, right before
+// generating the license bundle, without leaving to go find the user record.
+// Writes the same UUID to every bundled app's connectivity record so it stays
+// in sync with everywhere else that reads getAppConnectivity() (Users page,
+// this table) — one UUID, one bundle, applied consistently across all apps.
+function _updateAirgapMachineId(idx, inputEl){
   const u = users[idx];
   if(!u || !inputEl) return;
   const newId = inputEl.value.trim();
+  const bundledApps = getBundledAppsFor(u);
   if(!newId){
-    // Don't allow clearing it here — a blank Machine ID would silently drop
-    // this row out of future bundles. Revert and let the admin retype.
-    const c = getAppConnectivity(u, appName);
-    inputEl.value = c.machineId || '';
-    toast('Machine ID can\u2019t be blank \u2014 reverted');
+    // Don't allow clearing it here — a blank System UUID would silently drop
+    // this user out of future bundles. Revert and let the admin retype.
+    const bundle = _bundleConnectivity(u);
+    inputEl.value = bundle.machineId || '';
+    toast('System UUID can\u2019t be blank \u2014 reverted');
     return;
   }
   if(!u.appConnectivity) u.appConnectivity = {};
-  const existing = u.appConnectivity[appName] || getAppConnectivity(u, appName);
-  u.appConnectivity[appName] = Object.assign({}, existing, { machineId: newId });
+  bundledApps.forEach(app => {
+    const existing = u.appConnectivity[app] || getAppConnectivity(u, app);
+    u.appConnectivity[app] = Object.assign({}, existing, { machineId: newId });
+  });
   _stampUserModification(u);
   savePersisted('users', users);
-  toast('\u2713 Machine ID updated for ' + u.name + ' \u2014 ' + appName);
+  toast('\u2713 System UUID updated for ' + u.name + ' (' + bundledApps.length + ' app' + (bundledApps.length!==1?'s':'') + ')');
 }
 
 function confirmAirgapBundle(count){
@@ -7404,7 +7441,7 @@ function confirmAirgapBundle(count){
   const _me = currentUData();
   downloadHistory.push({
     product: 'Global Mapper Air-gapped',
-    installer: count + ' offline license file' + (count!==1?'s':'') + ' (.lic bundle)',
+    installer: count + ' offline license bundle' + (count!==1?'s':'') + ' (.lic bundle)',
     datetime: _formatTodayDateTime(),
     timestamp: Date.now(),
     os: _detectOS(),
@@ -7415,7 +7452,7 @@ function confirmAirgapBundle(count){
   });
   savePersisted('downloadHistory', downloadHistory);
   closeAirgapBundle();
-  toast('\u2713 Generated and downloaded ' + count + ' offline license file' + (count!==1?'s':'') + ' as air-gapped-licenses.zip');
+  toast('\u2713 Generated and downloaded ' + count + ' offline license bundle' + (count!==1?'s':'') + ' as air-gapped-licenses.zip');
 }
 
 // Air-gapped builds are a small, fixed list (this SKU isn't tiered the way
@@ -7706,26 +7743,20 @@ function payNow(productName, amount){
 // ── Offline license workflow ────────────────────────────────────────────────
 // Three paths through the same modal:
 //   REQUEST — user is currently online (u.offline !== true). Admin enters
-//     MachineID + reason, clicks Download license. Backend (Keycloak) confirms
+//     System UUID + reason, clicks Download license. Backend (Keycloak) confirms
 //     the user has no active session, then u.offline flips true.
 //   RE-DOWNLOAD — user is offline with a still-valid license. Admin can pull the
-//     .lic file again (user lost the file, got a new laptop, etc.). Machine ID
+//     .lic file again (user lost the file, got a new laptop, etc.). System UUID
 //     and reason can be updated but the 90-day clock stays anchored to the
 //     original issue date so re-download can't extend indefinitely.
 //   FRESH ISSUE AFTER EXPIRY — user is offline but past the validity window.
 //     Modal offers to issue a brand-new license with a fresh 90-day window.
+// One license now covers every bundled app at once (Desktop + Geographic
+// Calculator + MapPublisher where applicable) — there is no per-app scoping
+// or picker anymore. See _bundleConnectivity() below for how the modal reads
+// a single representative state across the whole bundle.
 let _offlineTargetIdx = null;
-let _offlineTargetApp = null;
 
-// Called when the admin picks a different app from the modal's app dropdown.
-// Re-invokes openOfflineLicense scoped to the picked app, which re-renders
-// every field in the modal to reflect that app's current state.
-function _onOfflineAppPick(){
-  const sel = document.getElementById('offline-app-picker');
-  if(!sel || _offlineTargetIdx === null) return;
-  const picked = sel.value;
-  if(picked) openOfflineLicense(_offlineTargetIdx, picked);
-}
 // The maximum allowed valid-until date for the current modal session (license
 // end date for the target user). Set on modal open, used to clamp preset picks
 // and mark which preset button is currently active.
@@ -7795,77 +7826,50 @@ function _onOfflineDateChange(){
   _syncOfflinePresetActive();
 }
 
-function openOfflineLicense(idx, appName){
+function openOfflineLicense(idx){
   _offlineTargetIdx = idx;
-  _offlineTargetApp = appName || null;
   const u = users[idx];
   if(!u) return;
 
   // AIR-GAPPED BRANCH GUARD. Blocks requests from users without an air-gapped
-  // seat regardless of entry point. Re-downloads are still allowed: if a license
-  // has already been issued for this app, the file exists on a machine and the
-  // admin must be able to retrieve it.
+  // seat regardless of entry point. Re-downloads are still allowed: if a
+  // license has already been issued for the bundle, the files exist on a
+  // machine and the admin must be able to retrieve them.
   if(!_canRequestOffline(u)){
-    const already = appName
-      ? getAppConnectivity(u, appName).state === 'offline'
-      : getConnectivityAggregate(u).offline > 0;
+    const already = getConnectivityAggregate(u).offline > 0;
     if(!already){
       toast(u.name + ' needs a Global Mapper Air-gapped seat before an offline license can be issued.');
       return;
     }
   }
 
-  // When called with an appName, we're operating on that specific app's per-user
-  // connectivity record instead of the legacy top-level u.offline* fields. This
-  // is how mixed-state users (like Delia) get scoped requests/re-downloads per
-  // app. When called WITHOUT an appName, we fall back to legacy behavior for
-  // single-app users. Build a synthetic "app record" that both paths can read.
-  const scoped = appName ? getAppConnectivity(u, appName) : null;
-  const displayOffline = scoped ? (scoped.state === 'offline' || scoped.state === 'roaming') : u.offline;
-  const displaySource  = scoped ? (scoped.state === 'roaming' ? 'self' : 'admin') : u.offlineSource;
-  const displayIssuedOn   = scoped ? scoped.issuedOn   : u.offlineIssuedOn;
-  const displayIssuedBy   = scoped ? scoped.issuedBy   : u.offlineIssuedBy;
-  const displayValidUntil = scoped ? scoped.validUntil : u.offlineValidUntil;
-  const displayMachineId  = scoped ? scoped.machineId  : u.offlineMachineId;
-  const displayReason     = scoped ? scoped.reason     : u.offlineReason;
-  const displayLastDl     = scoped ? scoped.lastDownloadedOn : u.offlineLastDownloadedOn;
-
-  // ── App-selector dropdown ────────────────────────────────────────────────
-  // If the modal is opened WITHOUT a specific app (from an aggregate cell), and
-  // the user has multiple bundled apps, show a dropdown so the admin can choose
-  // which app the offline license is for. Only apps currently ONLINE appear as
-  // choices — apps already Roaming can't be requested (rule stands from earlier),
-  // and apps already Offline should be re-downloaded from their expansion row.
-  // If exactly one online app exists, auto-scope to it. If none, fall back to
-  // the first bundled app so the modal still renders sensibly.
+  // One license now covers the user's entire app bundle, so we read a single
+  // representative state across all bundled apps rather than scoping to one.
+  // Falls back to the legacy top-level u.offline* fields when there's no
+  // bundle (getBundledAppsFor always returns at least one app in practice, so
+  // this mainly guards against unseeded/edge-case users).
   const bundledApps = getBundledAppsFor(u);
-  const pickerRow = document.getElementById('offline-app-picker-row');
-  const pickerSel = document.getElementById('offline-app-picker');
-  if(!appName && bundledApps.length > 1){
-    // Filter to apps currently Online (eligible for a fresh request)
-    const eligible = bundledApps.filter(a => getAppConnectivity(u, a).state === 'online');
-    if(eligible.length === 1){
-      // Single online app → auto-scope + hide picker
-      if(pickerRow) pickerRow.style.display = 'none';
-      return openOfflineLicense(idx, eligible[0]);
-    }
-    if(eligible.length >= 2){
-      // Multiple online apps → show picker, admin chooses
-      if(pickerRow) pickerRow.style.display = '';
-      if(pickerSel){
-        pickerSel.innerHTML = '<option value="">\u2014 Select an app \u2014</option>'
-          + eligible.map(a => '<option value="'+a+'">'+a+'</option>').join('');
-        pickerSel.value = '';
-      }
+  const bundle = bundledApps.length ? _bundleConnectivity(u) : null;
+  const displayOffline = bundle ? (bundle.state === 'offline' || bundle.state === 'roaming') : u.offline;
+  const displaySource  = bundle ? (bundle.state === 'roaming' ? 'self' : 'admin') : u.offlineSource;
+  const displayIssuedOn   = bundle ? bundle.issuedOn   : u.offlineIssuedOn;
+  const displayIssuedBy   = bundle ? bundle.issuedBy   : u.offlineIssuedBy;
+  const displayValidUntil = bundle ? bundle.validUntil : u.offlineValidUntil;
+  const displayMachineId  = bundle ? bundle.machineId  : u.offlineMachineId;
+  const displayReason     = bundle ? bundle.reason     : u.offlineReason;
+  const displayLastDl     = bundle ? bundle.lastDownloadedOn : u.offlineLastDownloadedOn;
+  const repApp = bundle ? bundle._repApp : null;
+
+  // No picker to populate anymore — just surface which apps this license will
+  // cover so the admin knows the scope of what they're about to issue.
+  const bundleNote = document.getElementById('offline-bundle-note');
+  if(bundleNote){
+    if(bundledApps.length > 1){
+      bundleNote.style.display = '';
+      bundleNote.innerHTML = 'This license covers all of ' + u.name + '\u2019s bundled apps: <strong>' + _bundleAppsLabel(bundledApps) + '</strong>.';
     } else {
-      // No eligible online apps (all Roaming/Offline). Hide picker; the admin
-      // should be using the expansion breakdown instead. The modal still opens
-      // to explain but with no selectable target.
-      if(pickerRow) pickerRow.style.display = 'none';
+      bundleNote.style.display = 'none';
     }
-  } else {
-    // Either scoped by caller (appName provided) or single-app user — no picker
-    if(pickerRow) pickerRow.style.display = 'none';
   }
 
   const modal = document.getElementById('modal-offline-license');
@@ -7914,18 +7918,17 @@ function openOfflineLicense(idx, appName){
       ? 'Cannot exceed license end date (' + _formatFriendlyDate(licenseEnd) + ').'
       : '';
   }
-  // App-scoped titles: when we're operating on a specific app of a bundled
-  // subscription, include the app name in the title so the admin sees which
-  // app they're issuing/downloading for.
-  const scopedSuffix = appName ? (' \u2014 ' + appName) : '';
+  // Bundle-scoped titles: with a multi-app bundle, name the apps so the admin
+  // sees the scope of what they're issuing/downloading for.
+  const scopedSuffix = bundledApps.length > 1 ? (' \u2014 ' + _bundleAppsLabel(bundledApps)) : '';
 
   if(displayOffline && !isSelfInitiated){
     // ── VIEW / RE-DOWNLOAD MODE ────────────────────────────────────────────
-    // Existing admin-issued license for this app (or legacy user-level). Admin
-    // can re-download while it's within its validity window. Same 90-day-cap
-    // logic applies. Backend (Keycloak) confirms the user's still offline.
-    const daysLeft = appName
-      ? _appDaysRemaining(u, appName)
+    // Existing admin-issued license for this bundle (or legacy user-level).
+    // Admin can re-download while it's within its validity window. Same
+    // 90-day-cap logic applies. Backend (Keycloak) confirms the user's still offline.
+    const daysLeft = repApp
+      ? _appDaysRemaining(u, repApp)
       : _offlineDaysRemaining(u);
     const isExpired = (daysLeft !== null && daysLeft <= 0);
     if(title) title.textContent = 'Offline license \u2014 ' + u.name + scopedSuffix;
@@ -8019,10 +8022,10 @@ function openOfflineLicense(idx, appName){
     //       self-declared offline status
     if(title) title.textContent = 'Request offline license' + scopedSuffix;
     if(sub){
-      const forApp = appName ? (' for ' + appName) : '';
+      const forApps = bundledApps.length > 1 ? (' for ' + _bundleAppsLabel(bundledApps)) : '';
       sub.textContent = isSelfInitiated
-        ? (u.name + ' went offline from within the app. Issue a downloadable license file' + forApp + ' below.')
-        : ('Enter the machine details and reason for ' + u.name + forApp + '. The license file will be scoped to that specific machine.');
+        ? (u.name + ' went offline from within the app. Issue a downloadable license file' + forApps + ' below.')
+        : ('Enter the machine details and reason for ' + u.name + forApps + '. The license file will be scoped to that specific machine.');
     }
     // For self-initiated users, show a small info card explaining the identity-
     // system data we have on them (offline-since date, current validity window
@@ -8047,7 +8050,7 @@ function openOfflineLicense(idx, appName){
         }
         const remainingEl = document.getElementById('offline-view-days-remaining');
         if(remainingEl){
-          const days = appName ? _appDaysRemaining(u, appName) : _offlineDaysRemaining(u);
+          const days = repApp ? _appDaysRemaining(u, repApp) : _offlineDaysRemaining(u);
           remainingEl.textContent = (days !== null) ? (' \u00b7 ' + days + ' day' + (days!==1?'s':'') + ' remaining') : '';
         }
         const lastEl = document.getElementById('offline-view-last-downloaded');
@@ -8093,7 +8096,6 @@ function confirmOfflineLicense(){
   const u = users[_offlineTargetIdx];
   if(!u) return;
 
-  const appName = _offlineTargetApp;
   const machineInput = document.getElementById('offline-machine-id');
   const reasonInput = document.getElementById('offline-reason');
   const errorBox = document.getElementById('offline-error');
@@ -8103,20 +8105,12 @@ function confirmOfflineLicense(){
   const reason = (reasonInput ? reasonInput.value : '').trim();
 
   // ── Validation (applies to all paths) ────────────────────────────────────
-  // If the user has a bundled multi-app product AND no app was scoped, block
-  // submission until the admin picks one via the dropdown. Prevents writes to
-  // legacy top-level fields when per-app state is what we should be capturing.
+  // No more "which app" check — one System UUID now covers every bundled app,
+  // so there's nothing left to pick before submitting.
   const bundledApps = getBundledAppsFor(u);
-  if(!_offlineTargetApp && bundledApps.length > 1){
-    if(errorBox && errorMsg){
-      errorMsg.textContent = 'Please choose which app the offline license is for.';
-      errorBox.style.display = '';
-    }
-    return;
-  }
   if(!machineId){
     if(errorBox && errorMsg){
-      errorMsg.textContent = 'Machine ID is required. Please enter the target machine\u2019s hardware identifier.';
+      errorMsg.textContent = 'System UUID is required. Please enter the target machine\u2019s hardware UUID.';
       errorBox.style.display = '';
     }
     return;
@@ -8132,26 +8126,32 @@ function confirmOfflineLicense(){
   const adminName = (me && me.name) ? me.name : 'Admin';
   const todayStr = _formatFriendlyDate(new Date());
 
-  // Determine current state from either the scoped app record or the legacy
-  // top-level fields, so the branching logic works consistently for both.
-  const scoped = appName ? getAppConnectivity(u, appName) : null;
-  const scopedState = scoped ? scoped.state : null; // 'online'|'roaming'|'offline'
-  const wasOffline = scoped ? (scopedState !== 'online') : !!u.offline;
-  const isSelfInitiated = scoped ? (scopedState === 'roaming') : (u.offlineSource === 'self');
-  const daysLeft = appName ? _appDaysRemaining(u, appName) : _offlineDaysRemaining(u);
+  // Determine current state from a single representative app across the
+  // bundle (they converge to the same state once a bundle license has been
+  // issued through this flow), falling back to legacy top-level fields for
+  // unbundled/unseeded users.
+  const bundle = bundledApps.length ? _bundleConnectivity(u) : null;
+  const repApp = bundle ? bundle._repApp : null;
+  const bundleState = bundle ? bundle.state : null; // 'online'|'roaming'|'offline'
+  const wasOffline = bundle ? (bundleState !== 'online') : !!u.offline;
+  const isSelfInitiated = bundle ? (bundleState === 'roaming') : (u.offlineSource === 'self');
+  const daysLeft = repApp ? _appDaysRemaining(u, repApp) : _offlineDaysRemaining(u);
   const isExpired = wasOffline && (daysLeft !== null && daysLeft <= 0);
+  const scopeText = bundledApps.length > 1 ? (' \u2014 ' + _bundleAppsLabel(bundledApps)) : '';
 
   // Path 2 is re-download only for ADMIN-ISSUED offline users. Self-initiated
   // (Roaming) users go to Path 3 so the admin's license becomes authoritative.
   if(wasOffline && !isSelfInitiated && !isExpired){
-    // ── Path 2: Re-download the existing license ─────────────────────────
-    if(appName){
+    // ── Path 2: Re-download the existing license, for every bundled app ───
+    if(bundledApps.length){
       if(!u.appConnectivity) u.appConnectivity = {};
-      const existing = u.appConnectivity[appName] || getAppConnectivity(u, appName);
-      u.appConnectivity[appName] = Object.assign({}, existing, {
-        machineId: machineId,
-        reason: reason,
-        lastDownloadedOn: todayStr,
+      bundledApps.forEach(app => {
+        const existing = u.appConnectivity[app] || getAppConnectivity(u, app);
+        u.appConnectivity[app] = Object.assign({}, existing, {
+          machineId: machineId,
+          reason: reason,
+          lastDownloadedOn: todayStr,
+        });
       });
     } else {
       u.offlineMachineId = machineId;
@@ -8162,7 +8162,6 @@ function confirmOfflineLicense(){
     savePersisted('users', users);
     closeModal();
     renderUsers();
-    const scopeText = appName ? (' for ' + appName) : '';
     const remainText = (daysLeft !== null)
       ? ' (' + daysLeft + ' day' + (daysLeft!==1?'s':'') + ' remaining)'
       : '';
@@ -8198,21 +8197,24 @@ function confirmOfflineLicense(){
   const daysValid = Math.round((chosenDate - today) / (1000*60*60*24));
   const validUntilStr = _formatFriendlyDate(chosenDate);
 
-  if(appName){
-    // Write to per-app state; keep u.offline: true so aggregate flag stays truthy
+  if(bundledApps.length){
+    // Write the same license to every bundled app at once; keep u.offline:
+    // true so the aggregate flag stays truthy.
     if(!u.appConnectivity) u.appConnectivity = {};
-    u.appConnectivity[appName] = {
-      state: 'offline',
-      machineId: machineId,
-      reason: reason,
-      issuedOn: todayStr,
-      issuedBy: adminName,
-      validUntil: validUntilStr,
-      lastDownloadedOn: todayStr,
-    };
-    u.offline = true; // any app-offline → user-level offline flag
+    bundledApps.forEach(app => {
+      u.appConnectivity[app] = {
+        state: 'offline',
+        machineId: machineId,
+        reason: reason,
+        issuedOn: todayStr,
+        issuedBy: adminName,
+        validUntil: validUntilStr,
+        lastDownloadedOn: todayStr,
+      };
+    });
+    u.offline = true;
   } else {
-    // Legacy path: single-app user or user with no per-app data
+    // Legacy path: user with no bundle data at all
     u.offline = true;
     u.offlineSource = 'admin';
     u.offlineMachineId = machineId;
@@ -8226,7 +8228,6 @@ function confirmOfflineLicense(){
   savePersisted('users', users);
   closeModal();
   renderUsers();
-  const scopeText = appName ? (' \u2014 ' + appName) : '';
   const successMsg = isExpired
     ? ('\u2713 New offline license issued to ' + u.name + scopeText + ' (valid for ' + daysValid + ' days)')
     : (isSelfInitiated
