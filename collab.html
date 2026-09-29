@@ -720,6 +720,75 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 }
 .mapviewer-scale-bar{width:30px;height:0;border-top:2px solid var(--text-secondary);display:inline-block;vertical-align:middle}
 .mv-coords{font-family:'DM Mono',monospace;white-space:nowrap}
+
+/* ─── CE-8 VISION PASS: toolbar, CRS/Geocalc, annotations, presence, drag-drop ─── */
+.mv-tool-btn{position:relative}
+.mv-tool-btn.active{background:var(--avenza-blue);color:#fff;border-color:var(--avenza-blue)}
+.mv-tool-btn.active svg path,.mv-tool-btn.active svg circle{stroke:#fff}
+
+.mv-presence{display:flex;align-items:center;gap:6px;padding:4px 9px 4px 4px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);flex-shrink:0}
+.mv-presence-avatars{display:flex}
+.mv-presence-av{width:20px;height:20px;border-radius:50%;background:var(--avenza-blue);color:#fff;font-size:8.5px;font-weight:600;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--surface);margin-left:-6px;font-family:'DM Sans',sans-serif}
+.mv-presence-av:first-child{margin-left:0}
+.mv-presence-label{font-size:11px;color:var(--text-secondary);white-space:nowrap}
+
+.mv-crs-bar{
+  position:absolute;bottom:46px;right:14px;z-index:15;
+  display:flex;align-items:center;gap:7px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:5px 8px;font-size:10.5px;color:var(--text-secondary);box-shadow:var(--shadow-sm);
+}
+.mv-crs-label{color:var(--text-muted);white-space:nowrap;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+.mv-crs-select{
+  font-family:'DM Mono',monospace;font-size:10.5px;border:1px solid var(--border);border-radius:5px;
+  padding:2px 4px;background:var(--surface);color:var(--text-primary);max-width:190px;
+}
+.mv-geocalc-badge{
+  display:flex;align-items:center;gap:3px;font-size:9px;font-weight:600;color:var(--avenza-teal);
+  background:var(--avenza-teal-lt);padding:2px 6px;border-radius:999px;white-space:nowrap;flex-shrink:0;
+}
+
+.mv-north-arrow{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:14;
+  width:30px;height:30px;background:var(--surface);border:1px solid var(--border);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);
+}
+
+.mv-annotate-cursor{cursor:crosshair !important}
+.mv-pin{cursor:pointer}
+.mv-pin-head{fill:var(--red);stroke:#fff;stroke-width:1.5}
+.mv-pin-num{fill:#fff;font-size:9px;font-weight:700;font-family:'DM Sans',sans-serif;text-anchor:middle}
+
+.mv-annotations-panel{
+  position:absolute;top:66px;right:14px;width:236px;max-height:calc(100% - 130px);
+  display:none;flex-direction:column;overflow:hidden;
+}
+.mv-annotations-panel.open{display:flex}
+.mv-annotation-item{padding:8px 12px;border-bottom:1px solid var(--border);font-size:11.5px}
+.mv-annotation-item:last-child{border-bottom:none}
+.mv-annotation-head{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.mv-annotation-num{width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:8.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mv-annotation-author{font-weight:600;color:var(--text-primary);font-size:10.5px}
+.mv-annotation-time{color:var(--text-muted);font-size:9.5px;margin-left:auto}
+.mv-annotation-text{color:var(--text-secondary);line-height:1.4}
+.mv-annotations-empty{padding:16px 12px;color:var(--text-muted);font-size:11px;text-align:center}
+
+.mv-drop-overlay{
+  position:absolute;inset:8px;z-index:20;display:none;align-items:center;justify-content:center;
+  flex-direction:column;gap:8px;border:2px dashed var(--avenza-blue);border-radius:var(--radius-md);
+  background:rgba(8,72,136,.07);pointer-events:none;
+}
+.mapviewer-canvas.mv-drag-active .mv-drop-overlay{display:flex}
+.mv-drop-overlay-text{font-size:13px;font-weight:600;color:var(--avenza-blue-dk);background:var(--surface);padding:8px 16px;border-radius:var(--radius);box-shadow:var(--shadow-md)}
+
+.mv-temp-layer-row{background:var(--amber-lt) !important}
+.mv-temp-badge{font-size:8.5px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.03em;background:#fff;padding:1px 5px;border-radius:4px;margin-left:auto}
+
+.mv-freshness-badge{
+  display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--green);
+  background:var(--green-lt);padding:4px 9px;border-radius:999px;flex-shrink:0;white-space:nowrap;
+}
+.mv-freshness-badge.stale{color:var(--amber);background:var(--amber-lt)}
 </style>
 </head>
 <body>
@@ -2674,8 +2743,38 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
         <div class="mapviewer-wrap">
           <div class="mapviewer-canvas" id="mv-canvas" data-basemap="light">
             <svg class="mapviewer-overlay" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Map preview canvas">
-              <g id="mv-overlay-group"></g>
+              <g id="mv-scale-group">
+                <g id="mv-overlay-group"></g>
+                <g id="mv-pins-group"></g>
+                <g id="mv-measure-group"></g>
+              </g>
             </svg>
+            <div class="mv-drop-overlay" id="mv-drop-overlay">
+              <div class="mv-drop-overlay-text">Drop file to add to this view — CRS will be detected and reprojected automatically</div>
+            </div>
+          </div>
+
+          <!-- Annotations panel (opens when Annotate mode is toggled) -->
+          <div class="mapviewer-panel mv-annotations-panel" id="mv-annotations-panel">
+            <div class="fb-info-header">
+              <span class="fb-info-title">Annotations</span>
+              <button class="icon-btn" style="width:22px;height:22px;border:none;background:none" onclick="toggleAnnotateMode()" title="Close annotations">
+                <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            <div style="overflow-y:auto" id="mv-annotations-body">
+              <div class="mv-annotations-empty" id="mv-annotations-empty">No pins yet. Click anywhere on the map to drop one.</div>
+            </div>
+          </div>
+
+          <div class="mv-crs-bar">
+            <span class="mv-crs-label">Project CRS</span>
+            <select class="mv-crs-select" id="mv-crs-select" onchange="updateProjectCRS(this.value)"></select>
+            <span class="mv-geocalc-badge" title="Coordinate transformations powered by Blue Marble Geographic Calculator">⚙ Geocalc</span>
+          </div>
+
+          <div class="mv-north-arrow" title="North" aria-hidden="true">
+            <svg width="14" height="16" viewBox="0 0 14 16" fill="none"><path d="M7 1l5 13-5-3.5L2 14l5-13z" fill="var(--avenza-navy)"/></svg>
           </div>
 
           <!-- Top bar: file identity + primary actions -->
@@ -2691,7 +2790,32 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <div class="mapviewer-file-type" id="mv-file-type">GeoPackage · Read-only preview</div>
               </div>
             </div>
+            <div class="mv-freshness-badge" id="mv-freshness-badge" title="This view reflects the current file state">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M13.5 8A5.5 5.5 0 1 1 8 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M13.5 3v4h-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span id="mv-freshness-label">Up to date</span>
+            </div>
+            <div class="mv-presence" id="mv-presence" title="People currently viewing this map">
+              <div class="mv-presence-avatars" id="mv-presence-avatars"></div>
+              <span class="mv-presence-label" id="mv-presence-label">1 viewing</span>
+            </div>
             <div class="mapviewer-topbar-actions">
+              <button class="btn sm mv-tool-btn" id="mv-measure-btn" onclick="toggleMeasureMode()" title="Measure distance">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 12L12 2M2 12l2.5-.5M2 12l.5-2.5M6 8l1.5 1.5M9 5l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Measure
+              </button>
+              <button class="btn sm mv-tool-btn" id="mv-annotate-btn" onclick="toggleAnnotateMode()" title="Add a pin / comment">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 1.5c-2.5 0-4.5 2-4.5 4.5 0 3.2 4.5 8.5 4.5 8.5s4.5-5.3 4.5-8.5c0-2.5-2-4.5-4.5-4.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="6" r="1.4" stroke="currentColor" stroke-width="1.2"/></svg>
+                Annotate
+              </button>
+              <button class="btn sm" id="mv-adddata-btn" onclick="triggerAddData()" title="Drag a file onto the map, or click to browse">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Add data
+              </button>
+              <button class="btn sm" onclick="openSaveViewModal()" title="Save this exact extent + layers as a shareable task link">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 2h6l3 3v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 2v3h4V2" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                Save view
+              </button>
+              <span class="proto-sep" style="height:20px"></span>
               <button class="btn sm" onclick="openModal('modal-share')">
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="13" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="8" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.7L5.5 7.3M10.5 12.3L5.5 8.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
                 Share
@@ -2875,14 +2999,14 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 <div class="modal-bg" id="modal-share">
   <div class="modal">
     <div class="modal-title">Share file</div>
-    <div class="modal-sub" id="share-modal-sub">Set sharing permissions for this file</div>
+    <div class="modal-sub" id="share-modal-sub">Who can access this, and what they can do, are two separate settings.</div>
 
-    <div class="modal-label">Access level</div>
+    <div class="modal-label">Who can access</div>
     <select class="modal-select" id="share-access-level" onchange="updateShareUI(this.value)">
       <option value="org">Organisation only</option>
       <option value="pw">Password-protected link</option>
       <option value="public">Public link</option>
-      <option value="private">Private</option>
+      <option value="private">Private — only me</option>
     </select>
 
     <div id="share-pw-row" style="display:none">
@@ -2903,12 +3027,46 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
       Public links are visible to anyone. This may violate your organisation's data policy. Your admin will be notified.
     </div>
 
+    <div id="share-capability-row">
+      <div class="modal-label">What they can do</div>
+      <select class="modal-select" id="share-capability-level">
+        <option value="viewer">Viewer — can view, cannot download</option>
+        <option value="viewer-dl">Viewer + Download — can view and download the source file</option>
+        <option value="commenter">Commenter — can view and add annotation pins, cannot download</option>
+        <option value="manager">Manager — full control, incl. re-sharing</option>
+      </select>
+      <div class="hint" style="font-size:11px;color:var(--text-muted);margin:-4px 0 12px">Viewing a rendered map and downloading the source file are different capabilities — pick separately from who can access.</div>
+    </div>
+
+    <div class="modal-label" style="display:flex;align-items:center;gap:7px">
+      <input type="checkbox" id="share-expiry-toggle" onchange="document.getElementById('share-expiry-row').style.display=this.checked?'block':'none'" style="width:auto">
+      Set an expiration date
+    </div>
+    <div id="share-expiry-row" style="display:none">
+      <input type="date" class="modal-input">
+      <div class="hint" style="font-size:11px;color:var(--text-muted);margin:-4px 0 12px">When access expires, it reverts to whatever broader access they already have (e.g. their team's default) rather than being cut off entirely.</div>
+    </div>
+
     <div class="modal-label">Also share with specific users</div>
     <input class="modal-input" placeholder="Enter email addresses…">
 
     <div class="modal-row">
       <button class="btn primary" onclick="toast('Sharing settings saved.');closeModal('modal-share')">Save sharing</button>
       <button class="btn" onclick="closeModal('modal-share')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Save View Modal (bookmark current extent+layers as a task link) -->
+<div class="modal-bg" id="modal-save-view">
+  <div class="modal" style="width:420px">
+    <div class="modal-title">Save this view</div>
+    <div class="modal-sub">Bookmarks the current extent, layer visibility, and any pins on <strong id="save-view-file-label">this file</strong> as its own shareable link — separate from sharing the file generally. Good for assigning a field crew exactly what to look at.</div>
+    <div class="modal-label">View name</div>
+    <input class="modal-input" placeholder="e.g. North sector — check erosion near culvert" id="save-view-name-input" autofocus>
+    <div class="modal-row">
+      <button class="btn primary" onclick="saveCurrentView()">Save & get link</button>
+      <button class="btn" onclick="closeModal('modal-save-view')">Cancel</button>
     </div>
   </div>
 </div>
@@ -3705,12 +3863,21 @@ function openMapViewer(id){
   document.getElementById('mv-layer-toggle').classList.add('active');
   applyMvZoom();
   setBasemap('light');
+
+  resetMvToolState();
+  populateCrsOptions();
+  renderPresence();
+  renderFreshness();
 }
 
 function closeMapViewer(){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const ret = document.getElementById('view-' + _mvReturnView) ? _mvReturnView : 'files';
   switchView(ret);
+  // Session-only state — dropped layers, pins, and in-progress measurements
+  // do not persist past this viewer session, per the ephemeral-by-default
+  // recommendation. Any added temp layer rows this session go with it.
+  document.querySelectorAll('.mv-temp-layer-row').forEach(r=>r.remove());
 }
 
 function setBasemap(name){
@@ -3733,23 +3900,274 @@ function mvZoomStep(dir){
   applyMvZoom();
 }
 function applyMvZoom(){
-  document.getElementById('mv-overlay-group').style.transform = 'scale(' + mvZoom + ')';
+  document.getElementById('mv-scale-group').style.transform = 'scale(' + mvZoom + ')';
+  document.getElementById('mv-scale-group').style.transformOrigin = 'center';
   const scaleKm = Math.round((5 / mvZoom) * 10) / 10;
   document.getElementById('mv-scale-label').textContent = scaleKm + ' km';
 }
 
+/* ═══════════════════════════════
+   CE-8 VISION PASS
+   Project CRS (Geocalc-framed), measure tool, annotation pins,
+   drag-and-drop ingestion, presence, and saved-view bookmarks.
+   All state is per-viewer-session only (nothing here persists to
+   FILE_DATA or survives closeMapViewer) — matching the "ephemeral
+   by default" recommendation for drag-and-drop ingestion and the
+   "session-local, not shared" default for dropped/annotated content.
+   ═══════════════════════════════ */
+
+/* A file's native CRS plus a small set of alternates Geocalc would
+   also support for that region — enough to demonstrate "not just
+   WGS84 and Web Mercator" without needing a real transform engine. */
+const MV_CRS_ALTERNATES = [
+  {code:'WGS84',  label:'WGS 84 (EPSG:4326) — geographic', fmt:'geo'},
+  {code:'WEBMERC',label:'Web Mercator (EPSG:3857)',        fmt:'merc'},
+  {code:'UTM17N', label:'NAD83 / UTM Zone 17N (EPSG:26917)', fmt:'utm'},
+  {code:'ONMPlane',label:'NAD83 / Ontario MTM Zone 10 (EPSG:2958)', fmt:'utm'},
+  {code:'NATIVE', label:'', fmt:'geo'} // filled in per-file as "File native CRS"
+];
+
+let mvMeasureMode = false;
+let mvAnnotateMode = false;
+let mvMeasurePoints = [];
+let mvPins = [];
+let mvTempLayers = [];
+let _mvPinCounter = 0;
+let mvProjectCRS = 'WGS84';
+const MV_PRESENCE_NAMES = ['Jane Doe','Mary Beth','Alan Rickman','Priya Nair','Tom Rees'];
+
+function resetMvToolState(){
+  mvMeasureMode = false; mvAnnotateMode = false;
+  mvMeasurePoints = []; mvPins = []; mvTempLayers = []; _mvPinCounter = 0;
+  document.getElementById('mv-measure-btn').classList.remove('active');
+  document.getElementById('mv-annotate-btn').classList.remove('active');
+  document.getElementById('mv-canvas').classList.remove('mv-annotate-cursor');
+  document.getElementById('mv-annotations-panel').classList.remove('open');
+  document.getElementById('mv-details-panel').style.display = '';
+  document.getElementById('mv-measure-group').innerHTML = '';
+  document.getElementById('mv-pins-group').innerHTML = '';
+  renderAnnotations();
+}
+
+/* ─── Presence (lightweight — a count/avatar cluster, not live cursors) ─── */
+function renderPresence(){
+  const n = 1 + Math.floor(Math.random()*3); // 1-3 "other" viewers, demo only
+  const names = MV_PRESENCE_NAMES.slice(0, n);
+  document.getElementById('mv-presence-avatars').innerHTML = names.map(nm=>{
+    const initials = nm.split(' ').map(p=>p[0]).join('');
+    return `<span class="mv-presence-av" title="${nm}">${initials}</span>`;
+  }).join('');
+  document.getElementById('mv-presence-label').textContent = n===1 ? '1 viewing' : (n+' viewing');
+}
+
+/* ─── Freshness ("change since last view") — simulated per file open ─── */
+function renderFreshness(){
+  const badge = document.getElementById('mv-freshness-badge');
+  const label = document.getElementById('mv-freshness-label');
+  const stale = Math.random() < 0.3; // demo: occasionally show it changed
+  badge.classList.toggle('stale', stale);
+  label.textContent = stale ? 'Updated since your last view' : 'Up to date';
+}
+
+/* ─── Project Coordinate System (Geocalc-framed) ─── */
+function populateCrsOptions(){
+  const f = FILE_DATA[_mvFileId] || {};
+  const sel = document.getElementById('mv-crs-select');
+  const opts = MV_CRS_ALTERNATES.map(o=>{
+    if(o.code==='NATIVE'){
+      if(!f.crs) return null;
+      return {code:'NATIVE', label:'File native — '+f.crs, fmt:'geo'};
+    }
+    return o;
+  }).filter(Boolean);
+  sel.innerHTML = opts.map(o=>`<option value="${o.code}">${o.label}</option>`).join('');
+  mvProjectCRS = f.crs ? 'NATIVE' : 'WGS84';
+  sel.value = mvProjectCRS;
+  updateCoordsDisplay(400, 260); // re-render status-bar coords in the new format, centered
+}
+
+function updateProjectCRS(code){
+  mvProjectCRS = code;
+  const opt = document.getElementById('mv-crs-select').selectedOptions[0];
+  toast('Reprojecting view to ' + (opt ? opt.textContent : code) + ' via Geocalc…');
+  updateCoordsDisplay(400, 260);
+}
+
+function updateCoordsDisplay(px, py, rectOverride){
+  const canvas = document.getElementById('mv-canvas');
+  const rect = rectOverride || canvas.getBoundingClientRect();
+  const xPct = px / (rectOverride ? rectOverride.width : rect.width);
+  const yPct = py / (rectOverride ? rectOverride.height : rect.height);
+  const lat = 44.8 - yPct * (44.8 - 43.2);
+  const lon = -80.1 + xPct * (80.1 - 79.3);
+  const coordsEl = document.getElementById('mv-coords');
+  if(!coordsEl) return;
+  const alt = MV_CRS_ALTERNATES.find(o=>o.code===mvProjectCRS);
+  const fmt = alt ? alt.fmt : 'geo';
+  if(fmt==='utm'){
+    // Simulated projected easting/northing — illustrative only, not a real transform
+    const easting = 500000 + Math.round((lon+79.7)*88000);
+    const northing = 4850000 + Math.round((lat-44.0)*111000);
+    coordsEl.textContent = easting.toLocaleString()+' E, '+northing.toLocaleString()+' N (m)';
+  } else if(fmt==='merc'){
+    const x = Math.round(lon * 20037508.34/180);
+    const y = Math.round(Math.log(Math.tan((90+lat)*Math.PI/360)) / (Math.PI/180) * 20037508.34/180);
+    coordsEl.textContent = x.toLocaleString()+', '+y.toLocaleString()+' (m)';
+  } else {
+    coordsEl.textContent = Math.abs(lat).toFixed(4) + '° N, ' + Math.abs(lon).toFixed(4) + '° W';
+  }
+}
+
+/* ─── Measure tool ─── */
+function toggleMeasureMode(){
+  mvMeasureMode = !mvMeasureMode;
+  if(mvMeasureMode && mvAnnotateMode) toggleAnnotateMode();
+  document.getElementById('mv-measure-btn').classList.toggle('active', mvMeasureMode);
+  mvMeasurePoints = [];
+  document.getElementById('mv-measure-group').innerHTML = '';
+  toast(mvMeasureMode ? 'Measure tool on — click two points on the map.' : 'Measure tool off.');
+}
+
+function mvHandleMeasureClick(x, y){
+  mvMeasurePoints.push({x,y});
+  const g = document.getElementById('mv-measure-group');
+  if(mvMeasurePoints.length===1){
+    g.innerHTML = `<circle cx="${x}" cy="${y}" r="4" fill="var(--avenza-blue)" stroke="#fff" stroke-width="1.5"/>`;
+  } else {
+    const [a,b] = mvMeasurePoints;
+    const pxDist = Math.hypot(b.x-a.x, b.y-a.y);
+    // scale label already shows "5 km" across ~ (800/zoom) px of the 800-wide viewBox — reuse that ratio
+    const kmPerPx = (5 / mvZoom) / 80;
+    const km = (pxDist * kmPerPx).toFixed(2);
+    const midX = (a.x+b.x)/2, midY = (a.y+b.y)/2;
+    g.innerHTML = `
+      <line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="var(--avenza-blue)" stroke-width="2" stroke-dasharray="6 4"/>
+      <circle cx="${a.x}" cy="${a.y}" r="4" fill="var(--avenza-blue)" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="${b.x}" cy="${b.y}" r="4" fill="var(--avenza-blue)" stroke="#fff" stroke-width="1.5"/>
+      <rect x="${midX-28}" y="${midY-22}" width="56" height="18" rx="4" fill="var(--avenza-navy)"/>
+      <text x="${midX}" y="${midY-9}" text-anchor="middle" fill="#fff" font-size="10" font-family="DM Mono, monospace">${km} km</text>`;
+    mvMeasurePoints = []; // reset for next measurement, keep drawing on screen until mode toggled off
+  }
+}
+
+/* ─── Annotate / comment pins (Commenter-role capability; additive, not an edit to the source data) ─── */
+function toggleAnnotateMode(){
+  mvAnnotateMode = !mvAnnotateMode;
+  if(mvAnnotateMode && mvMeasureMode) toggleMeasureMode();
+  document.getElementById('mv-annotate-btn').classList.toggle('active', mvAnnotateMode);
+  document.getElementById('mv-canvas').classList.toggle('mv-annotate-cursor', mvAnnotateMode);
+  document.getElementById('mv-annotations-panel').classList.toggle('open', mvAnnotateMode);
+  // Annotations panel and Details panel share the same screen position (top-right) — mutually exclusive.
+  document.getElementById('mv-details-panel').style.display = mvAnnotateMode ? 'none' : '';
+  toast(mvAnnotateMode ? 'Annotate mode on — click the map to drop a pin.' : 'Annotate mode off.');
+}
+
+function mvHandleAnnotateClick(x, y){
+  const note = prompt('Add a note for this pin (visible to anyone who can view this share):');
+  if(note===null || note.trim()==='') return;
+  _mvPinCounter++;
+  const pin = {num:_mvPinCounter, x, y, text:note.trim(), author:'You', time:'just now'};
+  mvPins.push(pin);
+  const g = document.getElementById('mv-pins-group');
+  g.innerHTML += `
+    <g class="mv-pin" onclick="event.stopPropagation();alert('Pin ${pin.num} — ${pin.author}: ${pin.text.replace(/'/g,"\\'")}')">
+      <circle cx="${x}" cy="${y-2}" r="8" class="mv-pin-head"/>
+      <text x="${x}" y="${y+1}" class="mv-pin-num">${pin.num}</text>
+    </g>`;
+  renderAnnotations();
+  toast('Pin added — visible to anyone with view access to this share.');
+}
+
+function renderAnnotations(){
+  const body = document.getElementById('mv-annotations-body');
+  const empty = document.getElementById('mv-annotations-empty');
+  if(mvPins.length===0){
+    body.innerHTML = '<div class="mv-annotations-empty" id="mv-annotations-empty">No pins yet. Click anywhere on the map to drop one.</div>';
+    return;
+  }
+  body.innerHTML = mvPins.map(p=>`
+    <div class="mv-annotation-item">
+      <div class="mv-annotation-head">
+        <span class="mv-annotation-num">${p.num}</span>
+        <span class="mv-annotation-author">${p.author}</span>
+        <span class="mv-annotation-time">${p.time}</span>
+      </div>
+      <div class="mv-annotation-text">${p.text}</div>
+    </div>`).join('');
+}
+
+/* ─── Drag-and-drop ingestion (session-only/ephemeral by default; CRS auto-detected) ─── */
+function triggerAddData(){
+  toast('Drag a file onto the map to add it — or this would open a file picker.');
+}
+
+function mvHandleDrop(e){
+  e.preventDefault();
+  document.getElementById('mv-canvas').classList.remove('mv-drag-active');
+  const fileName = (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) ? e.dataTransfer.files[0].name : 'dropped_layer.shp';
+  toast('Detecting coordinate system for "'+fileName+'"…');
+  setTimeout(()=>{
+    const detected = 'EPSG:26917 (NAD83 / UTM 17N)';
+    const target = document.getElementById('mv-crs-select').selectedOptions[0];
+    toast('Added — reprojected from '+detected+' to '+(target?target.textContent:'project CRS')+' via Geocalc. Session only — not saved to the Collaboration Environment yet.');
+    addTempLayer(fileName);
+  }, 900);
+}
+
+function addTempLayer(name){
+  mvTempLayers.push(name);
+  const g = document.getElementById('mv-pins-group'); // reuse pins group's un-zoomed... actually goes in scale group via overlay-group sibling
+  const x = 250 + Math.random()*300, y = 150 + Math.random()*220;
+  document.getElementById('mv-overlay-group').innerHTML += `
+    <g>
+      <circle cx="${x}" cy="${y}" r="30" fill="rgba(217,119,6,.18)" stroke="var(--amber)" stroke-width="2" stroke-dasharray="4 3"/>
+    </g>`;
+  const layersPanel = document.querySelector('.mapviewer-panel-layers');
+  const row = document.createElement('div');
+  row.className = 'mapviewer-layer-row mv-temp-layer-row';
+  row.style.marginTop = '6px';
+  row.innerHTML = `<span class="mv-eye-btn active" style="pointer-events:none"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-4.5 7-4.5S15 8 15 8s-2.5 4.5-7 4.5S1 8 1 8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.8" stroke="currentColor" stroke-width="1.3"/></svg></span>
+    <span class="mv-layer-swatch" style="background:var(--amber)"></span>
+    <span class="mv-layer-name" style="max-width:90px;overflow:hidden;text-overflow:ellipsis" title="${name}">${name}</span>
+    <span class="mv-temp-badge">Unsaved</span>`;
+  layersPanel.appendChild(row);
+}
+
+/* ─── Save current view as a shareable/bookmarkable task link ─── */
+function openSaveViewModal(){
+  document.getElementById('save-view-file-label').textContent = FILE_DATA[_mvFileId] ? FILE_DATA[_mvFileId].name : 'this file';
+  document.getElementById('save-view-name-input').value = '';
+  openModal('modal-save-view');
+}
+function saveCurrentView(){
+  const name = document.getElementById('save-view-name-input').value.trim() || 'Untitled task view';
+  closeModal('modal-save-view');
+  toast('Saved view "'+name+'" — share its link like any other Collaboration Environment share, honoring the same access controls.');
+}
+
+/* ─── Canvas click routing + coordinate tracking + drag/drop wiring ─── */
 document.addEventListener('DOMContentLoaded', function(){
   const canvas = document.getElementById('mv-canvas');
   if(!canvas) return;
+
   canvas.addEventListener('mousemove', function(e){
     const rect = this.getBoundingClientRect();
-    const xPct = (e.clientX - rect.left) / rect.width;
-    const yPct = (e.clientY - rect.top) / rect.height;
-    const lat = 44.8 - yPct * (44.8 - 43.2);
-    const lon = -80.1 + xPct * (80.1 - 79.3);
-    const coordsEl = document.getElementById('mv-coords');
-    if(coordsEl) coordsEl.textContent = Math.abs(lat).toFixed(3) + '° N, ' + Math.abs(lon).toFixed(3) + '° W';
+    updateCoordsDisplay(e.clientX - rect.left, e.clientY - rect.top, rect);
   });
+
+  canvas.addEventListener('click', function(e){
+    if(!mvMeasureMode && !mvAnnotateMode) return;
+    const svg = canvas.querySelector('svg');
+    const rect = svg.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 800;
+    const y = ((e.clientY - rect.top) / rect.height) * 520;
+    if(mvMeasureMode) mvHandleMeasureClick(x, y);
+    else if(mvAnnotateMode) mvHandleAnnotateClick(x, y);
+  });
+
+  canvas.addEventListener('dragover', function(e){ e.preventDefault(); canvas.classList.add('mv-drag-active'); });
+  canvas.addEventListener('dragleave', function(e){ canvas.classList.remove('mv-drag-active'); });
+  canvas.addEventListener('drop', mvHandleDrop);
 });
 
 /* ─── SINGLE FILE SELECTION ─── */
@@ -3970,6 +4388,13 @@ function updateShareUI(val){
   document.getElementById('share-pw-row').style.display=val==='pw'?'block':'none';
   document.getElementById('share-link-row').style.display=(val==='pw'||val==='public')?'block':'none';
   document.getElementById('share-public-warn').style.display=val==='public'?'flex':'none';
+  // "Private" is you-only — no capability grant to anyone else applies.
+  document.getElementById('share-capability-row').style.display = val==='private' ? 'none' : 'block';
+  // Sensible default capability per access mode — still editable, never assumed silently.
+  const cap = document.getElementById('share-capability-level');
+  if(val==='public') cap.value = 'viewer';           // public defaults to view-only, download is an explicit opt-in
+  else if(val==='org') cap.value = 'viewer-dl';       // internal org sharing defaults to trusted, view+download
+  else if(val==='pw') cap.value = 'viewer';
 }
 
 /* ─── NEW FOLDER ─── */
