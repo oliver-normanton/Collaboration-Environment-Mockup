@@ -14,22 +14,22 @@
    DESIGN TOKENS  (Blue Marble Geographics palette)
 ───────────────────────────────────────────── */
 :root{
-  /* Blue Marble Geographics exact brand colours (sampled from logo #084888) */
-  --avenza-navy:#0a2240;    /* BMG dark header navy */
-  --avenza-blue:#084888;    /* BMG primary blue — exact from logo */
-  --avenza-blue-dk:#063a70; /* hover / active state */
-  --avenza-blue-lt:#deeaf7; /* light tint */
+  /* Blue Marble Geographics brand colours (green, per design mockups) */
+  --avenza-navy:#2f9b58;    /* BMG primary green (updated per design mockups) */
+  --avenza-blue:#2f9b58;    /* BMG primary green — matches sidebar */
+  --avenza-blue-dk:#257a46; /* hover / active state */
+  --avenza-blue-lt:#e6f7ec; /* light tint */
   --avenza-teal:#0e7a8c;
   --avenza-teal-lt:#d8f0f4;
   /* Surfaces */
   --surface:#ffffff;
-  --surface-2:#f2f6fb;
+  --surface-2:#f9fafb;
   --surface-3:#e5edf6;
-  --border:#c8d6e8;
-  --border-2:#b0c4d8;
-  --text-primary:#07162a;
-  --text-secondary:#253d58;
-  --text-muted:#617a94;
+  --border:#e3e5e8;
+  --border-2:#cdd1d6;
+  --text-primary:#101828;
+  --text-secondary:#475467;
+  --text-muted:#98a2b3;
   --green:#1ba461;
   --green-lt:#e8f7ef;
   --amber:#d97706;
@@ -767,7 +767,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
    WELCOME BANNER
 ───────────────────────────────────────────── */
 .welcome-banner{
-  background:linear-gradient(135deg,#0a2240 0%,#084888 100%);
+  background:linear-gradient(135deg,#1f7a44 0%,#2f9b58 100%);
   border-radius:var(--radius-md);padding:22px 24px;
   margin-bottom:20px;
   display:flex;align-items:center;justify-content:space-between;
@@ -923,7 +923,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 .login-page.active{display:flex}
 .login-bg{
   position:absolute;inset:0;
-  background:linear-gradient(160deg,#0a2240 0%,#0d3a6e 50%,#0a2240 100%);
+  background:linear-gradient(160deg,#1f7a44 0%,#257a46 50%,#1f7a44 100%);
   overflow:hidden;
 }
 .login-bg-shape{position:absolute;border-radius:50%;opacity:.07;background:var(--avenza-blue);}
@@ -933,7 +933,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
   width:100%;max-width:420px;margin:0 16px;overflow:hidden;
 }
 .login-card-top{
-  background:linear-gradient(135deg,#0a2240 0%,#084888 100%);
+  background:linear-gradient(135deg,#1f7a44 0%,#2f9b58 100%);
   padding:28px 32px 24px;text-align:center;
 }
 .login-logo{
@@ -986,7 +986,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 .sso-btn-sub{font-size:11px;color:var(--text-muted);font-weight:400;margin-top:1px}
 .login-footer{
   padding:13px 28px;
-  background:#0a2240;
+  background:#1f7a44;
   border-top:1px solid rgba(255,255,255,.08);
   text-align:center;
   font-size:11px;
@@ -1104,7 +1104,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
    BMG SITE FOOTER
 ───────────────────────────────────────────── */
 .site-footer{
-  background:#0a2240;
+  background:#1f7a44;
   color:rgba(255,255,255,.75);
   flex-shrink:0;
 }
@@ -1270,7 +1270,7 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
   font-size:14px;font-weight:600;cursor:pointer;
   transition:background .15s
 }
-.register-submit:hover{background:#063a70}
+.register-submit:hover{background:#257a46}
 .register-back{
   display:block;text-align:center;margin-top:16px;
   background:none;border:none;color:var(--text-muted);
@@ -2022,7 +2022,7 @@ th.sortable:not(.asc):not(.desc) .sort-icon::after{content:'⇅'}
         </div>
 
         <!-- Admin welcome banner -->
-        <div class="welcome-banner" style="margin-bottom:20px;background:linear-gradient(135deg,#0a2240 0%,#084888 100%)">
+        <div class="welcome-banner" style="margin-bottom:20px;background:linear-gradient(135deg,#1f7a44 0%,#2f9b58 100%)">
           <div>
             <div style="font-size:17px;font-weight:600;color:#fff;margin-bottom:5px" id="a-dash-greeting">Good morning, Jane 👋</div>
             <div style="font-size:13px;color:rgba(255,255,255,.65)" id="a-dash-org-line">You're managing <strong style="color:#fff">Acme Corp</strong> &middot; 48 total licenses across 3 products</div>
@@ -10380,7 +10380,7 @@ function submitRegister(){
       </a>
       <!-- YouTube -->
       <a href="https://www.youtube.com/user/BlueMarbleWebinars" target="_blank" title="YouTube">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#0a2240"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#1f7a44"/></svg>
       </a>
       <!-- LinkedIn -->
       <a href="https://www.linkedin.com/company/blue-marble-geographics" target="_blank" title="LinkedIn">
