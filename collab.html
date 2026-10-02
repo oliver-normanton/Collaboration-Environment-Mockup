@@ -97,8 +97,16 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 .sb-logo svg{width:18px;height:18px}
 .sb-product-name{font-size:14px;font-weight:600;color:#fff;letter-spacing:-.01em}
 .sb-product-tag{font-size:10.5px;color:rgba(255,255,255,.45);margin-top:1px;letter-spacing:.02em}
-.sb-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.sb-nav{flex:1;padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column}
 .sb-group{margin-bottom:20px}
+.sb-new-project-btn{
+  display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;margin-bottom:14px;
+  border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;
+  transition:background .12s;text-align:left;
+}
+.sb-new-project-btn:hover{background:rgba(255,255,255,.12)}
+.sb-new-project-btn svg{width:14px;height:14px;flex-shrink:0}
 .sb-group-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:0 8px;margin-bottom:4px}
 .sb-item{
   display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);
@@ -374,6 +382,32 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 .dash-activity-time{font-size:10.5px;color:var(--text-muted);margin-top:2px}
 .dash-activity-more{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--avenza-blue);background:none;border:none;cursor:pointer;padding:12px 0 0;width:100%}
 .dash-empty-projects{grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);font-size:13px}
+.discover-empty{text-align:center;padding:60px 20px;max-width:420px;margin:0 auto}
+.discover-empty svg{margin-bottom:14px}
+.discover-empty-title{font-size:15px;font-weight:600;color:var(--text-secondary);margin-bottom:8px}
+.discover-empty-sub{font-size:13px;color:var(--text-muted);line-height:1.5}
+/* Drive's default right-panel overview (Storage + Activity), shown when
+   nothing is selected — relocated here from the old Dashboard page. */
+.fb-overview-card{padding:16px}
+.fb-overview-card+.fb-overview-card{border-top:1px solid var(--border)}
+.fb-overview-card h3{font-size:12.5px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:7px;margin-bottom:12px}
+/* Drive filter tabs — Recent/Starred/Trash/Shared/etc. folded in here instead
+   of being separate sidebar items (see navSidebar/switchView). */
+.drive-filter-tabs{display:flex;align-items:center;border-bottom:1px solid var(--border);margin-bottom:18px}
+.drive-filter-tab{padding:0 0 10px;margin-right:22px;font-size:13px;font-weight:500;color:var(--text-muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:color .1s}
+.drive-filter-tab:hover{color:var(--text-primary)}
+.drive-filter-tab.active{color:var(--text-primary);border-bottom-color:var(--avenza-blue);font-weight:600}
+/* Map/Drive mode switcher — sits in the topbar alongside (not instead of) the
+   9-dot app launcher. The 9-dot is the permanent app-level switcher (Hub,
+   Collaboration Environment, Map Viewer, Geographic Calculator Cloud); this
+   is a lighter, project-scoped switch for the common case of working within
+   one file/project without leaving the window. Right-click "Open in Map
+   Viewer" and dragging a file to a separately-opened viewer window still
+   work exactly as before for the multi-screen case. */
+.mode-tabs{display:flex;align-items:center;background:var(--surface-2);border-radius:var(--radius-sm);padding:3px;gap:2px;flex-shrink:0}
+.mode-tab{padding:6px 14px;border-radius:6px;border:none;background:none;font-size:12.5px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;display:flex;align-items:center;gap:6px}
+.mode-tab:hover{color:var(--text-primary)}
+.mode-tab.active{background:var(--surface);color:var(--text-primary);box-shadow:var(--shadow-sm);cursor:default}
 .fb-icon.folder{background:#fff7ed;color:#c2410c}
 .fb-icon.gm{background:#deeaf7;color:#084888}
 .fb-icon.pdf{background:#fef2f2;color:#dc2626}
@@ -985,79 +1019,46 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
     </div>
 
     <div class="sb-nav">
+      <button class="sb-new-project-btn" onclick="toast('This would open the Create Project flow — not part of this mockup yet.')">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        New project
+      </button>
+
       <div class="sb-group">
-        <div class="sb-group-label">Overview</div>
-        <button class="sb-item active" id="si-dashboard" onclick="navSidebar('dashboard')">
-          <svg viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.4"/></svg>
-          Dashboard
+        <button class="sb-item" id="si-discover" onclick="navSidebar('discover')">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M2 8h12M8 2c-1.8 1.7-2.7 3.8-2.7 6s.9 4.3 2.7 6c1.8-1.7 2.7-3.8 2.7-6S9.8 3.7 8 2z" stroke="currentColor" stroke-width="1.2"/></svg>
+          Discover
         </button>
-      </div>
-      <div class="sb-group">
-        <div class="sb-group-label">My Files</div>
-        <button class="sb-item" id="si-myfiles" onclick="navSidebar('myfiles')">
-          <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 6h12" stroke="currentColor" stroke-width="1.4"/></svg>
-          All files
-        </button>
-        <button class="sb-item" id="si-recent" onclick="navSidebar('recent')">
-          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5.5V8l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-          Recent
-        </button>
-        <button class="sb-item" id="si-starred" onclick="navSidebar('starred')">
-          <svg viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-          Starred
-        </button>
-        <button class="sb-item" id="si-trash" onclick="navSidebar('trash')">
-          <svg viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6 4.5V3h4v1.5M5 4.5l.5 7.5h5l.5-7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Trash
+        <button class="sb-item" id="si-projects" onclick="navSidebar('projects')">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 2.5h6l3 3v8a1 1 0 01-1 1H3a1 1 0 01-1-1v-10a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 2.5v3h3" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          Projects
         </button>
       </div>
 
       <div class="sb-group">
-        <div class="sb-group-label">Shared</div>
-        <button class="sb-item" id="si-shared" onclick="navSidebar('shared')">
-          <svg viewBox="0 0 16 16" fill="none"><path d="M5.5 7a2 2 0 100-4 2 2 0 000 4zM1 13c0-2 1.5-3.5 4.5-3.5M11 9a2 2 0 100-4 2 2 0 000 4zM8 13c.3-2.1 1.6-3 3-3 2 0 4 1 4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-          Shared with me
-          <span class="sb-badge">3</span>
+        <div class="sb-group-label">Drive</div>
+        <button class="sb-item active" id="si-myfiles" onclick="navSidebar('myfiles')">
+          <svg viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="4" rx="6" ry="2" stroke="currentColor" stroke-width="1.3"/><path d="M2 4v4c0 1.1 2.7 2 6 2s6-.9 6-2V4" stroke="currentColor" stroke-width="1.3"/><path d="M2 8v4c0 1.1 2.7 2 6 2s6-.9 6-2V8" stroke="currentColor" stroke-width="1.3"/></svg>
+          My Datasets
         </button>
-        <button class="sb-item" id="si-myshared" onclick="navSidebar('myshared')">
-          <svg viewBox="0 0 16 16" fill="none"><circle cx="12" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="13" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="8" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.7L5.5 7.3M10.5 12.3L5.5 8.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-          Shared by me
-        </button>
-      </div>
-
-      <div class="sb-group">
-        <div class="sb-group-label">Organisation</div>
-        <!-- ACME Corp general storage -->
         <button class="sb-item" id="si-public" onclick="navSidebar('public')">
           <svg viewBox="0 0 16 16" fill="none"><path d="M2 13V6l6-3 6 3v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 13V9.5h4V13" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
           ACME Corp files
         </button>
-        <!-- Teams -->
-        <button class="sb-item" id="si-teams" onclick="navSidebar('teams')">
-          <svg viewBox="0 0 16 16" fill="none"><path d="M5.5 7a2 2 0 100-4 2 2 0 000 4zM1 13c0-2 1.5-3.5 4.5-3.5M11 9a2 2 0 100-4 2 2 0 000 4zM8 13c.3-2.1 1.6-3 3-3 2 0 4 1 4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-          Teams
-        </button>
-        <!-- Team quick-links (injected by JS on load) -->
-        <div id="sb-team-links"></div>
-        <!-- Private -->
-        <button class="sb-item" id="si-private" onclick="navSidebar('private')">
-          <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-          Private files
-        </button>
       </div>
 
-      <div class="sb-group" id="sb-admin-group">
-        <div class="sb-group-label">Admin</div>
-        <button class="sb-item" id="si-storageadmin" onclick="switchView('admin')">
-          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M8 2.5V4.5M8 11.5v2M2.5 8H4.5M11.5 8H13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-          Storage settings
-        </button>
-        <button class="sb-item" id="si-audit" onclick="switchView('audit')">
-          <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 5.5h5M5.5 8h5M5.5 10.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Audit log
+      <div class="sb-group" style="margin-top:auto">
+        <button class="sb-item" id="si-settings" onclick="navSidebar('settings')">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M8 2.5V4.5M8 11.5v2M2.5 8H4.5M11.5 8H13.5M4.2 4.2l1.4 1.4M10.4 10.4l1.4 1.4M4.2 11.8l1.4-1.4M10.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Settings
         </button>
       </div>
     </div>
+    <!-- Hidden but retained: Recent/Starred/Trash/Shared/Teams/Private/Audit still exist as
+         pages (switchView still supports them) — they're now reached as filter tabs inside
+         Drive and Settings rather than top-level sidebar items. sb-team-links is still
+         populated by JS but no longer rendered in the main nav; see renderTeamLinks(). -->
+    <div id="sb-team-links" style="display:none"></div>
 
     <!-- QUOTA -->
     <div class="quota-bar-wrap">
@@ -1120,8 +1121,18 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
         <span class="breadcrumb">
           <a onclick="window.location.href='index.html'" style="color:var(--text-muted);cursor:pointer;text-decoration:none;transition:color .1s" onmouseover="this.style.color='var(--avenza-blue)'" onmouseout="this.style.color='var(--text-muted)'">Blue Marble Hub</a>
           <span style="margin:0 5px;color:var(--border-2)">›</span>
-          <span id="breadcrumb-current">Dashboard</span>
+          <span id="breadcrumb-current">My Datasets</span>
         </span>
+      </div>
+      <div class="mode-tabs">
+        <button class="mode-tab" onclick="goToMap()" title="Open the current selection in the Map Viewer">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4l4-1.4 4 1.4 4-1.4v9.4l-4 1.4-4-1.4-4 1.4V4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          Map
+        </button>
+        <button class="mode-tab active" title="You're here">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="4" rx="6" ry="2" stroke="currentColor" stroke-width="1.2"/><path d="M2 4v4c0 1.1 2.7 2 6 2s6-.9 6-2V4" stroke="currentColor" stroke-width="1.2"/><path d="M2 8v4c0 1.1 2.7 2 6 2s6-.9 6-2V8" stroke="currentColor" stroke-width="1.2"/></svg>
+          Drive
+        </button>
       </div>
       <div class="topbar-actions">
         <div class="dd-wrap">
@@ -1191,68 +1202,51 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
       <!-- ═══════════════════════════════
            VIEW: FILES (main browser)
       ═══════════════════════════════ -->
-      <div class="page active" id="view-dashboard">
+      <!-- Projects: team collaborative map projects (reuses the card-grid component;
+           Storage + Activity, which used to sit alongside this grid on the old
+           Dashboard, now live in Drive's default right-panel state instead —
+           see the fb-info default content in view-files below. -->
+      <div class="page" id="view-projects">
         <div class="dash-wrap">
           <div class="dash-header">
-            <h1 id="dash-welcome">Welcome back, Jane!</h1>
-            <p>Here's what's happening today.</p>
+            <h1>Projects</h1>
+            <p>Team collaborative map projects — link files from Drive into an organized, shared workspace.</p>
           </div>
-          <div id="dash-storage-banner-wrap"></div>
-
-          <div class="dash-grid">
-            <div class="dash-main">
-              <div class="dash-section-header">
-                <h2>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4.5a1 1 0 011-1h3.2l1.3 1.6h5.5a1 1 0 011 1v6.4a1 1 0 01-1 1H3a1 1 0 01-1-1v-8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-                  Projects
-                </h2>
-                <div class="dash-section-actions">
-                  <select class="modal-select" style="margin:0;width:150px;padding:7px 10px;font-size:12.5px">
-                    <option>Last updated</option>
-                    <option>Name</option>
-                    <option>Date created</option>
-                  </select>
-                  <button class="btn primary sm" onclick="toast('This would open the Create Project flow — not part of this mockup yet.')">+ Create new</button>
-                </div>
-              </div>
-              <div class="dash-projects-grid" id="dash-projects-grid"></div>
+          <div class="dash-section-header" style="margin-top:22px">
+            <h2>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4.5a1 1 0 011-1h3.2l1.3 1.6h5.5a1 1 0 011 1v6.4a1 1 0 01-1 1H3a1 1 0 01-1-1v-8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+              All projects
+            </h2>
+            <div class="dash-section-actions">
+              <select class="modal-select" style="margin:0;width:150px;padding:7px 10px;font-size:12.5px">
+                <option>Last updated</option>
+                <option>Name</option>
+                <option>Date created</option>
+              </select>
+              <button class="btn primary sm" onclick="toast('This would open the Create Project flow — not part of this mockup yet.')">+ Create new</button>
             </div>
+          </div>
+          <div class="dash-projects-grid" id="dash-projects-grid"></div>
+        </div>
+      </div>
 
-            <div class="dash-side">
-              <div class="dash-side-card">
-                <div class="dash-side-card-header">
-                  <h3>
-                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2v2.5M8 2a4.5 4.5 0 00-4.5 4.5c0 3-1.5 4-1.5 4h12s-1.5-1-1.5-4A4.5 4.5 0 008 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-                    Storage
-                  </h3>
-                </div>
-                <div class="dash-storage-stat" id="dash-storage-stat">38.2<span> GB of 100 GB used</span></div>
-                <div class="dash-storage-bar-track"><div class="dash-storage-bar-fill" id="dash-storage-fill" style="width:38%"></div></div>
-                <button class="btn sm" style="width:100%;justify-content:center" onclick="toast('This would open the storage add-on purchase flow — not part of this mockup.')">Add Storage</button>
-              </div>
-
-              <div class="dash-side-card">
-                <div class="dash-side-card-header">
-                  <h3>
-                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 6h6M5 8.5h6M5 11h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-                    Activity
-                  </h3>
-                  <button class="icon-btn" style="width:26px;height:26px" onclick="toast('Refreshing activity…')" title="Refresh">
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13.5 8A5.5 5.5 0 1 1 8 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M13.5 3v4h-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </button>
-                </div>
-                <div id="dash-activity-list"></div>
-                <button class="dash-activity-more" onclick="toast('This would show more activity — not part of this mockup.')">
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                  Show more actions
-                </button>
-              </div>
-            </div>
+      <!-- Discover: templates (new, placeholder) -->
+      <div class="page" id="view-discover">
+        <div class="dash-wrap">
+          <div class="dash-header">
+            <h1>Discover</h1>
+            <p>Browse starter templates for common survey, basemap, and reporting workflows.</p>
+          </div>
+          <div class="discover-empty">
+            <svg width="40" height="40" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--text-muted)" stroke-width="1.2"/><path d="M2 8h12M8 2c-1.8 1.7-2.7 3.8-2.7 6s.9 4.3 2.7 6c1.8-1.7 2.7-3.8 2.7-6S9.8 3.7 8 2z" stroke="var(--text-muted)" stroke-width="1.1"/></svg>
+            <div class="discover-empty-title">Templates are coming soon</div>
+            <div class="discover-empty-sub">This will be a gallery of starter projects you can clone — field survey kits, basemap sets, reporting layouts — rather than starting from a blank project.</div>
           </div>
         </div>
       </div>
 
-      <div class="page" id="view-files">
+      <div class="page active" id="view-files">
+        <div class="drive-filter-tabs-mount"></div>
         <!-- Public file warning from Hub req #10 -->
         <div class="public-warn-banner" id="public-warn" style="display:flex">
           <div style="display:flex;align-items:center;gap:8px;flex:1">
@@ -1276,7 +1270,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
               <div class="fb-tree-body">
                 <button class="fb-tree-item active" onclick="selectFolder('root')">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-                  My Files
+                  My Datasets
                 </button>
                 <button class="fb-tree-item fb-tree-indent" onclick="selectFolder('field-surveys')">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
@@ -1315,7 +1309,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
               <div class="fb-toolbar">
                 <div class="fb-path">
                   <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 13V6l6-3 6 3v7H2z" stroke="var(--text-muted)" stroke-width="1.4" stroke-linejoin="round"/></svg>
-                  <span id="fb-path-label">My Files</span>
+                  <span id="fb-path-label">My Datasets</span>
                 </div>
                 <div class="fb-search">
                   <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="var(--text-muted)" stroke-width="1.4"/><path d="M10.5 10.5L13 13" stroke="var(--text-muted)" stroke-width="1.4" stroke-linecap="round"/></svg>
@@ -1817,6 +1811,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
            VIEW: PRIVATE FILES
       ═══════════════════════════════ -->
       <div class="page" id="view-private">
+        <div class="drive-filter-tabs-mount"></div>
 
         <!-- Privacy notice — changes based on role -->
         <div id="private-notice-member" style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:11px 15px;margin-bottom:20px;font-size:12.5px;color:var(--text-secondary)">
@@ -2009,6 +2004,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
            VIEW: SHARED BY ME
       ═══════════════════════════════ -->
       <div class="page" id="view-myshared">
+        <div class="drive-filter-tabs-mount"></div>
         <div class="card" style="margin-bottom:16px">
           <div class="card-head">
             <span class="card-title">Shared by me</span>
@@ -2166,6 +2162,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
            VIEW: SHARED WITH ME
       ═══════════════════════════════ -->
       <div class="page" id="view-shared">
+        <div class="drive-filter-tabs-mount"></div>
         <div class="card" style="margin-bottom:16px">
           <div class="card-head">
             <span class="card-title">Shared with me</span>
@@ -2202,7 +2199,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 </td>
                 <td class="fb-meta">Jun 10, 2026</td>
                 <td><span class="share-badge org">View & download</span></td>
-                <td><button class="btn xs" onclick="event.stopPropagation();toast('Saving to My Files…')">Save to my files</button></td>
+                <td><button class="btn xs" onclick="event.stopPropagation();toast('Saving to My Datasets…')">Save to my files</button></td>
               </tr>
               <tr onclick="toast('Opening shared file…')">
                 <td>
@@ -2222,7 +2219,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 </td>
                 <td class="fb-meta">Jun 8, 2026</td>
                 <td><span class="share-badge org">View & download</span></td>
-                <td><button class="btn xs" onclick="event.stopPropagation();toast('Saving to My Files…')">Save to my files</button></td>
+                <td><button class="btn xs" onclick="event.stopPropagation();toast('Saving to My Datasets…')">Save to my files</button></td>
               </tr>
               <tr onclick="toast('Opening shared file…')">
                 <td>
@@ -2242,7 +2239,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 </td>
                 <td class="fb-meta">May 29, 2026</td>
                 <td><span class="share-badge pw">Password protected</span></td>
-                <td><button class="btn xs" onclick="event.stopPropagation();toast('Saving to My Files…')">Save to my files</button></td>
+                <td><button class="btn xs" onclick="event.stopPropagation();toast('Saving to My Datasets…')">Save to my files</button></td>
               </tr>
             </tbody>
           </table>
@@ -2284,6 +2281,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
            VIEW: STORAGE SETTINGS (admin only)
       ═══════════════════════════════ -->
       <div class="page" id="view-admin">
+        <div class="settings-tabs-mount"></div>
 
         <!-- Admin role banner -->
         <div style="display:flex;align-items:center;gap:8px;background:var(--avenza-navy);color:rgba(255,255,255,.8);border-radius:var(--radius-md);padding:10px 16px;margin-bottom:20px;font-size:12.5px">
@@ -2549,6 +2547,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
            VIEW: AUDIT LOG (admin only)
       ═══════════════════════════════ -->
       <div class="page" id="view-audit">
+        <div class="settings-tabs-mount"></div>
 
         <!-- Admin gate -->
         <div style="display:flex;align-items:center;gap:8px;background:var(--avenza-navy);color:rgba(255,255,255,.8);border-radius:var(--radius-md);padding:10px 16px;margin-bottom:20px;font-size:12.5px">
@@ -2619,14 +2618,14 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#0e7a8c;color:#fff;width:22px;height:22px;font-size:9px">JD</div>Jane Doe</div></td>
                 <td><span class="pill active" style="font-size:10px">Uploaded</span></td>
                 <td style="font-size:12px;font-weight:500">terrain_analysis_v3.gmmp</td>
-                <td style="font-size:11.5px;color:var(--text-muted)">88 MB · My Files /</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">88 MB · My Datasets /</td>
               </tr>
               <tr data-action="upload">
                 <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-14 16:30</td>
                 <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#0e7a8c;color:#fff;width:22px;height:22px;font-size:9px">JD</div>Jane Doe</div></td>
                 <td><span class="pill active" style="font-size:10px">Uploaded</span></td>
                 <td style="font-size:12px;font-weight:500">dem_mosaic_30m.tif</td>
-                <td style="font-size:11.5px;color:var(--text-muted)">1.2 GB · My Files /</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">1.2 GB · My Datasets /</td>
               </tr>
               <tr data-action="delete">
                 <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-12 10:11</td>
@@ -2647,7 +2646,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <td><div style="display:flex;align-items:center;gap:6px"><div class="user-av" style="background:#2563eb;color:#fff;width:22px;height:22px;font-size:9px">MB</div>Mary Beth</div></td>
                 <td><span class="pill active" style="font-size:10px">Uploaded</span></td>
                 <td style="font-size:12px;font-weight:500">field_map_2025_06.pdf</td>
-                <td style="font-size:11.5px;color:var(--text-muted)">34 MB · My Files /</td>
+                <td style="font-size:11.5px;color:var(--text-muted)">34 MB · My Datasets /</td>
               </tr>
               <tr data-action="share">
                 <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap">2026-06-01 11:14</td>
@@ -2666,6 +2665,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 
       ═══════════════════════════════ -->
       <div class="page" id="view-recent">
+        <div class="drive-filter-tabs-mount"></div>
         <div class="two-col" style="align-items:start">
 
           <!-- Left: my recent files -->
@@ -2829,6 +2829,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
            VIEW: STARRED
       ═══════════════════════════════ -->
       <div class="page" id="view-starred">
+        <div class="drive-filter-tabs-mount"></div>
         <div class="card">
           <div class="card-head">
             <span class="card-title">Starred files</span>
@@ -2850,7 +2851,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
               <tr onclick="toast('Opening file…')" id="starred-row-q2">
                 <td><button class="star-btn starred" onclick="event.stopPropagation();toggleStarRow(this,'starred-row-q2')" title="Unstar"><svg class="star-icon" viewBox="0 0 16 16" fill="var(--amber)" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="var(--amber)" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                 <td><div class="fb-name-cell"><div class="fb-icon gpkg">GPKG</div><div><div class="fb-file-name">q2_survey_results.gpkg</div><div class="fb-file-type">GeoPackage</div></div></div></td>
-                <td class="fb-meta">My Files /</td>
+                <td class="fb-meta">My Datasets /</td>
                 <td class="fb-meta">Jun 15, 2026</td>
                 <td class="fb-size">142 MB</td>
                 <td><span class="share-badge public">Public link</span></td>
@@ -2859,7 +2860,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
               <tr onclick="toast('Opening file…')" id="starred-row-waypoints">
                 <td><button class="star-btn starred" onclick="event.stopPropagation();toggleStarRow(this,'starred-row-waypoints')" title="Unstar"><svg class="star-icon" viewBox="0 0 16 16" fill="var(--amber)" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="var(--amber)" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                 <td><div class="fb-name-cell"><div class="fb-icon kml">KML</div><div><div class="fb-file-name">waypoints_north_sector.kml</div><div class="fb-file-type">KML</div></div></div></td>
-                <td class="fb-meta">My Files /</td>
+                <td class="fb-meta">My Datasets /</td>
                 <td class="fb-meta">Jun 7, 2026</td>
                 <td class="fb-size">2.1 MB</td>
                 <td><span class="share-badge org">Org only</span></td>
@@ -2881,6 +2882,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
            VIEW: TRASH
       ═══════════════════════════════ -->
       <div class="page" id="view-trash">
+        <div class="drive-filter-tabs-mount"></div>
         <div class="alert warn">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M8 2L14.5 13H1.5L8 2Z" stroke="#b45309" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.5V9.5" stroke="#b45309" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#b45309"/></svg>
           Files in trash are permanently deleted after <strong>30 days</strong>. Permanent deletion cannot be undone.
@@ -2929,7 +2931,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <td><div class="fb-name-cell"><div class="fb-icon csv">CSV</div><div><div class="fb-file-name">field_notes_may_draft.csv</div><div class="fb-file-type">CSV Spreadsheet</div></div></div></td>
                 <td><div style="display:flex;align-items:center;gap:7px"><div class="user-av" style="background:#0e7a8c;color:#fff;font-size:9px">JD</div>Jane Doe</div></td>
                 <td class="fb-meta">Jun 14, 2026</td>
-                <td class="fb-meta">My Files /</td>
+                <td class="fb-meta">My Datasets /</td>
                 <td class="fb-size">210 KB</td>
                 <td><span class="pill warn" style="font-size:10.5px">Jul 14, 2026</span></td>
                 <td>
@@ -2944,7 +2946,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                 <td><div class="fb-name-cell"><div class="fb-icon gm">GMMP</div><div><div class="fb-file-name">survey_jun_DRAFT.gmmp</div><div class="fb-file-type">Global Mapper Project</div></div></div></td>
                 <td><div style="display:flex;align-items:center;gap:7px"><div class="user-av" style="background:#2563eb;color:#fff;font-size:9px">MS</div>Mark Smith</div></td>
                 <td class="fb-meta">Jun 14, 2026</td>
-                <td class="fb-meta">My Files /</td>
+                <td class="fb-meta">My Datasets /</td>
                 <td class="fb-size">61 MB</td>
                 <td><span class="pill warn" style="font-size:10.5px">Jul 14, 2026</span></td>
                 <td>
@@ -3204,7 +3206,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 <div class="modal-bg" id="modal-upload">
   <div class="modal">
     <div class="modal-title">Upload files</div>
-    <div class="modal-sub">Files are uploaded to <strong id="upload-dest-label">My Files</strong>. Geospatial metadata will be extracted automatically.</div>
+    <div class="modal-sub">Files are uploaded to <strong id="upload-dest-label">My Datasets</strong>. Geospatial metadata will be extracted automatically.</div>
 
     <div class="upload-zone" onclick="toast('File picker opened')" id="drop-zone"
       ondragover="event.preventDefault();this.classList.add('drag-over')"
@@ -3219,10 +3221,10 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 
     <div class="modal-label">Destination folder</div>
     <select class="modal-select">
-      <option>My Files /</option>
-      <option>My Files / Field Surveys 2025</option>
-      <option>My Files / Basemaps</option>
-      <option>My Files / Exports</option>
+      <option>My Datasets /</option>
+      <option>My Datasets / Field Surveys 2025</option>
+      <option>My Datasets / Basemaps</option>
+      <option>My Datasets / Exports</option>
       <option>ACME Corp files / Shared Data</option>
     </select>
 
@@ -3326,8 +3328,8 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
     <input class="modal-input" placeholder="e.g. Field Surveys 2026" id="new-folder-name" autofocus>
     <div class="modal-label">Location</div>
     <select class="modal-select">
-      <option>My Files /</option>
-      <option>My Files / Field Surveys 2025</option>
+      <option>My Datasets /</option>
+      <option>My Datasets / Field Surveys 2025</option>
       <option>ACME Corp files /</option>
     </select>
     <div class="modal-row">
@@ -3466,24 +3468,76 @@ function toggleAppLauncher(e){
 }
 
 /* ─── PROTO VIEW SWITCHER ─── */
+const DRIVE_FILTER_TABS = [
+  {id:'files',  label:'All files'},
+  {id:'recent', label:'Recent'},
+  {id:'starred',label:'Starred'},
+  {id:'shared', label:'Shared with me'},
+  {id:'myshared',label:'Shared by me'},
+  {id:'private',label:'Private'},
+  {id:'trash',  label:'Trash'},
+];
+function renderDriveFilterTabs(activeView){
+  const isDriveView = DRIVE_FILTER_TABS.some(t=>t.id===activeView);
+  const html = isDriveView ? '<div class="drive-filter-tabs">' + DRIVE_FILTER_TABS.map(t=>
+    `<button class="drive-filter-tab${t.id===activeView?' active':''}" onclick="switchView('${t.id}')">${t.label}</button>`
+  ).join('') + '</div>' : '';
+  document.querySelectorAll('.drive-filter-tabs-mount').forEach(el=>{ el.innerHTML = html; });
+}
+
+/* Settings: Storage Settings + Audit Log consolidated under one sidebar item,
+   reached as two tabs rather than two separate pages. Keeping them as
+   genuinely separate .page elements (just with a shared tab strip) rather
+   than merging their markup was the lower-risk choice — each already has
+   its own non-trivial table/card content. */
+const SETTINGS_TABS = [
+  {id:'admin', label:'Storage'},
+  {id:'audit', label:'Audit Log'},
+];
+function renderSettingsTabs(activeView){
+  const isSettingsView = SETTINGS_TABS.some(t=>t.id===activeView);
+  const html = isSettingsView ? '<div class="drive-filter-tabs">' + SETTINGS_TABS.map(t=>
+    `<button class="drive-filter-tab${t.id===activeView?' active':''}" onclick="switchView('${t.id}')">${t.label}</button>`
+  ).join('') + '</div>' : '';
+  document.querySelectorAll('.settings-tabs-mount').forEach(el=>{ el.innerHTML = html; });
+}
+
 function switchView(view){
-  ['dashboard','files','shared','admin','audit','recent','starred','trash','myshared','private','teams','public'].forEach(v=>{
+  ['discover','projects','files','shared','admin','audit','recent','starred','trash','myshared','private','teams','public'].forEach(v=>{
     const pg = document.getElementById('view-'+v);
     if(pg) pg.classList.toggle('active',v===view);
     const btn=document.getElementById('sw-'+v);
     if(btn)btn.classList.toggle('active',v===view);
   });
-  const labels={'dashboard':'Dashboard','files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Settings','audit':'Audit Log','recent':'Recent','starred':'Starred','trash':'Trash','private':'Private Files','teams':'Teams','public':'ACME Corp Files'};
-  document.getElementById('breadcrumb-current').textContent=labels[view]||'Files';
+  renderDriveFilterTabs(view);
+  renderSettingsTabs(view);
+  const labels={'discover':'Discover','projects':'Projects','files':'My Datasets','shared':'Shared with me','myshared':'Shared by me','admin':'Settings','audit':'Settings','recent':'Recent','starred':'Starred','trash':'Trash','private':'Private Files','teams':'Teams','public':'ACME Corp Files'};
+  document.getElementById('breadcrumb-current').textContent=labels[view]||'My Datasets';
   document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
-  const sideMap={'dashboard':'si-dashboard','files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','myshared':'si-myshared','admin':'si-storageadmin','audit':'si-audit','private':'si-private','teams':'si-teams','public':'si-public'};
+  // Several views (Recent/Starred/Trash/Shared/Private/Teams) are reached as
+  // filter tabs inside Drive now, so they all highlight the same 'My Datasets'
+  // or 'ACME Corp files' sidebar item rather than having their own.
+  const sideMap={
+    'discover':'si-discover','projects':'si-projects',
+    'files':'si-myfiles','recent':'si-myfiles','starred':'si-myfiles','trash':'si-myfiles','private':'si-myfiles',
+    'shared':'si-myfiles','myshared':'si-myfiles',
+    'public':'si-public','teams':'si-public',
+    'admin':'si-settings','audit':'si-settings',
+  };
   const sid=document.getElementById(sideMap[view]);
   if(sid)sid.classList.add('active');
 }
 
-/* ─── SIDEBAR NAV ─── */
+/* ─── SIDEBAR NAV ───
+   Simplified per the nav redesign: Discover / Projects / Drive (My Datasets +
+   ACME Corp files) / Settings. Recent/Starred/Trash/Shared/Teams/Private/Audit
+   still exist as real views (switchView still supports every one of them) —
+   they're reached as filter tabs inside Drive and tabs inside Settings now,
+   not as separate top-level sidebar items. */
 function navSidebar(id){
-  if(id==='dashboard')         switchView('dashboard');
+  if(id==='discover')          switchView('discover');
+  else if(id==='projects')     switchView('projects');
+  else if(id==='settings')     switchView('admin'); // Settings page defaults to its Storage tab
   else if(id==='shared')       switchView('shared');
   else if(id==='myshared')     switchView('myshared');
   else if(id==='storageadmin') switchView('admin');
@@ -3574,9 +3628,6 @@ const ACTIVITY_FEED = [
   {user:'jane',  text:'created new folder <b>Field Surveys 2025</b>', time:'1 day ago'},
   {user:'gary',  text:'joined <b>Northern Survey Project</b>', time:'2 days ago'},
 ];
-function renderDashboardWelcome(){
-  document.getElementById('dash-welcome').textContent = 'Welcome back, ' + currentUser.name.split(' ')[0] + '!';
-}
 function renderProjectsPreview(){
   const grid=document.getElementById('dash-projects-grid');
   if(!grid) return;
@@ -3662,10 +3713,12 @@ function renderStorageState(){
   }
 }
 function renderDashboard(){
-  renderDashboardWelcome();
+  // Projects grid lives on its own page now (view-projects) but we render it
+  // unconditionally on load since the element exists regardless of which
+  // .page is currently visible — cheap, and avoids needing a per-view lazy-load.
   renderProjectsPreview();
-  renderActivityFeed();
-  renderStorageState();
+  // Storage + Activity now live in Drive's default right-panel state.
+  renderDriveOverviewPanel();
 }
 document.addEventListener('DOMContentLoaded', renderDashboard);
 
@@ -3701,9 +3754,10 @@ function switchUser(key) {
     pending.style.display = 'none';
   }
 
-  // ── Admin-only sidebar section ──
-  const adminGroup = document.getElementById('sb-admin-group');
-  adminGroup.style.display = u.isAdmin ? '' : 'none';
+  // ── Admin-only nav item (was a whole sidebar group before the nav
+  // simplification folded Storage/Audit into one Settings item) ──
+  const settingsItem = document.getElementById('si-settings');
+  if (settingsItem) settingsItem.style.display = u.isAdmin ? '' : 'none';
 
   // ── Private Files: update notices, user picker, and self tab label ──
   const noticeAdmin  = document.getElementById('private-notice-admin');
@@ -3934,7 +3988,8 @@ function closeTeamBrowser() {
   document.getElementById('team-browser').style.display = 'none';
   activeTeam = null;
   document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
-  document.getElementById('si-teams').classList.add('active');
+  const sid = document.getElementById('si-public'); // Teams now lives under ACME Corp files
+  if (sid) sid.classList.add('active');
 }
 
 function switchTeamTab(tab) {
@@ -4159,8 +4214,8 @@ function filterAuditLog(val){
 function selectFolder(id){
   document.querySelectorAll('.fb-tree-item').forEach(el=>el.classList.remove('active'));
   event.target.closest('.fb-tree-item').classList.add('active');
-  const labels={'root':'My Files','field-surveys':'Field Surveys 2025','basemaps':'Basemaps','exports':'Exports','org':'ACME Corp Files','shared-data':'Shared Data','archive':'Archive'};
-  document.getElementById('fb-path-label').textContent=labels[id]||'My Files';
+  const labels={'root':'My Datasets','field-surveys':'Field Surveys 2025','basemaps':'Basemaps','exports':'Exports','org':'ACME Corp Files','shared-data':'Shared Data','archive':'Archive'};
+  document.getElementById('fb-path-label').textContent=labels[id]||'My Datasets';
   toast('Opened folder');
 }
 
@@ -4655,9 +4710,40 @@ function clearSelection() {
     if (row) row.classList.remove('selected');
     selectedFile = null;
   }
+  renderDriveOverviewPanel();
+}
+
+/* Default state of Drive's right-hand panel when nothing is selected: Storage
+   + Activity (relocated from the old Dashboard page — same ids, same render
+   functions, just a new home). Re-rendering this each time is cheap and
+   avoids a stale storage/activity snapshot if the demo state changed while
+   a file was selected. */
+function renderDriveOverviewPanel(){
   const titleEl = document.getElementById('fb-info-title');
-  if (titleEl) titleEl.textContent = 'File details';
-  document.getElementById('fb-info-content').innerHTML = '<div class="fb-info-empty"><svg width="28" height="28" viewBox="0 0 16 16" fill="none" style="display:block;margin:0 auto 8px;opacity:.3"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 6h5M5.5 8.5h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Select a file or folder to see its details</div>';
+  if (titleEl) titleEl.textContent = 'Overview';
+  const content = document.getElementById('fb-info-content');
+  if (!content) return;
+  content.innerHTML = `
+    <div id="dash-storage-banner-wrap"></div>
+    <div class="fb-overview-card">
+      <h3><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v2.5M8 2a4.5 4.5 0 00-4.5 4.5c0 3-1.5 4-1.5 4h12s-1.5-1-1.5-4A4.5 4.5 0 008 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>Storage</h3>
+      <div class="dash-storage-stat" id="dash-storage-stat" style="font-size:19px">38.2<span style="font-size:12px"> GB of 100 GB used</span></div>
+      <div class="dash-storage-bar-track"><div class="dash-storage-bar-fill" id="dash-storage-fill" style="width:38%"></div></div>
+      <button class="btn sm" style="width:100%;justify-content:center" onclick="toast('This would open the storage add-on purchase flow — not part of this mockup.')">Add Storage</button>
+    </div>
+    <div class="fb-overview-card">
+      <h3 style="justify-content:space-between">
+        <span style="display:flex;align-items:center;gap:7px"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 6h6M5 8.5h6M5 11h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Activity</span>
+        <button class="icon-btn" style="width:24px;height:24px" onclick="toast('Refreshing activity…')" title="Refresh"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M13.5 8A5.5 5.5 0 1 1 8 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M13.5 3v4h-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </h3>
+      <div id="dash-activity-list"></div>
+      <button class="dash-activity-more" onclick="toast('This would show more activity — not part of this mockup.')">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Show more actions
+      </button>
+    </div>`;
+  renderActivityFeed();
+  renderStorageState();
 }
 
 /* ─── MULTI-SELECT: checkbox change handler ─── */
@@ -5016,6 +5102,17 @@ function fileDragStart(e, id){
   e.dataTransfer.effectAllowed = 'copy';
 }
 
+/* Map/Drive mode switcher (topbar): if a viewable file is currently selected
+   in Drive, jump straight to it in the Map Viewer; otherwise open the Map
+   Viewer's empty state so the person can pick or drag a file in from there. */
+function goToMap(){
+  if (selectedFile && FILE_DATA[selectedFile] && MV_VIEWABLE.has(FILE_DATA[selectedFile].icon)) {
+    window.location.href = 'viewer.html?file=' + encodeURIComponent(selectedFile);
+  } else {
+    window.location.href = 'viewer.html';
+  }
+}
+
 function confirmRename() {
   const newName = document.getElementById('rename-input').value.trim();
   if (!newName) return;
@@ -5113,11 +5210,11 @@ document.querySelectorAll('.modal-bg').forEach(bg=>{
     <div class="modal-sub" id="move-modal-sub">Choose a destination folder.</div>
     <div class="modal-label">Destination</div>
     <select class="modal-select" id="move-destination">
-      <optgroup label="My Files">
-        <option>My Files /</option>
-        <option>My Files / Field Surveys 2025</option>
-        <option>My Files / Basemaps</option>
-        <option>My Files / Exports</option>
+      <optgroup label="My Datasets">
+        <option>My Datasets /</option>
+        <option>My Datasets / Field Surveys 2025</option>
+        <option>My Datasets / Basemaps</option>
+        <option>My Datasets / Exports</option>
       </optgroup>
       <optgroup label="ACME Corp">
         <option>ACME Corp files / Shared Data</option>

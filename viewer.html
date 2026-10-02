@@ -164,6 +164,12 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
   color:var(--avenza-blue);background:#fff;padding:1px 4px;border-radius:4px;
 }
 .app-launcher-footer{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:10.5px;color:var(--text-muted);text-align:center}
+/* Map/Drive mode switcher — see collab.html for the full rationale comment.
+   Sits alongside the 9-dot launcher, not instead of it. */
+.mode-tabs{display:flex;align-items:center;background:var(--surface-2);border-radius:var(--radius-sm);padding:3px;gap:2px;flex-shrink:0}
+.mode-tab{padding:6px 14px;border-radius:6px;border:none;background:none;font-size:12.5px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;display:flex;align-items:center;gap:6px}
+.mode-tab:hover{color:var(--text-primary)}
+.mode-tab.active{background:var(--surface);color:var(--text-primary);box-shadow:var(--shadow-sm);cursor:default}
 .icon-btn:hover{background:var(--surface-2);border-color:var(--border-2)}
 .icon-btn svg{width:15px;height:15px}
 
@@ -887,6 +893,16 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
           <span style="margin:0 5px;color:var(--border-2)">›</span>
           <span id="breadcrumb-current">Map Viewer</span>
         </span>
+      </div>
+      <div class="mode-tabs">
+        <button class="mode-tab active" title="You're here">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4l4-1.4 4 1.4 4-1.4v9.4l-4 1.4-4-1.4-4 1.4V4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          Map
+        </button>
+        <button class="mode-tab" onclick="window.location.href='collab.html'" title="Back to Drive">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="4" rx="6" ry="2" stroke="currentColor" stroke-width="1.2"/><path d="M2 4v4c0 1.1 2.7 2 6 2s6-.9 6-2V4" stroke="currentColor" stroke-width="1.2"/><path d="M2 8v4c0 1.1 2.7 2 6 2s6-.9 6-2V8" stroke="currentColor" stroke-width="1.2"/></svg>
+          Drive
+        </button>
       </div>
       <div class="topbar-actions">
         <div class="dd-wrap">
