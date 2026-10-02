@@ -716,7 +716,52 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
   position:absolute;z-index:15;background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius-md);box-shadow:var(--shadow-md);
 }
-.mapviewer-panel-layers{top:66px;left:14px;width:208px;padding:12px}
+/* AI panel (left) and Tools panel (right) both stop short of the bottom to
+   leave room for the floating Legend (bottom-left) and CRS bar/zoom controls
+   (bottom-right) — same clearance on both sides for a symmetric layout. */
+.mv-ai-panel{
+  top:66px;bottom:150px;left:14px;width:260px;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.mv-ai-header{
+  padding:12px 14px;border-bottom:1px solid var(--border);
+  font-size:12.5px;font-weight:700;color:var(--text-primary);
+  display:flex;align-items:center;gap:7px;flex-shrink:0;
+}
+.mv-ai-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.mv-ai-msg{font-size:12px;line-height:1.5;max-width:92%}
+.mv-ai-msg.user{align-self:flex-end;background:var(--avenza-blue);color:#fff;padding:8px 11px;border-radius:12px 12px 2px 12px}
+.mv-ai-msg.ai{align-self:flex-start;background:var(--surface-2);color:var(--text-primary);padding:8px 11px;border-radius:12px 12px 12px 2px}
+.mv-ai-msg.ai-intro{background:none;padding:0;color:var(--text-muted);font-size:11.5px;line-height:1.5}
+.mv-ai-suggestions{padding:0 14px 10px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.mv-ai-suggestion-btn{
+  text-align:left;font-size:11.5px;padding:7px 10px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);
+  cursor:pointer;transition:background .1s;font-family:'DM Sans',sans-serif;
+}
+.mv-ai-suggestion-btn:hover{background:var(--surface-2)}
+.mv-ai-input-row{display:flex;gap:7px;padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0}
+.mv-ai-input-row input{flex:1;border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;font-family:'DM Sans',sans-serif;min-width:0}
+.mv-ai-input-row input:focus{outline:2px solid var(--avenza-blue-lt);outline-offset:-1px;border-color:var(--avenza-blue)}
+
+.mv-tools-panel{
+  top:66px;bottom:150px;right:14px;width:248px;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.mv-tools-scroll{flex:1;overflow-y:auto}
+.mv-tool-section{padding:14px;border-bottom:1px solid var(--border)}
+.mv-tool-section:last-child{border-bottom:none}
+.mv-tool-section-title{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.mv-tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mv-tool-grid-btn{
+  display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;
+  border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);
+  color:var(--text-secondary);font-size:11px;font-weight:500;cursor:pointer;
+  transition:all .12s;font-family:'DM Sans',sans-serif;
+}
+.mv-tool-grid-btn:hover{background:var(--surface-2)}
+.mv-tool-grid-btn.active{background:var(--avenza-blue);border-color:var(--avenza-blue);color:#fff}
+#mv-details-section .fb-info-empty{padding:4px 0}
 .mapviewer-panel-header{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px}
 .mapviewer-panel-subhead{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
 .mapviewer-panel-divider{height:1px;background:var(--border);margin:12px 0}
@@ -969,7 +1014,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 
     <div class="page-body">
 
-      <div class="page" id="view-mapviewer">
+      <div class="page active" id="view-mapviewer">
         <div class="mapviewer-wrap">
           <div class="mapviewer-canvas" id="mv-canvas" data-basemap="light">
             <svg class="mapviewer-overlay" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Map preview canvas">
@@ -1034,23 +1079,6 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
               <span class="mv-presence-label" id="mv-presence-label">1 viewing</span>
             </div>
             <div class="mapviewer-topbar-actions">
-              <button class="btn sm mv-tool-btn" id="mv-measure-btn" onclick="toggleMeasureMode()" title="Measure distance">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 12L12 2M2 12l2.5-.5M2 12l.5-2.5M6 8l1.5 1.5M9 5l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Measure
-              </button>
-              <button class="btn sm mv-tool-btn" id="mv-annotate-btn" onclick="toggleAnnotateMode()" title="Add a pin / comment">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 1.5c-2.5 0-4.5 2-4.5 4.5 0 3.2 4.5 8.5 4.5 8.5s4.5-5.3 4.5-8.5c0-2.5-2-4.5-4.5-4.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="6" r="1.4" stroke="currentColor" stroke-width="1.2"/></svg>
-                Annotate
-              </button>
-              <button class="btn sm" id="mv-adddata-btn" onclick="triggerAddData()" title="Drag a file onto the map, or click to browse">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                Add data
-              </button>
-              <button class="btn sm" onclick="openSaveViewModal()" title="Save this exact extent + layers as a shareable task link">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 2h6l3 3v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 2v3h4V2" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-                Save view
-              </button>
-              <span class="proto-sep" style="height:20px"></span>
               <button class="btn sm" onclick="openModal('modal-share')">
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="13" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="8" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.7L5.5 7.3M10.5 12.3L5.5 8.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
                 Share
@@ -1062,34 +1090,79 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
             </div>
           </div>
 
-          <!-- Layers panel -->
-          <div class="mapviewer-panel mapviewer-panel-layers">
-            <div class="mapviewer-panel-header">Layers</div>
-            <div class="mapviewer-layer-row">
-              <button class="mv-eye-btn active" id="mv-layer-toggle" onclick="toggleLayerVisibility()" aria-label="Toggle layer visibility" title="Toggle layer visibility">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-4.5 7-4.5S15 8 15 8s-2.5 4.5-7 4.5S1 8 1 8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.8" stroke="currentColor" stroke-width="1.3"/></svg>
-              </button>
-              <span class="mv-layer-swatch" id="mv-layer-swatch"></span>
-              <span class="mv-layer-name" id="mv-layer-name">q2_survey_results</span>
+          <!-- AI Assistant panel (left) — natural-language build/query over this
+               project's map. Canned responses (see AI_RESPONSES); no real model
+               behind this, same demo-fidelity as every other placeholder in
+               this mockup, but the interaction pattern is real. -->
+          <div class="mapviewer-panel mv-ai-panel">
+            <div class="mv-ai-header">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l1.2 3.3 3.3 1.2-3.3 1.2L8 10.5l-1.2-3.3-3.3-1.2 3.3-1.2L8 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M12.5 10l.6 1.7 1.7.6-1.7.6-.6 1.7-.6-1.7-1.7-.6 1.7-.6.6-1.7z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>
+              Ask AI
             </div>
-            <div class="mapviewer-panel-divider"></div>
-            <div class="mapviewer-panel-subhead">Basemap</div>
-            <div class="mapviewer-basemap-row" role="group" aria-label="Choose basemap style">
-              <button class="mv-basemap-swatch active" data-basemap="light" onclick="setBasemap('light')" title="Light" aria-label="Light basemap"></button>
-              <button class="mv-basemap-swatch" data-basemap="terrain" onclick="setBasemap('terrain')" title="Terrain" aria-label="Terrain basemap"></button>
-              <button class="mv-basemap-swatch" data-basemap="satellite" onclick="setBasemap('satellite')" title="Satellite" aria-label="Satellite basemap"></button>
+            <div class="mv-ai-messages" id="mv-ai-messages"></div>
+            <div class="mv-ai-suggestions" id="mv-ai-suggestions"></div>
+            <div class="mv-ai-input-row">
+              <input id="mv-ai-input" placeholder="Ask about this map…" onkeydown="if(event.key==='Enter')sendAiPrompt()">
+              <button class="icon-btn" style="width:32px;height:32px;background:var(--avenza-blue);border-color:var(--avenza-blue);color:#fff" onclick="sendAiPrompt()" title="Send" aria-label="Send">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M8 2l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
             </div>
           </div>
 
-          <!-- Details panel (reuses fb-info-* patterns from the file browser) -->
-          <div class="mapviewer-panel mapviewer-panel-details" id="mv-details-panel">
-            <div class="fb-info-header">
-              <span class="fb-info-title">Details</span>
-              <button class="icon-btn" style="width:22px;height:22px;border:none;background:none" onclick="toggleDetailsPanel()" title="Collapse details" aria-label="Collapse details panel">
-                <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
+          <!-- Tools panel (right) — Layers/Basemap/Analysis/Data/Share/Details,
+               categorized, replacing what used to be a Layers panel on the left
+               and a single Details panel on the right. -->
+          <div class="mapviewer-panel mv-tools-panel">
+            <div class="mv-tools-scroll">
+              <div class="mv-tool-section" id="mv-layers-section">
+                <div class="mv-tool-section-title">Layers</div>
+                <div class="mapviewer-layer-row" style="display:none">
+                  <button class="mv-eye-btn active" id="mv-layer-toggle" onclick="toggleLayerVisibility()" aria-label="Toggle layer visibility" title="Toggle layer visibility">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-4.5 7-4.5S15 8 15 8s-2.5 4.5-7 4.5S1 8 1 8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.8" stroke="currentColor" stroke-width="1.3"/></svg>
+                  </button>
+                  <span class="mv-layer-swatch" id="mv-layer-swatch"></span>
+                  <span class="mv-layer-name" id="mv-layer-name">q2_survey_results</span>
+                </div>
+              </div>
+              <div class="mv-tool-section">
+                <div class="mv-tool-section-title">Basemap</div>
+                <div class="mapviewer-basemap-row" role="group" aria-label="Choose basemap style">
+                  <button class="mv-basemap-swatch active" data-basemap="light" onclick="setBasemap('light')" title="Light" aria-label="Light basemap"></button>
+                  <button class="mv-basemap-swatch" data-basemap="terrain" onclick="setBasemap('terrain')" title="Terrain" aria-label="Terrain basemap"></button>
+                  <button class="mv-basemap-swatch" data-basemap="satellite" onclick="setBasemap('satellite')" title="Satellite" aria-label="Satellite basemap"></button>
+                </div>
+              </div>
+              <div class="mv-tool-section">
+                <div class="mv-tool-section-title">Analysis</div>
+                <div class="mv-tool-grid">
+                  <button class="mv-tool-grid-btn" id="mv-measure-btn" onclick="toggleMeasureMode()" title="Measure distance">
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 12L12 2M2 12l2.5-.5M2 12l.5-2.5M6 8l1.5 1.5M9 5l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Measure
+                  </button>
+                  <button class="mv-tool-grid-btn" id="mv-annotate-btn" onclick="toggleAnnotateMode()" title="Add a pin / comment">
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.5c-2.5 0-4.5 2-4.5 4.5 0 3.2 4.5 8.5 4.5 8.5s4.5-5.3 4.5-8.5c0-2.5-2-4.5-4.5-4.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="6" r="1.4" stroke="currentColor" stroke-width="1.2"/></svg>
+                    Annotate
+                  </button>
+                </div>
+              </div>
+              <div class="mv-tool-section">
+                <div class="mv-tool-section-title">Data</div>
+                <div class="mv-tool-grid">
+                  <button class="mv-tool-grid-btn" id="mv-adddata-btn" onclick="triggerAddData()" title="Drag a file onto the map, or click to browse">
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    Add data
+                  </button>
+                  <button class="mv-tool-grid-btn" onclick="openSaveViewModal()" title="Save this exact extent + layers as a shareable task link">
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M4 2h6l3 3v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 2v3h4V2" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                    Save view
+                  </button>
+                </div>
+              </div>
+              <div class="mv-tool-section" id="mv-details-section">
+                <div class="mv-tool-section-title">Details</div>
+                <div id="mv-details-body"></div>
+              </div>
             </div>
-            <div class="fb-info-body" id="mv-details-body"></div>
           </div>
 
           <!-- Legend -->
@@ -2062,12 +2135,15 @@ function openMapViewer(id){
     return;
   }
   _mvFileId = id;
+  currentProjectId = null;
   const activePage = document.querySelector('.page.active');
   _mvReturnView = activePage ? activePage.id.replace('view-','') : 'files';
 
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('view-mapviewer').classList.add('active');
   document.getElementById('breadcrumb-current').textContent = f.name;
+  const layerRow = document.querySelector('.mapviewer-layer-row');
+  if(layerRow) layerRow.style.display = '';
 
   document.getElementById('mv-file-icon').className = 'fb-icon ' + f.icon;
   document.getElementById('mv-file-icon').textContent = MV_ICON_LABEL[f.icon] || 'FILE';
@@ -2105,7 +2181,6 @@ function openMapViewer(id){
 
   document.getElementById('mv-overlay-group').innerHTML = MV_OVERLAY_TEMPLATES[f.icon] || MV_OVERLAY_TEMPLATES.gpkg;
   document.getElementById('mv-overlay-group').style.opacity = '1';
-  document.getElementById('mv-details-panel').classList.remove('collapsed');
   mvZoom = 1;
   mvLayerVisible = true;
   document.getElementById('mv-layer-toggle').classList.add('active');
@@ -2142,9 +2217,77 @@ function toggleLayerVisibility(){
   document.getElementById('mv-layer-toggle').classList.toggle('active', mvLayerVisible);
 }
 
-function toggleDetailsPanel(){
-  document.getElementById('mv-details-panel').classList.toggle('collapsed');
+/* ─── AI panel (left) — natural-language build/query over this map.
+   Canned responses only; no real model behind this. The interaction
+   pattern (ask, get a grounded-sounding answer referencing this map's
+   actual layers/CRS, suggested follow-ups) is what's real here, matching
+   how every other "AI" touchpoint in this mockup is scoped — see the
+   Collaboration Environment specs' CE-9 notes on staying narrowly
+   grounded rather than open-ended chat. ─── */
+const AI_SUGGESTIONS = [
+  'What layers are on this map?',
+  'What coordinate system is this in?',
+  'Zoom to the largest parcel',
+];
+const AI_RESPONSES = [
+  {
+    match: /layer/i,
+    reply: () => {
+      const f = FILE_DATA[_mvFileId];
+      if (f) return `This map has one layer loaded: <b>${f.name}</b> (${f.type}). You can toggle its visibility or add another from the Data section on the right.`;
+      return `No data layers are loaded yet — this is just the project basemap. Use <b>Add data</b> on the right, or drag a file in from Drive, to add one.`;
+    }
+  },
+  {
+    match: /coordinate|crs|projection/i,
+    reply: () => {
+      const sel = document.getElementById('mv-crs-select');
+      const label = sel && sel.selectedOptions[0] ? sel.selectedOptions[0].textContent : 'WGS 84 (EPSG:4326)';
+      return `This view is currently in <b>${label}</b>. You can change it from the Project CRS control at the bottom of the map — it's powered by Geocalc, so state plane, UTM, and most regional systems are available too, not just WGS84 or Web Mercator.`;
+    }
+  },
+  {
+    match: /zoom|largest|parcel/i,
+    reply: () => `I can't run a real spatial query in this mockup, but this is exactly the kind of thing CE-9 (the AI Query Assistant) is meant to do — e.g. "zoom to the largest parcel" would filter the active layer by area and move the map there. Try the Measure tool on the right if you want to check sizes manually for now.`
+  },
+];
+const AI_FALLBACK = `I can't run a real query in this mockup, but a natural-language assistant here would ground its answers in this project's actual layers, CRS, and metadata — not a general-purpose chatbot. Try one of the suggestions below, or ask about layers or coordinates.`;
+
+function aiAddMessage(role, html){
+  const list = document.getElementById('mv-ai-messages');
+  const div = document.createElement('div');
+  div.className = 'mv-ai-msg ' + role;
+  div.innerHTML = html;
+  list.appendChild(div);
+  list.scrollTop = list.scrollHeight;
 }
+function renderAiSuggestions(){
+  const box = document.getElementById('mv-ai-suggestions');
+  if(!box) return;
+  box.innerHTML = AI_SUGGESTIONS.map(s=>`<button class="mv-ai-suggestion-btn" onclick="askAiSuggestion('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+}
+function askAiSuggestion(text){
+  document.getElementById('mv-ai-input').value = text;
+  sendAiPrompt();
+}
+function sendAiPrompt(){
+  const input = document.getElementById('mv-ai-input');
+  const text = input.value.trim();
+  if(!text) return;
+  aiAddMessage('user', text.replace(/</g,'&lt;'));
+  input.value = '';
+  const match = AI_RESPONSES.find(r=>r.match.test(text));
+  const replyHtml = match ? match.reply() : AI_FALLBACK;
+  setTimeout(()=>{ aiAddMessage('ai', replyHtml); }, 350);
+}
+function initAiPanel(){
+  const list = document.getElementById('mv-ai-messages');
+  if(!list) return;
+  list.innerHTML = '';
+  aiAddMessage('ai-intro', "Ask about this map's layers, coordinate system, or data — grounded in what's actually here, not a general chatbot.");
+  renderAiSuggestions();
+}
+document.addEventListener('DOMContentLoaded', initAiPanel);
 
 function mvZoomStep(dir){
   mvZoom = Math.min(2.2, Math.max(0.6, +(mvZoom + dir*0.2).toFixed(1)));
@@ -2194,7 +2337,8 @@ function resetMvToolState(){
   document.getElementById('mv-annotate-btn').classList.remove('active');
   document.getElementById('mv-canvas').classList.remove('mv-annotate-cursor');
   document.getElementById('mv-annotations-panel').classList.remove('open');
-  document.getElementById('mv-details-panel').style.display = '';
+  const toolsPanel = document.querySelector('.mv-tools-panel');
+  if(toolsPanel) toolsPanel.style.display = '';
   document.getElementById('mv-measure-group').innerHTML = '';
   document.getElementById('mv-pins-group').innerHTML = '';
   renderAnnotations();
@@ -2308,8 +2452,9 @@ function toggleAnnotateMode(){
   document.getElementById('mv-annotate-btn').classList.toggle('active', mvAnnotateMode);
   document.getElementById('mv-canvas').classList.toggle('mv-annotate-cursor', mvAnnotateMode);
   document.getElementById('mv-annotations-panel').classList.toggle('open', mvAnnotateMode);
-  // Annotations panel and Details panel share the same screen position (top-right) — mutually exclusive.
-  document.getElementById('mv-details-panel').style.display = mvAnnotateMode ? 'none' : '';
+  // Annotations panel and the Tools panel share the same screen position (right side) — mutually exclusive.
+  const toolsPanel2 = document.querySelector('.mv-tools-panel');
+  if(toolsPanel2) toolsPanel2.style.display = mvAnnotateMode ? 'none' : '';
   toast(mvAnnotateMode ? 'Annotate mode on — click the map to drop a pin.' : 'Annotate mode off.');
 }
 
@@ -2387,7 +2532,7 @@ function addTempLayer(name){
     <g>
       <circle cx="${x}" cy="${y}" r="30" fill="rgba(217,119,6,.18)" stroke="var(--amber)" stroke-width="2" stroke-dasharray="4 3"/>
     </g>`;
-  const layersPanel = document.querySelector('.mapviewer-panel-layers');
+  const layersPanel = document.getElementById('mv-layers-section');
   const row = document.createElement('div');
   row.className = 'mapviewer-layer-row mv-temp-layer-row';
   row.style.marginTop = '6px';
@@ -2434,19 +2579,63 @@ document.addEventListener('DOMContentLoaded', function(){
   canvas.addEventListener('dragleave', function(e){ canvas.classList.remove('mv-drag-active'); });
   canvas.addEventListener('drop', mvHandleDrop);
 
-  // Standalone-window entry point: ?file=<id> in the URL, set either by the
-  // Collaboration Environment's "Open in Map Viewer" context-menu action
-  // (opens this page in a new tab) or by a prior drop in this same window
-  // (see mvHandleDrop, which updates the URL to match via history.replaceState).
+  // Standalone-window entry point: ?file=<id> opens a specific file (from the
+  // Collaboration Environment's "Open in Map Viewer" action, a drop in this
+  // window, or the Drive<->Map mode tab); ?project=<id> opens that project's
+  // basemap with no specific file loaded yet (from a Projects card).
   const params = new URLSearchParams(window.location.search);
   const fileId = params.get('file');
+  const projectId = params.get('project');
   if(fileId && FILE_DATA[fileId] && MV_VIEWABLE.has(FILE_DATA[fileId].icon)){
     openMapViewer(fileId);
+  } else if(projectId && PROJECT_DATA[projectId]){
+    openProjectMap(projectId);
   }
   // else: leave the empty state showing (see #mv-empty-state) rather than
   // silently falling back to a sample file — an empty standalone viewer
   // should look empty, not pretend something is open.
 });
+
+/* Every project gets its own basemap by default, shown immediately —
+   there's no "no file open" state for a project the way there is for the
+   bare Map Viewer, since the project itself is the context, not a single
+   file. Layers get added into this via Add Data or by opening/linking a
+   file from Drive; this function alone only sets up the basemap. */
+const PROJECT_DATA = {
+  'national-topo':   {name:'National Topographic Sets',  basemap:'light'},
+  'gateway-arch':    {name:'Gateway Arch National Park', basemap:'terrain'},
+  'colorado-maps':   {name:'Colorado Maps',              basemap:'light'},
+  'morialta':        {name:'Morialta Conservation Park', basemap:'terrain'},
+  'northern-survey': {name:'Northern Survey Project',    basemap:'satellite'},
+  'basemap-ref':     {name:'Basemap & Reference Layers', basemap:'light'},
+};
+let currentProjectId = null;
+function openProjectMap(projectId){
+  const proj = PROJECT_DATA[projectId];
+  if(!proj) return;
+  currentProjectId = projectId;
+  _mvFileId = null;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('view-mapviewer').classList.add('active');
+  document.getElementById('breadcrumb-current').textContent = proj.name;
+  document.getElementById('mv-file-name').textContent = proj.name;
+  document.getElementById('mv-file-type').textContent = 'Project basemap · no data layers yet';
+  document.getElementById('mv-file-icon').className = 'fb-icon';
+  document.getElementById('mv-file-icon').style.background = 'var(--surface-3)';
+  document.getElementById('mv-file-icon').textContent = '—';
+  document.getElementById('mv-overlay-group').innerHTML = '';
+  const layerRow = document.querySelector('.mapviewer-layer-row');
+  if(layerRow) layerRow.style.display = 'none';
+  document.getElementById('mv-details-body').innerHTML = '';
+  mvZoom = 1; applyMvZoom();
+  setBasemap(proj.basemap);
+  resetMvToolState();
+  populateCrsOptions();
+  renderPresence();
+  renderFreshness();
+  const empty = document.getElementById('mv-empty-state');
+  if(empty) empty.style.display = 'none'; // a basemap is showing — this isn't the "nothing open" state
+}
 
 /* ─── SINGLE FILE SELECTION ─── */
 let selectedFile = null;

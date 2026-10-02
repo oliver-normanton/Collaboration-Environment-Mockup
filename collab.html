@@ -3614,12 +3614,12 @@ document.addEventListener('click', e=>{ if(!e.target.closest('.org-switcher')) c
 
 /* ─── Dashboard: project previews, activity feed, storage states ─── */
 const PROJECTS_PREVIEW = [
-  {name:'National Topographic Sets', starred:true,  updated:'35 mins ago', docs:10, comments:4},
-  {name:'Gateway Arch National Park', starred:true,  updated:'35 mins ago', docs:10, comments:4},
-  {name:'Colorado Maps',              starred:false, updated:'35 mins ago', docs:10, comments:4},
-  {name:'Morialta Conservation Park', starred:false, updated:'1 hour ago',  docs:7,  comments:2},
-  {name:'Northern Survey Project',    starred:false, updated:'2 hours ago', docs:14, comments:6},
-  {name:'Basemap & Reference Layers', starred:false, updated:'Yesterday',   docs:22, comments:1},
+  {id:'national-topo',   name:'National Topographic Sets',   starred:true,  updated:'35 mins ago', docs:10, comments:4},
+  {id:'gateway-arch',    name:'Gateway Arch National Park',  starred:true,  updated:'35 mins ago', docs:10, comments:4},
+  {id:'colorado-maps',   name:'Colorado Maps',               starred:false, updated:'35 mins ago', docs:10, comments:4},
+  {id:'morialta',        name:'Morialta Conservation Park',  starred:false, updated:'1 hour ago',  docs:7,  comments:2},
+  {id:'northern-survey', name:'Northern Survey Project',     starred:false, updated:'2 hours ago', docs:14, comments:6},
+  {id:'basemap-ref',     name:'Basemap & Reference Layers',  starred:false, updated:'Yesterday',   docs:22, comments:1},
 ];
 const ACTIVITY_FEED = [
   {user:'mary',  text:'uploaded <b>q2_survey_results.gpkg</b>', time:'Just now'},
@@ -3632,7 +3632,7 @@ function renderProjectsPreview(){
   const grid=document.getElementById('dash-projects-grid');
   if(!grid) return;
   grid.innerHTML = PROJECTS_PREVIEW.map((p,i)=>`
-    <div class="dash-pcard" onclick="toast('This would open ${p.name.replace(/'/g,"\\'")} — Projects isn\\'t a built-out section of this mockup yet.')">
+    <div class="dash-pcard" onclick="window.location.href='viewer.html?project=${encodeURIComponent(p.id)}'">
       <div class="dash-pcard-thumb">
         <svg width="36" height="36" viewBox="0 0 16 16" fill="none"><path d="M2 4l4-1.4 4 1.4 4-1.4v9.4l-4 1.4-4-1.4-4 1.4V4z" stroke="#98a2b3" stroke-width="1.1" stroke-linejoin="round"/><path d="M6 2.8v9.4M10 4.2v9.4" stroke="#98a2b3" stroke-width="1.1"/></svg>
         <button class="dash-pcard-star${p.starred?' starred':''}" onclick="event.stopPropagation();toggleDashStar(${i})" title="${p.starred?'Unstar':'Star'}">
