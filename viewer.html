@@ -719,16 +719,36 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 /* AI panel (left) and Tools panel (right) both stop short of the bottom to
    leave room for the floating Legend (bottom-left) and CRS bar/zoom controls
    (bottom-right) — same clearance on both sides for a symmetric layout. */
-.mv-ai-panel{
-  top:66px;bottom:150px;left:14px;width:260px;
+.mv-left-panel{
+  top:66px;bottom:150px;left:14px;width:264px;
   display:flex;flex-direction:column;overflow:hidden;
 }
-.mv-ai-header{
-  padding:12px 14px;border-bottom:1px solid var(--border);
-  font-size:12.5px;font-weight:700;color:var(--text-primary);
-  display:flex;align-items:center;gap:7px;flex-shrink:0;
+.mv-left-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.mv-left-section{border-bottom:1px solid var(--border);flex-shrink:0}
+.mv-left-section:last-child{border-bottom:none}
+.mv-left-section-title-static{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;padding:14px 14px 10px}
+.mv-left-section + .mv-left-section .mv-left-section-title-static{padding-top:14px}
+#mv-layers-section, #mv-details-section{padding-bottom:14px}
+#mv-layers-section > .mapviewer-layer-row{margin:0 14px}
+.mv-left-section > .mv-tool-grid-btn{margin:0 14px;width:calc(100% - 28px)}
+
+/* Ask AI — collapsible section. Flex-grows to fill available space while
+   expanded (so a longer conversation gets real room); collapses to just
+   its header, same interaction pattern as the Drive file-details panel's
+   earlier collapse affordance. */
+.mv-ai-section{display:flex;flex-direction:column;flex:1;min-height:38px}
+.mv-ai-section.collapsed{flex:0 0 auto}
+.mv-left-section-header{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;border:none;background:none;cursor:pointer;flex-shrink:0;
+  font-family:'DM Sans',sans-serif;
 }
-.mv-ai-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.mv-left-section-title-row{font-size:12.5px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:7px}
+.mv-collapse-chevron{color:var(--text-muted);transition:transform .15s;flex-shrink:0}
+.mv-ai-section.collapsed .mv-collapse-chevron{transform:rotate(-90deg)}
+.mv-ai-body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.mv-ai-section.collapsed .mv-ai-body{display:none}
+.mv-ai-messages{flex:1;overflow-y:auto;padding:0 14px 12px;display:flex;flex-direction:column;gap:10px;min-height:60px}
 .mv-ai-msg{font-size:12px;line-height:1.5;max-width:92%}
 .mv-ai-msg.user{align-self:flex-end;background:var(--avenza-blue);color:#fff;padding:8px 11px;border-radius:12px 12px 2px 12px}
 .mv-ai-msg.ai{align-self:flex-start;background:var(--surface-2);color:var(--text-primary);padding:8px 11px;border-radius:12px 12px 12px 2px}
@@ -740,16 +760,16 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
   cursor:pointer;transition:background .1s;font-family:'DM Sans',sans-serif;
 }
 .mv-ai-suggestion-btn:hover{background:var(--surface-2)}
-.mv-ai-input-row{display:flex;gap:7px;padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0}
+.mv-ai-input-row{display:flex;gap:7px;padding:10px 14px;border-top:1px solid var(--border);flex-shrink:0}
 .mv-ai-input-row input{flex:1;border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;font-family:'DM Sans',sans-serif;min-width:0}
 .mv-ai-input-row input:focus{outline:2px solid var(--avenza-blue-lt);outline-offset:-1px;border-color:var(--avenza-blue)}
 
 .mv-tools-panel{
-  top:66px;bottom:150px;right:14px;width:248px;
+  top:66px;bottom:150px;right:14px;width:252px;
   display:flex;flex-direction:column;overflow:hidden;
 }
-.mv-tools-scroll{flex:1;overflow-y:auto}
-.mv-tool-section{padding:14px;border-bottom:1px solid var(--border)}
+.mv-tools-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.mv-tool-section{padding:14px;border-bottom:1px solid var(--border);flex-shrink:0}
 .mv-tool-section:last-child{border-bottom:none}
 .mv-tool-section-title{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
 .mv-tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -762,6 +782,42 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 .mv-tool-grid-btn:hover{background:var(--surface-2)}
 .mv-tool-grid-btn.active{background:var(--avenza-blue);border-color:var(--avenza-blue);color:#fff}
 #mv-details-section .fb-info-empty{padding:4px 0}
+
+/* Atlas-inspired tool browser: search + category tabs + categorized rows.
+   Deliberately not a 1:1 copy — CE-8 is view-only, not a geoprocessing
+   platform, so the category set and row count are scoped to what CE
+   actually has (Measure, Annotate, a couple of speced-but-unbuilt view
+   actions) rather than a full Dissolve/Merge/Spatial-join-style suite. */
+.mv-tools-browser-section{flex:1;display:flex;flex-direction:column;min-height:0;padding-bottom:6px}
+.mv-tools-search{
+  display:flex;align-items:center;gap:7px;background:var(--surface-2);
+  border-radius:var(--radius-sm);padding:7px 10px;margin-bottom:10px;flex-shrink:0;
+}
+.mv-tools-search input{border:none;background:none;outline:none;font-size:12px;width:100%;font-family:'DM Sans',sans-serif}
+.mv-tools-tabs{display:flex;gap:4px;margin-bottom:10px;flex-shrink:0;flex-wrap:wrap}
+.mv-tools-tab{
+  padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface);
+  font-size:11px;font-weight:500;color:var(--text-secondary);cursor:pointer;
+  transition:all .12s;font-family:'DM Sans',sans-serif;
+}
+.mv-tools-tab:hover{background:var(--surface-2)}
+.mv-tools-tab.active{background:var(--avenza-blue);border-color:var(--avenza-blue);color:#fff}
+.mv-tool-category-label{font-size:9.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin:12px 0 6px;padding:0 2px}
+.mv-tool-category-label:first-child{margin-top:0}
+.mv-tool-row{
+  display:flex;align-items:center;gap:10px;width:100%;padding:8px 8px;
+  border:1px solid transparent;border-radius:var(--radius-sm);background:none;
+  cursor:pointer;text-align:left;transition:background .1s;font-family:'DM Sans',sans-serif;
+}
+.mv-tool-row:hover{background:var(--surface-2)}
+.mv-tool-row.active{background:var(--avenza-blue-lt);border-color:var(--avenza-blue)}
+.mv-tool-row-icon{
+  width:28px;height:28px;border-radius:7px;background:var(--surface-3);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;color:var(--text-secondary);
+}
+.mv-tool-row.active .mv-tool-row-icon{background:var(--avenza-blue);color:#fff}
+.mv-tool-row-label{font-size:12px;font-weight:500;color:var(--text-primary)}
+.mv-tool-row-empty{font-size:11.5px;color:var(--text-muted);padding:16px 4px;text-align:center}
 .mapviewer-panel-header{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px}
 .mapviewer-panel-subhead{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
 .mapviewer-panel-divider{height:1px;background:var(--border);margin:12px 0}
@@ -1094,28 +1150,31 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                project's map. Canned responses (see AI_RESPONSES); no real model
                behind this, same demo-fidelity as every other placeholder in
                this mockup, but the interaction pattern is real. -->
-          <div class="mapviewer-panel mv-ai-panel">
-            <div class="mv-ai-header">
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l1.2 3.3 3.3 1.2-3.3 1.2L8 10.5l-1.2-3.3-3.3-1.2 3.3-1.2L8 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M12.5 10l.6 1.7 1.7.6-1.7.6-.6 1.7-.6-1.7-1.7-.6 1.7-.6.6-1.7z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>
-              Ask AI
-            </div>
-            <div class="mv-ai-messages" id="mv-ai-messages"></div>
-            <div class="mv-ai-suggestions" id="mv-ai-suggestions"></div>
-            <div class="mv-ai-input-row">
-              <input id="mv-ai-input" placeholder="Ask about this map…" onkeydown="if(event.key==='Enter')sendAiPrompt()">
-              <button class="icon-btn" style="width:32px;height:32px;background:var(--avenza-blue);border-color:var(--avenza-blue);color:#fff" onclick="sendAiPrompt()" title="Send" aria-label="Send">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M8 2l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Tools panel (right) — Layers/Basemap/Analysis/Data/Share/Details,
-               categorized, replacing what used to be a Layers panel on the left
-               and a single Details panel on the right. -->
-          <div class="mapviewer-panel mv-tools-panel">
-            <div class="mv-tools-scroll">
-              <div class="mv-tool-section" id="mv-layers-section">
-                <div class="mv-tool-section-title">Layers</div>
+          <!-- Left panel: Ask AI (collapsible) + Layers + Data + Details —
+               "what's on this map, and what do you want to know about it". -->
+          <div class="mapviewer-panel mv-left-panel">
+            <div class="mv-left-scroll">
+              <div class="mv-left-section mv-ai-section" id="mv-ai-section">
+                <button class="mv-left-section-header" onclick="toggleAiCollapse()" aria-expanded="true" aria-controls="mv-ai-body">
+                  <span class="mv-left-section-title-row">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l1.2 3.3 3.3 1.2-3.3 1.2L8 10.5l-1.2-3.3-3.3-1.2 3.3-1.2L8 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M12.5 10l.6 1.7 1.7.6-1.7.6-.6 1.7-.6-1.7-1.7-.6 1.7-.6.6-1.7z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>
+                    Ask AI
+                  </span>
+                  <svg class="mv-collapse-chevron" id="mv-ai-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="mv-ai-body" id="mv-ai-body">
+                  <div class="mv-ai-messages" id="mv-ai-messages"></div>
+                  <div class="mv-ai-suggestions" id="mv-ai-suggestions"></div>
+                  <div class="mv-ai-input-row">
+                    <input id="mv-ai-input" placeholder="Ask about this map…" onkeydown="if(event.key==='Enter')sendAiPrompt()">
+                    <button class="icon-btn" style="width:32px;height:32px;background:var(--avenza-blue);border-color:var(--avenza-blue);color:#fff" onclick="sendAiPrompt()" title="Send" aria-label="Send">
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M8 2l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="mv-left-section" id="mv-layers-section">
+                <div class="mv-left-section-title-static">Layers</div>
                 <div class="mapviewer-layer-row" style="display:none">
                   <button class="mv-eye-btn active" id="mv-layer-toggle" onclick="toggleLayerVisibility()" aria-label="Toggle layer visibility" title="Toggle layer visibility">
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-4.5 7-4.5S15 8 15 8s-2.5 4.5-7 4.5S1 8 1 8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.8" stroke="currentColor" stroke-width="1.3"/></svg>
@@ -1124,6 +1183,27 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                   <span class="mv-layer-name" id="mv-layer-name">q2_survey_results</span>
                 </div>
               </div>
+              <div class="mv-left-section">
+                <div class="mv-left-section-title-static">Data</div>
+                <button class="mv-tool-grid-btn" id="mv-adddata-btn" style="width:100%" onclick="triggerAddData()" title="Drag a file onto the map, or click to browse">
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  Add data
+                </button>
+              </div>
+              <div class="mv-left-section" id="mv-details-section">
+                <div class="mv-left-section-title-static">Details</div>
+                <div id="mv-details-body"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right panel: Basemap + an Atlas-inspired searchable, categorized
+               tool palette — scoped to CE's actual tool set (Measure, Annotate,
+               Save view, plus two already-speced-but-unbuilt nice-to-haves,
+               Compare and Export view) rather than a full geoprocessing suite,
+               since CE-8 is explicitly view-only, not an analysis platform. -->
+          <div class="mapviewer-panel mv-tools-panel">
+            <div class="mv-tools-scroll">
               <div class="mv-tool-section">
                 <div class="mv-tool-section-title">Basemap</div>
                 <div class="mapviewer-basemap-row" role="group" aria-label="Choose basemap style">
@@ -1132,35 +1212,14 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
                   <button class="mv-basemap-swatch" data-basemap="satellite" onclick="setBasemap('satellite')" title="Satellite" aria-label="Satellite basemap"></button>
                 </div>
               </div>
-              <div class="mv-tool-section">
-                <div class="mv-tool-section-title">Analysis</div>
-                <div class="mv-tool-grid">
-                  <button class="mv-tool-grid-btn" id="mv-measure-btn" onclick="toggleMeasureMode()" title="Measure distance">
-                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 12L12 2M2 12l2.5-.5M2 12l.5-2.5M6 8l1.5 1.5M9 5l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Measure
-                  </button>
-                  <button class="mv-tool-grid-btn" id="mv-annotate-btn" onclick="toggleAnnotateMode()" title="Add a pin / comment">
-                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.5c-2.5 0-4.5 2-4.5 4.5 0 3.2 4.5 8.5 4.5 8.5s4.5-5.3 4.5-8.5c0-2.5-2-4.5-4.5-4.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="6" r="1.4" stroke="currentColor" stroke-width="1.2"/></svg>
-                    Annotate
-                  </button>
+              <div class="mv-tool-section mv-tools-browser-section">
+                <div class="mv-tool-section-title">Tools</div>
+                <div class="mv-tools-search">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="var(--text-muted)" stroke-width="1.4"/><path d="M10.5 10.5L13 13" stroke="var(--text-muted)" stroke-width="1.4" stroke-linecap="round"/></svg>
+                  <input id="mv-tools-search-input" placeholder="Search tools…" oninput="filterToolRows(this.value)">
                 </div>
-              </div>
-              <div class="mv-tool-section">
-                <div class="mv-tool-section-title">Data</div>
-                <div class="mv-tool-grid">
-                  <button class="mv-tool-grid-btn" id="mv-adddata-btn" onclick="triggerAddData()" title="Drag a file onto the map, or click to browse">
-                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                    Add data
-                  </button>
-                  <button class="mv-tool-grid-btn" onclick="openSaveViewModal()" title="Save this exact extent + layers as a shareable task link">
-                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M4 2h6l3 3v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 2v3h4V2" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-                    Save view
-                  </button>
-                </div>
-              </div>
-              <div class="mv-tool-section" id="mv-details-section">
-                <div class="mv-tool-section-title">Details</div>
-                <div id="mv-details-body"></div>
+                <div class="mv-tools-tabs" id="mv-tools-tabs"></div>
+                <div id="mv-tools-list"></div>
               </div>
             </div>
           </div>
@@ -2289,6 +2348,109 @@ function initAiPanel(){
 }
 document.addEventListener('DOMContentLoaded', initAiPanel);
 
+function toggleAiCollapse(){
+  const section = document.getElementById('mv-ai-section');
+  section.classList.toggle('collapsed');
+}
+
+/* ─── Tools browser (right panel) — search + category tabs + rows, in the
+   spirit of Atlas's tool palette but scoped to what CE-8 actually has.
+   'Compare' and 'Export view' are real items from the CE-8 spec's
+   collaboration-workflow notes (side-by-side comparison; offline-ready
+   view export) that haven't been built yet — stubbed as toasts, same
+   demo-fidelity as every other not-yet-built action in this mockup,
+   rather than invented geoprocessing tools that don't fit CE-8's scope. ─── */
+const TOOLS_DATA = [
+  {id:'measure', category:'measure', label:'Measure', active:()=>mvMeasureMode,
+    icon:'<path d="M2 12L12 2M2 12l2.5-.5M2 12l.5-2.5M6 8l1.5 1.5M9 5l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>',
+    action:()=>toggleMeasureMode()},
+  {id:'annotate', category:'markup', label:'Annotate', active:()=>mvAnnotateMode,
+    icon:'<path d="M8 1.5c-2.5 0-4.5 2-4.5 4.5 0 3.2 4.5 8.5 4.5 8.5s4.5-5.3 4.5-8.5c0-2.5-2-4.5-4.5-4.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="6" r="1.4" stroke="currentColor" stroke-width="1.2"/>',
+    action:()=>toggleAnnotateMode()},
+  {id:'save-view', category:'view', label:'Save view', active:()=>false,
+    icon:'<path d="M4 2h6l3 3v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 2v3h4V2" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>',
+    action:()=>openSaveViewModal()},
+  {id:'compare', category:'view', label:'Compare', active:()=>false,
+    icon:'<rect x="1.5" y="3" width="6" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8.5" y="3" width="6" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>',
+    action:()=>toast('Side-by-side layer comparison — a speced nice-to-have, not built yet in this mockup.')},
+  {id:'export-view', category:'view', label:'Export view', active:()=>false,
+    icon:'<rect x="2" y="2" width="12" height="9" rx="1.2" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 13.5h5M8 11v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>',
+    action:()=>toast('Offline-ready snapshot export — a speced nice-to-have, not built yet in this mockup.')},
+];
+const TOOL_CATEGORIES = [
+  {id:'all', label:'All'},
+  {id:'measure', label:'Measure'},
+  {id:'markup', label:'Markup'},
+  {id:'view', label:'View'},
+];
+let activeToolTab = 'all';
+let toolSearchQuery = '';
+
+function renderToolTabs(){
+  const box = document.getElementById('mv-tools-tabs');
+  if(!box) return;
+  box.innerHTML = TOOL_CATEGORIES.map(c=>
+    `<button class="mv-tools-tab${c.id===activeToolTab?' active':''}" onclick="setToolTab('${c.id}')">${c.label}</button>`
+  ).join('');
+}
+function setToolTab(catId){
+  activeToolTab = catId;
+  renderToolTabs();
+  renderToolRows();
+}
+function filterToolRows(query){
+  toolSearchQuery = query.toLowerCase();
+  renderToolRows();
+}
+function renderToolRows(){
+  const list = document.getElementById('mv-tools-list');
+  if(!list) return;
+  const filtered = TOOLS_DATA.filter(t=>{
+    const matchesTab = activeToolTab==='all' || t.category===activeToolTab;
+    const matchesSearch = !toolSearchQuery || t.label.toLowerCase().includes(toolSearchQuery);
+    return matchesTab && matchesSearch;
+  });
+  if(filtered.length===0){
+    list.innerHTML = '<div class="mv-tool-row-empty">No tools match.</div>';
+    return;
+  }
+  // Group by category only when viewing "All" with no search narrowing it to one; otherwise flat list.
+  if(activeToolTab==='all' && !toolSearchQuery){
+    list.innerHTML = TOOL_CATEGORIES.filter(c=>c.id!=='all').map(cat=>{
+      const rows = filtered.filter(t=>t.category===cat.id);
+      if(rows.length===0) return '';
+      return `<div class="mv-tool-category-label">${cat.label}</div>` + rows.map(toolRowHtml).join('');
+    }).join('');
+  } else {
+    list.innerHTML = filtered.map(toolRowHtml).join('');
+  }
+}
+function toolRowHtml(t){
+  return `<button class="mv-tool-row${t.active()?' active':''}" id="mv-toolrow-${t.id}" onclick="${t.id==='measure'?'toggleMeasureMode()':t.id==='annotate'?'toggleAnnotateMode()':''}" data-tool="${t.id}">
+    <span class="mv-tool-row-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none">${t.icon}</svg></span>
+    <span class="mv-tool-row-label">${t.label}</span>
+  </button>`;
+}
+// Non-toggle rows (save-view, compare, export-view) need their action wired
+// post-render since their onclick isn't hardcoded in toolRowHtml above.
+document.addEventListener('click', function(e){
+  const row = e.target.closest('.mv-tool-row');
+  if(!row) return;
+  const id = row.dataset.tool;
+  const tool = TOOLS_DATA.find(t=>t.id===id);
+  if(tool && id!=='measure' && id!=='annotate') tool.action();
+});
+function refreshToolActiveStates(){
+  TOOLS_DATA.forEach(t=>{
+    const row = document.getElementById('mv-toolrow-'+t.id);
+    if(row) row.classList.toggle('active', t.active());
+  });
+}
+document.addEventListener('DOMContentLoaded', function(){
+  renderToolTabs();
+  renderToolRows();
+});
+
 function mvZoomStep(dir){
   mvZoom = Math.min(2.2, Math.max(0.6, +(mvZoom + dir*0.2).toFixed(1)));
   applyMvZoom();
@@ -2333,8 +2495,7 @@ const MV_PRESENCE_NAMES = ['Jane Doe','Mary Beth','Alan Rickman','Priya Nair','T
 function resetMvToolState(){
   mvMeasureMode = false; mvAnnotateMode = false;
   mvMeasurePoints = []; mvPins = []; mvTempLayers = []; _mvPinCounter = 0;
-  document.getElementById('mv-measure-btn').classList.remove('active');
-  document.getElementById('mv-annotate-btn').classList.remove('active');
+  refreshToolActiveStates();
   document.getElementById('mv-canvas').classList.remove('mv-annotate-cursor');
   document.getElementById('mv-annotations-panel').classList.remove('open');
   const toolsPanel = document.querySelector('.mv-tools-panel');
@@ -2417,7 +2578,7 @@ function updateCoordsDisplay(px, py, rectOverride){
 function toggleMeasureMode(){
   mvMeasureMode = !mvMeasureMode;
   if(mvMeasureMode && mvAnnotateMode) toggleAnnotateMode();
-  document.getElementById('mv-measure-btn').classList.toggle('active', mvMeasureMode);
+  refreshToolActiveStates();
   mvMeasurePoints = [];
   document.getElementById('mv-measure-group').innerHTML = '';
   toast(mvMeasureMode ? 'Measure tool on — click two points on the map.' : 'Measure tool off.');
@@ -2449,7 +2610,7 @@ function mvHandleMeasureClick(x, y){
 function toggleAnnotateMode(){
   mvAnnotateMode = !mvAnnotateMode;
   if(mvAnnotateMode && mvMeasureMode) toggleMeasureMode();
-  document.getElementById('mv-annotate-btn').classList.toggle('active', mvAnnotateMode);
+  refreshToolActiveStates();
   document.getElementById('mv-canvas').classList.toggle('mv-annotate-cursor', mvAnnotateMode);
   document.getElementById('mv-annotations-panel').classList.toggle('open', mvAnnotateMode);
   // Annotations panel and the Tools panel share the same screen position (right side) — mutually exclusive.
