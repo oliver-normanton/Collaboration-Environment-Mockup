@@ -1016,7 +1016,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 
       <div class="page active" id="view-mapviewer">
         <div class="mapviewer-wrap">
-          <div class="mapviewer-canvas" id="mv-canvas" data-basemap="light">
+          <div class="mapviewer-canvas" id="mv-canvas" data-basemap="terrain">
             <svg class="mapviewer-overlay" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Map preview canvas">
               <g id="mv-scale-group">
                 <g id="mv-overlay-group"></g>
@@ -1127,8 +1127,8 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
               <div class="mv-tool-section">
                 <div class="mv-tool-section-title">Basemap</div>
                 <div class="mapviewer-basemap-row" role="group" aria-label="Choose basemap style">
-                  <button class="mv-basemap-swatch active" data-basemap="light" onclick="setBasemap('light')" title="Light" aria-label="Light basemap"></button>
-                  <button class="mv-basemap-swatch" data-basemap="terrain" onclick="setBasemap('terrain')" title="Terrain" aria-label="Terrain basemap"></button>
+                  <button class="mv-basemap-swatch" data-basemap="light" onclick="setBasemap('light')" title="Light" aria-label="Light basemap"></button>
+                  <button class="mv-basemap-swatch active" data-basemap="terrain" onclick="setBasemap('terrain')" title="Terrain" aria-label="Terrain basemap"></button>
                   <button class="mv-basemap-swatch" data-basemap="satellite" onclick="setBasemap('satellite')" title="Satellite" aria-label="Satellite basemap"></button>
                 </div>
               </div>
