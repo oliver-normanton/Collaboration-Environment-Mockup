@@ -4994,6 +4994,8 @@ function applyOrgContext(){
 ═══════════════════════════════════════ */
 function switchUser(role){
   currentRole=role;
+  // Hand the signed-in persona to Collaboration Environment / Map Viewer (same origin).
+  try{ localStorage.setItem('bmh:session:persona', role); }catch(e){}
   currentOrg=USER_ORG[role].defaultOrg; // null for Gary
 
   // Reload persona-scoped persisted data (so Jane's invites don't leak into Mary's view)
@@ -9813,6 +9815,7 @@ function enterApp(role) {
 }
 
 function signOut() {
+  try{ localStorage.removeItem('bmh:session:persona'); }catch(e){}
   document.getElementById('login-page').classList.add('active');
   document.querySelector('.proto-bar').style.display = 'none';
   document.querySelector('.app').style.display = 'none';
@@ -10420,5 +10423,16 @@ function submitRegister(){
       </div>
     </div>
   </div>
+<script>
+/* Returning from CE / Map Viewer via ?resume=1: re-enter the app as the saved persona
+   instead of showing the login page. */
+(function(){
+  try{
+    if(new URLSearchParams(location.search).get('resume')!=='1') return;
+    var r=localStorage.getItem('bmh:session:persona');
+    if(r && USER_ORG[r]){ currentLoginMethod='password'; enterApp(r); }
+  }catch(e){}
+})();
+</script>
 </body>
 </html>

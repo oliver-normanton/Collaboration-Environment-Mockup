@@ -943,6 +943,17 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 }
 .mv-empty-state-title{font-size:15px;font-weight:600;color:var(--text-secondary)}
 .mv-empty-state-sub{font-size:12.5px;color:var(--text-muted);max-width:340px;line-height:1.5}
+
+/* ── Persona gating + starter workspace ── */
+.cap-disabled{opacity:.4 !important;cursor:not-allowed !important}
+.ws-empty{display:none;flex-direction:column;align-items:center;gap:6px;padding:48px 20px;color:var(--text-muted);text-align:center;font-size:12.5px}
+.ws-empty b{color:var(--text-primary);font-size:14px;font-weight:600}
+body.ws-starter .ws-empty{display:flex}
+body.ws-starter .page:not(#view-mapviewer) table tbody tr{display:none}
+body.ws-starter .fb-grid{display:none}
+body.ws-starter .fb-tree-body > :not(:first-child){display:none}
+body.ws-starter #public-warn{display:none !important}
+.ws-empty-inline{grid-column:1/-1;padding:40px 16px;text-align:center;color:var(--text-muted);font-size:12.5px;border:1px dashed var(--border);border-radius:10px}
 </style>
 </head>
 <body>
@@ -951,7 +962,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 <div class="proto-bar">
   <span class="proto-label">Prototype</span>
   <div class="proto-sep"></div>
-  <button class="proto-btn" onclick="window.location.href='index.html'">
+  <button class="proto-btn" onclick="window.location.href='index.html?resume=1'">
     <svg viewBox="0 0 16 16" fill="none" width="13" height="13"><path d="M2 8h12M2 8l4-4M2 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     Back to Hub
   </button>
@@ -988,7 +999,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
     <div class="topbar">
       <div class="topbar-left">
         <span class="breadcrumb">
-          <a onclick="window.location.href='index.html'" style="color:var(--text-muted);cursor:pointer;text-decoration:none;transition:color .1s" onmouseover="this.style.color='var(--avenza-blue)'" onmouseout="this.style.color='var(--text-muted)'">Blue Marble Hub</a>
+          <a onclick="window.location.href='index.html?resume=1'" style="color:var(--text-muted);cursor:pointer;text-decoration:none;transition:color .1s" onmouseover="this.style.color='var(--avenza-blue)'" onmouseout="this.style.color='var(--text-muted)'">Blue Marble Hub</a>
           <span style="margin:0 5px;color:var(--border-2)">›</span>
           <a onclick="window.location.href='collab.html'" style="color:var(--text-muted);cursor:pointer;text-decoration:none;transition:color .1s" onmouseover="this.style.color='var(--avenza-blue)'" onmouseout="this.style.color='var(--text-muted)'">Collaboration Environment</a>
           <span style="margin:0 5px;color:var(--border-2)">›</span>
@@ -1023,7 +1034,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
               Settings
             </button>
             <div class="dd-sep"></div>
-            <button class="dd-item" onclick="window.location.href='index.html';closeDrop()">
+            <button class="dd-item" onclick="window.location.href='index.html?resume=1';closeDrop()">
               <svg viewBox="0 0 16 16" fill="none"><path d="M6 3H3a1 1 0 00-1 1v8a1 1 0 001 1h3M10 5l3 3-3 3M6 8h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Back to Hub
             </button>
@@ -1040,7 +1051,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
           <div class="app-launcher-panel">
             <div class="app-launcher-header">Blue Marble apps</div>
             <div class="app-launcher-grid">
-              <button class="app-launcher-tile" onclick="window.location.href='index.html'">
+              <button class="app-launcher-tile" onclick="window.location.href='index.html?resume=1'">
                 <div class="app-launcher-tile-icon" style="background:var(--avenza-blue)">
                   <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1.2" stroke="#fff" stroke-width="1.4"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1.2" stroke="#fff" stroke-width="1.4"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1.2" stroke="#fff" stroke-width="1.4"/><rect x="9" y="9" width="5.5" height="5.5" rx="1.2" stroke="#fff" stroke-width="1.4"/></svg>
                 </div>
@@ -1512,7 +1523,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4l6 5 6-5M2 4h12v9H2V4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
         Request access from admin
       </button>
-      <button class="btn" style="width:100%;justify-content:center" onclick="window.location.href='index.html'">
+      <button class="btn" style="width:100%;justify-content:center" onclick="window.location.href='index.html?resume=1'">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M2 8l4-4M2 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Back to Hub
       </button>
@@ -1536,6 +1547,8 @@ function toast(msg){
 
 /* ─── MODAL ─── */
 function openModal(id){
+  const _cap = {'modal-share':'share','modal-upload':'upload','modal-newfolder':'organize','modal-rename':'organize','modal-move':'organize'}[id];
+  if (_cap && !ceGuard(_cap)) return;
   document.getElementById(id).classList.add('open');
   document.addEventListener('keydown',escListener);
 }
@@ -1619,25 +1632,216 @@ function navSidebar(id){
 }
 
 /* ─── PERSONA DEFINITIONS ─── */
-const USERS = {
-  jane:  { name:'Jane Doe',        initials:'JD', email:'jane@acme.com',    role:'Admin',    color:'#0e7a8c', isAdmin:true,  isNew:false },
-  penny: { name:'Penny Purchaser', initials:'PP', email:'penny@acme.com',   role:'Admin',    color:'#0891b2', isAdmin:true,  isNew:false },
-  mary:  { name:'Mary Beth',       initials:'MB', email:'mary@acme.com',    role:'Member',   color:'#2563eb', isAdmin:false, isNew:false },
-  alan:  { name:'Alan Rickman',    initials:'AR', email:'alan@acme.com',    role:'Member',   color:'#7c3aed', isAdmin:false, isNew:false },
-  gary:  { name:'Gary Oldman',     initials:'GO', email:'gary@acme.com',    role:'New user', color:'#94a3b8', isAdmin:false, isNew:true  },
+/* ─── PERSONAS ───────────────────────────────────────────────────────────
+   Mirrors the Hub's USER_ORG (index.html), which is the source of truth for
+   who the personas are. Keys match the Hub (admin, user, penny, bob, freya,
+   sonya, alan, gary). The Hub writes the signed-in persona key to
+   localStorage on login / persona switch; CE and the Viewer read it on load,
+   so the logged-in user follows you between apps.
+   Legacy aliases (jane, mary) are kept so older call sites keep working. ── */
+const PERSONA_KEY = 'bmh:session:persona';
+const HUB_ORGS = {
+  acme:      {name:'Acme Corp',       avatar:'AC', bg:'#1e40af', fg:'#bfdbfe'},
+  poppins:   {name:'Poppins',         avatar:'PO', bg:'#9d174d', fg:'#fce7f3'},
+  snape:     {name:'Severus Snape',   avatar:'SS', bg:'#0f766e', fg:'#ccfbf1'},
+  davis:     {name:'Davis Lane',      avatar:'DL', bg:'#065f46', fg:'#a7f3d0'},
+  debuyer:   {name:'DeBuyer Inc.',    avatar:'DB', bg:'#7c3aed', fg:'#ddd6fe'},
+  vanfrugal: {name:'VanFrugal LLC',   avatar:'VF', bg:'#0891b2', fg:'#cffafe'},
+  freeloader:{name:'Freeloader Inc.', avatar:'FI', bg:'#4f46e5', fg:'#e0e7ff'},
 };
-let currentUser = USERS.jane;
+const USERS = {
+  admin: { key:'admin', name:'Jane Doe',        initials:'JD', email:'jane@acme.com',          role:'Primary admin', color:'#0d6efd', isAdmin:true,  isNew:false, orgs:['acme'],            defaultOrg:'acme' },
+  user:  { key:'user',  name:'Mary Beth',       initials:'MB', email:'mary@acme.com',          role:'Member',        color:'#1ba461', isAdmin:false, isNew:false, orgs:['acme','davis'],    defaultOrg:'acme' },
+  penny: { key:'penny', name:'Penny Purchaser', initials:'PP', email:'penny@poppins.com',      role:'Primary admin', color:'#be185d', isAdmin:true,  isNew:false, orgs:['poppins'],         defaultOrg:'poppins' },
+  bob:   { key:'bob',   name:'Bob DeBuyer',     initials:'BD', email:'bob@debuyer.com',        role:'Primary admin', color:'#7c3aed', isAdmin:true,  isNew:false, orgs:['debuyer'],         defaultOrg:'debuyer' },
+  freya: { key:'freya', name:'Freya VanFrugal', initials:'FV', email:'freya@vanfrugal.com',    role:'Primary admin', color:'#0891b2', isAdmin:true,  isNew:false, orgs:['vanfrugal'],       defaultOrg:'vanfrugal' },
+  sonya: { key:'sonya', name:'Sonya Freeloader',initials:'SF', email:'sonya@freeloader.com',   role:'Primary admin', color:'#4f46e5', isAdmin:true,  isNew:false, orgs:['freeloader'],      defaultOrg:'freeloader' },
+  alan:  { key:'alan',  name:'Alan Rickman',    initials:'AR', email:'alan@lilyalways.com',    role:'Member',        color:'#0f766e', isAdmin:false, isNew:false, orgs:['snape'],           defaultOrg:'snape' },
+  gary:  { key:'gary',  name:'Gary Oldman',     initials:'GO', email:'gary@noaccountyet.com',  role:'User',          color:'#6d28d9', isAdmin:false, isNew:true,  orgs:[],                  defaultOrg:null },
+};
+USERS.jane = USERS.admin;  // legacy alias
+USERS.mary = USERS.user;   // legacy alias
+const PERSONA_ORDER = ['admin','user','alan','penny','bob','freya','sonya','gary'];
 
-function switchUser(key) {
-  const u = USERS[key];
-  if (!u) return;
-  currentUser = u;
+/* Capability bundles. A role is just a named bundle of capabilities; the org
+   you are acting in decides which bundle applies (admin/member in your own
+   orgs, guest roles in orgs you've been invited into). */
+const CE_ROLE_CAPS = {
+  admin:     ['view','download','annotate','upload','organize','share','manageOrg'],
+  member:    ['view','download','annotate','upload','organize','share'],
+  owner:     ['view','download','annotate','upload','organize','share'],
+  commenter: ['view','annotate'],
+  viewer:    ['view'],
+};
+const CE_CAP_DENIED = {
+  download:'download files', annotate:'add annotations', upload:'upload files',
+  organize:'create or reorganise folders', share:'share files', manageOrg:'change organisation settings',
+};
+const CAP_SELECTORS = {
+  download: ['[onclick*="Downloading"]','[onclick*="downloadSelected"]','#mv-download-btn'],
+  upload:   ["[onclick*=\"openModal('modal-upload')\"]",'#sw-upload'],
+  share:    ["[onclick*=\"openModal('modal-share')\"]",'#sw-share'],
+  organize: ["[onclick*=\"openModal('modal-newfolder')\"]"],
+  annotate: ['#mv-annotate-btn'],
+};
+
+let ORGS = {};
+let currentOrg = null;
+let currentUser = USERS.admin;
+let ceRoleKey = 'admin';
+let ceOrgKind = 'member';
+
+function ceOrgList(u){
+  const out = {};
+  (u.orgs || []).forEach(k => {
+    const h = HUB_ORGS[k];
+    out[k] = {name:h.name, avatar:h.avatar, bg:h.bg, fg:h.fg, role:u.role, kind:'member',
+              roleKey: u.isAdmin ? 'admin' : 'member'};
+  });
+  // CE-only demo orgs Jane has been invited into as a guest (pre-existing in this mockup).
+  if (u.key === 'admin') {
+    out.rand     = {name:'Rand McNally',     avatar:'RM', bg:'#b45309', fg:'#fed7aa', role:'Guest · Viewer',    kind:'guest',    roleKey:'viewer'};
+    out.hema     = {name:'Hema Maps',        avatar:'HM', bg:'#be123c', fg:'#fecdd3', role:'Guest · Commenter', kind:'guest',    roleKey:'commenter'};
+    out.personal = {name:'Personal account', avatar:u.initials, bg:'#475467', fg:'#e4e7ec', role:'Just you', kind:'personal', roleKey:'owner'};
+  }
+  return out;
+}
+function ceCan(cap){
+  if (cap === 'manageOrg') return !!currentUser.isAdmin && (CE_ROLE_CAPS[ceRoleKey] || []).includes('manageOrg');
+  return (CE_ROLE_CAPS[ceRoleKey] || []).includes(cap);
+}
+function ceGuard(cap){
+  if (ceCan(cap)) return true;
+  toast('Your role here (' + currentUser.role + ') can\u2019t ' + (CE_CAP_DENIED[cap] || cap) + '.');
+  return false;
+}
+/* Non-Acme orgs get a starter (empty) workspace — the seeded demo data below
+   belongs to Acme. Guest orgs still show the seeded data (display-only demo). */
+function ceWorkspaceIsStarter(){
+  return !!currentOrg && currentOrg !== 'acme' && ceOrgKind !== 'guest';
+}
+
+function applyCaps(){
+  Object.keys(CAP_SELECTORS).forEach(cap => {
+    const allowed = ceCan(cap);
+    document.querySelectorAll(CAP_SELECTORS[cap].join(',')).forEach(el => {
+      if (!allowed) {
+        if (el.dataset.capGated !== cap) { el.dataset.capTitle = el.getAttribute('title') || ''; }
+        el.dataset.capGated = cap;
+        el.disabled = true;
+        el.setAttribute('aria-disabled','true');
+        el.classList.add('cap-disabled');
+        el.title = 'Your role (' + currentUser.role + ') can\u2019t ' + (CE_CAP_DENIED[cap] || cap);
+      }
+    });
+  });
+  document.querySelectorAll('[data-cap-gated]').forEach(el => {
+    const cap = el.dataset.capGated;
+    if (ceCan(cap)) {
+      el.disabled = false;
+      el.removeAttribute('aria-disabled');
+      el.classList.remove('cap-disabled');
+      if (el.dataset.capTitle) el.title = el.dataset.capTitle; else el.removeAttribute('title');
+      delete el.dataset.capGated; delete el.dataset.capTitle;
+    }
+  });
+}
+(function(){
+  let t = null;
+  document.addEventListener('DOMContentLoaded', function(){
+    new MutationObserver(function(){ clearTimeout(t); t = setTimeout(applyCaps, 60); })
+      .observe(document.body, {childList:true, subtree:true});
+  });
+})();
+
+const _ceOrigText = new WeakMap();
+function ceRelabelOrgText(orgName){
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: n => {
+      const p = n.parentNode && n.parentNode.nodeName;
+      if (p === 'SCRIPT' || p === 'STYLE') return NodeFilter.FILTER_REJECT;
+      return (_ceOrigText.has(n) || /ACME/.test(n.nodeValue)) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n => {
+    if (!_ceOrigText.has(n)) _ceOrigText.set(n, n.nodeValue);
+    const orig = _ceOrigText.get(n);
+    n.nodeValue = orgName ? orig.replace(/ACME Corp/g, orgName).replace(/ACME/g, orgName) : orig;
+  });
+}
+function ceInjectEmptyStates(orgName){
+  document.querySelectorAll('.page:not(#view-mapviewer) table').forEach(tbl => {
+    let next = tbl.nextElementSibling;
+    if (!next || !next.classList.contains('ws-empty')) {
+      next = document.createElement('div');
+      next.className = 'ws-empty';
+      tbl.insertAdjacentElement('afterend', next);
+    }
+    next.innerHTML = '<b>Nothing here yet</b><span>Your <span class="ws-org"></span> workspace is new. Upload a dataset or invite teammates to get started.</span>';
+    next.querySelector('.ws-org').textContent = orgName || '';
+  });
+}
+function ceRenderOrgButton(){
+  const sw = document.querySelector('.org-switcher');
+  const o = ORGS[currentOrg];
+  if (sw) sw.style.display = o ? '' : 'none';
+  if (!o) return;
+  const set = (id, fn) => { const el = document.getElementById(id); if (el) fn(el); };
+  set('org-avatar', el => { el.style.background = o.bg; el.style.color = o.fg; el.textContent = o.avatar; });
+  set('org-name', el => el.textContent = o.name);
+  set('org-role-label', el => el.textContent = o.role);
+}
+function renderPersonaList(){
+  const box = document.getElementById('dd-users-list');
+  if (!box) return;
+  box.innerHTML = PERSONA_ORDER.map(k => {
+    const p = USERS[k];
+    const org = p.orgs.length ? HUB_ORGS[p.orgs[0]].name + (p.orgs.length > 1 ? ' +' + (p.orgs.length - 1) : '') : 'No organisation';
+    const active = currentUser && currentUser.key === k;
+    return '<button class="dd-item" onclick="switchUser(\'' + k + '\');closeDrop()"' + (active ? ' style="background:var(--surface-2)"' : '') + '>' +
+      '<div style="width:22px;height:22px;border-radius:50%;background:' + p.color + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0">' + p.initials + '</div>' +
+      '<div><div style="font-size:12.5px;font-weight:' + (active ? 600 : 500) + '">' + p.name + '</div>' +
+      '<div style="font-size:11px;color:var(--text-muted)">' + p.role + ' · ' + org + '</div></div></button>';
+  }).join('');
+}
+function applyPersonaContext(base, requestedOrg){
+  ORGS = ceOrgList(base);
+  const orgKey = (requestedOrg && ORGS[requestedOrg]) ? requestedOrg : (base.defaultOrg && ORGS[base.defaultOrg] ? base.defaultOrg : (Object.keys(ORGS)[0] || null));
+  currentOrg = orgKey;
+  const o = orgKey ? ORGS[orgKey] : null;
+  ceRoleKey = o ? o.roleKey : 'viewer';
+  ceOrgKind = o ? o.kind : 'member';
+  // Effective persona: admin-ness and role label depend on the org you're acting in.
+  const eff = Object.assign({}, base, {
+    isAdmin: !!(base.isAdmin && o && o.roleKey === 'admin'),
+    role: o ? o.role : base.role,
+  });
+  currentUser = eff;
+  try { localStorage.setItem(PERSONA_KEY, base.key); } catch(e) {}
+  document.body.classList.toggle('ws-starter', ceWorkspaceIsStarter());
+  ceRenderOrgButton();
+  ceRelabelOrgText(ceWorkspaceIsStarter() ? o.name : null);
+  ceInjectEmptyStates(o ? o.name : '');
+  renderPersonaList();
+  applyCaps();
+  if (typeof renderProjectsPreview === 'function') renderProjectsPreview();
+  if (typeof renderDriveOverviewPanel === 'function') renderDriveOverviewPanel();
+  return eff;
+}
+
+function switchUser(key, opts) {
+  opts = opts || {};
+  const base = USERS[key];
+  if (!base) return;
+  const u = applyPersonaContext(base, opts.org);   // sets currentUser (org-aware), caps, workspace, persists persona
 
   // ── Update sidebar avatar + name ──
-  document.getElementById('sb-av-display').textContent    = u.initials;
-  document.getElementById('sb-av-display').style.background = u.color;
-  document.getElementById('sb-uname-display').textContent = u.name;
-  document.getElementById('sb-urole-display').textContent = u.role;
+  // (The standalone Map Viewer has no sidebar — these are null-safe so the shared persona code works here.)
+  const _sbSet = (id, fn) => { const e = document.getElementById(id); if (e) fn(e); };
+  _sbSet('sb-av-display',    e => { e.textContent = u.initials; e.style.background = u.color; });
+  _sbSet('sb-uname-display', e => e.textContent = u.name);
+  _sbSet('sb-urole-display', e => e.textContent = u.role);
 
   // ── Update topbar profile ──
   document.getElementById('topbar-av').textContent        = u.initials;
@@ -1662,7 +1866,7 @@ function switchUser(key) {
 
   // ── Admin-only sidebar section ──
   const adminGroup = document.getElementById('sb-admin-group');
-  adminGroup.style.display = u.isAdmin ? '' : 'none';
+  if (adminGroup) adminGroup.style.display = u.isAdmin ? '' : 'none';
 
   // ── Private Files: update notices, user picker, and self tab label ──
   const noticeAdmin  = document.getElementById('private-notice-admin');
@@ -1703,7 +1907,7 @@ function switchUser(key) {
     switchView('files');
   }
 
-  toast('Viewing as ' + u.name + ' (' + u.role + ')');
+  if (!opts.silent) toast('Viewing as ' + u.name + ' (' + u.role + ')');
 }
 
 function getCurrentView() {
@@ -2508,7 +2712,7 @@ function resetMvToolState(){
 /* ─── Presence (lightweight — a count/avatar cluster, not live cursors) ─── */
 function renderPresence(){
   const n = 1 + Math.floor(Math.random()*3); // 1-3 "other" viewers, demo only
-  const names = MV_PRESENCE_NAMES.slice(0, n);
+  const names = MV_PRESENCE_NAMES.filter(nm => nm !== currentUser.name).slice(0, n);
   document.getElementById('mv-presence-avatars').innerHTML = names.map(nm=>{
     const initials = nm.split(' ').map(p=>p[0]).join('');
     return `<span class="mv-presence-av" title="${nm}">${initials}</span>`;
@@ -2608,6 +2812,7 @@ function mvHandleMeasureClick(x, y){
 
 /* ─── Annotate / comment pins (Commenter-role capability; additive, not an edit to the source data) ─── */
 function toggleAnnotateMode(){
+  if(!mvAnnotateMode && !ceGuard('annotate')) return;
   mvAnnotateMode = !mvAnnotateMode;
   if(mvAnnotateMode && mvMeasureMode) toggleMeasureMode();
   refreshToolActiveStates();
@@ -3176,6 +3381,7 @@ function ctxAction(action) {
       else toast('Preview not available for this file type.');
       break;
     case 'download':
+      if (!ceGuard('download')) break;
       toast('Downloading ' + name + '…'); break;
     case 'rename':
       document.getElementById('rename-input').value = name;
@@ -3235,6 +3441,13 @@ renderTeams();
 
 document.querySelectorAll('.modal-bg').forEach(bg=>{
   bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');});
+});
+
+/* ─── Boot: adopt the persona the Hub signed in (default: Jane) ─── */
+document.addEventListener('DOMContentLoaded', function(){
+  let k = null; try { k = localStorage.getItem(PERSONA_KEY); } catch(e) {}
+  if (!k || !USERS[k]) k = 'admin';
+  switchUser(k, {silent:true});
 });
 </script>
 
