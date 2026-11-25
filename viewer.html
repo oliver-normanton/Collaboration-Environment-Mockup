@@ -976,6 +976,8 @@ body.ws-starter #public-warn{display:none !important}
 .fp.raster .fp-shape{fill-opacity:.05}
 .fp .fp-tile{fill:var(--c);fill-opacity:.08;stroke:var(--c);stroke-width:.8;stroke-opacity:.8}
 .fp .fp-merged{stroke-dasharray:5 3}
+.fp.linked .fp-shape{fill-opacity:0;stroke:var(--text-secondary);stroke-dasharray:2 3;stroke-width:1.5}
+.fp.linked:hover .fp-shape,.fp.linked.hl .fp-shape,.fp.linked.sel .fp-shape{fill-opacity:.06;fill:var(--text-secondary);stroke-width:2.5}
 .fp .fp-point{fill:var(--c);stroke:#fff;stroke-width:2}
 .fp .fp-badge{fill:var(--c);stroke:#fff;stroke-width:2}
 .fp .fp-badge-text{fill:#fff;font:600 10px 'DM Sans',sans-serif;text-anchor:middle;dominant-baseline:central;pointer-events:none}
@@ -1496,7 +1498,7 @@ body.ws-starter #public-warn{display:none !important}
       <option>My Files / Field Surveys 2025</option>
       <option>My Files / Basemaps</option>
       <option>My Files / Exports</option>
-      <option>ACME Corp files / Shared Data</option>
+      <option>Org library / Shared Data</option>
     </select>
 
     <div class="modal-label">Sharing</div>
@@ -1601,7 +1603,7 @@ body.ws-starter #public-warn{display:none !important}
     <select class="modal-select">
       <option>My Files /</option>
       <option>My Files / Field Surveys 2025</option>
-      <option>ACME Corp files /</option>
+      <option>Org library /</option>
     </select>
     <div class="modal-row">
       <button class="btn primary" onclick="createFolder()">Create folder</button>
@@ -1748,7 +1750,7 @@ function switchView(view){
     const btn=document.getElementById('sw-'+v);
     if(btn)btn.classList.toggle('active',v===view);
   });
-  const labels={'files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Settings','audit':'Audit Log','recent':'Recent','starred':'Starred','trash':'Trash','private':'Private Files','teams':'Teams','public':'ACME Corp Files'};
+  const labels={'files':'Files','shared':'Shared with me','myshared':'Shared by me','admin':'Storage Settings','audit':'Audit Log','recent':'Recent','starred':'Starred','trash':'Trash','private':'Private Files','teams':'Teams','public':'Org library'};
   document.getElementById('breadcrumb-current').textContent=labels[view]||'Files';
   document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
   const sideMap={'files':'si-myfiles','recent':'si-recent','starred':'si-starred','trash':'si-trash','shared':'si-shared','myshared':'si-myshared','admin':'si-storageadmin','audit':'si-audit','private':'si-private','teams':'si-teams','public':'si-public'};
@@ -2463,7 +2465,7 @@ function filterAuditLog(val){
 function selectFolder(id){
   document.querySelectorAll('.fb-tree-item').forEach(el=>el.classList.remove('active'));
   event.target.closest('.fb-tree-item').classList.add('active');
-  const labels={'root':'My Files','field-surveys':'Field Surveys 2025','basemaps':'Basemaps','exports':'Exports','org':'ACME Corp Files','shared-data':'Shared Data','archive':'Archive'};
+  const labels={'root':'My Files','field-surveys':'Field Surveys 2025','basemaps':'Basemaps','exports':'Exports','org':'Org library','shared-data':'Shared Data','archive':'Archive'};
   document.getElementById('fb-path-label').textContent=labels[id]||'My Files';
   toast('Opened folder');
 }
@@ -3643,13 +3645,16 @@ const FP_PROJECTS = {
     F('roads_2024.shp','Desktop work','NAD83 (EPSG:4269)',[-80.3,43.4,-79.1,44.5],{size:'210 MB',modified:'Jan 12, 2026',by:'Penny Purchaser'}),
     F('culvert_design.dwg','Desktop work',null,null,{size:'14 MB',reason:'No coordinate system assigned',fix:'Assign a CRS'}),
     F('drainage_study.pdf','Desktop work',null,null,{size:'9 MB',reason:'PDF is not georeferenced',fix:'Georeference in Global Mapper'}),
-    F('landowner_parcels.gpkg','Desktop work','NAD83 (EPSG:4269)',[-79.8,43.7,-79.5,44.0],{restricted:true})
+    F('landowner_parcels.gpkg','Desktop work','NAD83 (EPSG:4269)',[-79.8,43.7,-79.5,44.0],{restricted:true}),
+    F('acme_basemap_2026.tif','Linked from Org library','NAD83 / UTM 17N (EPSG:26917)',[-81.6,42.6,-77.8,45.6],{linked:true,size:'4.2 GB',modified:'Mar 4, 2026',by:'Penny Purchaser'}),
+    F('admin_boundaries_v3.gpkg','Linked from Org library','NAD83 (EPSG:4269)',[-82.2,42.2,-77.2,46.0],{linked:true,size:'88 MB',modified:'Feb 18, 2026',by:'Penny Purchaser'})
   ]},
   'national-topo': {files:[
     NTS('030M',43,-80), NTS('031D',44,-80), NTS('031E',45,-80),
     NTS('040P',43,-82), NTS('041A',44,-82), NTS('041H',45,-82),
     NTS('030N',43,-78), NTS('031C',44,-78), NTS('031F',45,-78),
-    F('sheet_index.csv','Map sheets',null,null,{size:'22 KB',reason:'No location columns found',fix:'Choose X/Y columns'})
+    F('sheet_index.csv','Map sheets',null,null,{size:'22 KB',reason:'No location columns found',fix:'Choose X/Y columns'}),
+    F('acme_basemap_2026.tif','Linked from Org library','NAD83 / UTM 17N (EPSG:26917)',[-81.6,42.6,-77.8,45.6],{linked:true,size:'4.2 GB',modified:'Mar 4, 2026',by:'Penny Purchaser'})
   ]},
   'gateway-arch': {files:[
     F('riverfront_flood_dem.tif','Basemaps','NAD83 / Missouri East (EPSG:26996)',[-90.25,38.55,-90.10,38.70],{size:'640 MB'}),
@@ -3661,7 +3666,8 @@ const FP_PROJECTS = {
     F('visitor_map.pdf','Maps','WGS 84 (EPSG:4326)',[-90.195,38.616,-90.178,38.632],{size:'22 MB'}),
     F('grounds_model.gmmp','Maps','NAD83 / UTM 15N (EPSG:26915)',[-90.196,38.615,-90.176,38.633],{size:'54 MB'}),
     F('utilities.dwg','CAD',null,null,{size:'18 MB',reason:'No coordinate system assigned',fix:'Assign a CRS'}),
-    F('maintenance_log.csv','Park data',null,null,{size:'64 KB',reason:'No location columns found',fix:'Choose X/Y columns'})
+    F('maintenance_log.csv','Park data',null,null,{size:'64 KB',reason:'No location columns found',fix:'Choose X/Y columns'}),
+    F('admin_boundaries_v3.gpkg','Linked from Org library','NAD83 (EPSG:4269)',[-95.8,35.9,-89.1,40.6],{linked:true,size:'88 MB',modified:'Feb 18, 2026',by:'Penny Purchaser'})
   ]},
   'colorado-maps': {files:[
     F('co_state_dem_10m.tif','Statewide','NAD83 / Colorado Central (EPSG:26954)',[-109.05,37.0,-102.04,41.0],{size:'18.6 GB'}),
@@ -3740,8 +3746,10 @@ function fpFrame(){
   if(r - l < 220){ l = 12; r = W.width - 12; }
   return {l, r, t, b, w:r-l, h:b-t, cx:(l+r)/2, cy:(t+b)/2, W:W.width, H:W.height};
 }
+function fpOwned(files){ return (files || fp.files).filter(f=>!f.linked); }
 function fpExtentLL(){
-  const bs = fp.files.filter(fpOnMap).map(f=>fpUnwrap(f.bbox));
+  let src = fp.files.filter(f=>fpOnMap(f) && !f.linked); if(!src.length) src = fp.files.filter(fpOnMap);
+  const bs = src.map(f=>fpUnwrap(f.bbox));
   return [Math.min(...bs.map(b=>b[0])), Math.min(...bs.map(b=>b[1])), Math.max(...bs.map(b=>b[2])), Math.max(...bs.map(b=>b[3]))];
 }
 function fpFitTo(ll, pad){
@@ -3768,11 +3776,11 @@ function fpRender(){
   const f = fpFrame();
   svg.setAttribute('viewBox', `0 0 ${f.W} ${f.H}`);
   const items = fp.files.filter(x=>fpOnMap(x) && fpVisible(x)).map(x=>({x, r:fpRect(x.bbox, f)}))
-    .sort((a,b)=>b.r.w*b.r.h - a.r.w*a.r.h); // big underneath, small on top so everything stays clickable
+    .sort((a,b)=>(b.x.linked?1:0)-(a.x.linked?1:0) || b.r.w*b.r.h - a.r.w*a.r.h); // library context, then big, underneath, small on top so everything stays clickable
   let out = '', label = '';
   for(const {x, r} of items){
     const meta = FP_EXT[x.ext] || FP_EXT.gpkg, c = fpColor(x);
-    const cls = 'fp ' + meta.cat + (fp.sel===x.id?' sel':'') + (fp.hl===x.id?' hl':'');
+    const cls = 'fp ' + meta.cat + (x.linked?' linked':'') + (fp.sel===x.id?' sel':'') + (fp.hl===x.id?' hl':'');
     const aria = `${x.name}, ${meta.type}`;
     let inner = '';
     if(x.tiles){
@@ -3853,6 +3861,7 @@ function fpShowPop(f){
       <div class="fp-pop-row"><span>Extent</span><span>${fpFmtLat(b[1])} to ${fpFmtLat(b[3])}, ${fpFmtLon(b[0])} to ${fpFmtLon(b[2])}</span></div>
       <div class="fp-pop-row"><span>Updated</span><span>${f.modified} by ${f.by}</span></div>
       ${f.note ? `<div class="fp-pop-note">${f.note}</div>` : ''}
+      ${f.linked ? `<div class="fp-pop-note">Linked from the Org library. Read-only in this project, and updates when the library copy changes.</div>` : ''}
     </div>
     <div class="fp-pop-actions">
       <button class="btn sm primary" onclick="fpOpenFile('${f.id}')">Open</button>
@@ -3915,7 +3924,7 @@ function fpRenderTree(){
   const folders = [...new Set(onMap.map(f=>f.folder))];
   let h = `<div class="fp-tree-head">
       <button class="mv-eye-btn ${allOn?'active':''}" onclick="fpToggle('all')" aria-pressed="${allOn}" aria-label="${allOn?'Hide':'Show'} all footprints">${allOn?FP_EYE:FP_EYE_OFF}</button>
-      <span class="fp-tree-title">Project files</span><span class="fp-count">${onMap.length} on the map</span>
+      <span class="fp-tree-title">Project files</span><span class="fp-count">${onMap.filter(f=>!f.linked).length} on the map</span>
     </div>`;
   for(const fo of folders){
     const files = onMap.filter(f=>f.folder===fo);
@@ -3931,7 +3940,7 @@ function fpRenderTree(){
         const small = !f.tiles && (Math.abs(fpUnwrap(f.bbox)[2]-f.bbox[0]) < 0.02);
         return `<div class="fp-file-row${v?'':' off'}${fp.sel===f.id?' sel':''}" data-id="${f.id}" onmouseenter="fpSetHl('${f.id}')" onmouseleave="fpSetHl(null)">
           <button class="mv-eye-btn ${v?'active':''}" onclick="fpToggle('${f.id}')" aria-pressed="${v}" aria-label="${v?'Hide':'Show'} ${f.name}">${v?FP_EYE:FP_EYE_OFF}</button>
-          <span class="fp-swatch${small?' pt':''}" style="--c:${fpColor(f)}"></span>
+          <span class="fp-swatch${small?' pt':''}" style="--c:${f.linked?'var(--text-secondary)':fpColor(f)}"></span>
           <button class="fp-file-name" onclick="fpSelect('${f.id}',{zoom:true})" title="Zoom to ${f.name}">${f.name}</button>
           ${f.tiles ? `<span class="fp-file-meta">${f.tiles.cols*f.tiles.rows} tiles</span>` : ''}
         </div>`;}).join('')}</div>
@@ -3966,8 +3975,9 @@ function fpRenderDetails(){
   const crsSet = [...new Set(onMap.map(f=>f.crs))];
   document.getElementById('mv-details-body').innerHTML = `
     <div class="fb-info-section" style="padding:0 14px">
-      <div class="fb-info-row"><span class="fb-info-key">Files</span><span class="fb-info-val">${fp.files.length}</span></div>
-      <div class="fb-info-row"><span class="fb-info-key">On the map</span><span class="fb-info-val">${onMap.length}</span></div>
+      <div class="fb-info-row"><span class="fb-info-key">Files</span><span class="fb-info-val">${fpOwned().length}</span></div>
+      <div class="fb-info-row"><span class="fb-info-key">On the map</span><span class="fb-info-val">${onMap.filter(f=>!f.linked).length}</span></div>
+      ${fp.files.some(f=>f.linked) ? `<div class="fb-info-row"><span class="fb-info-key">Linked from library</span><span class="fb-info-val">${fp.files.filter(f=>f.linked).length}</span></div>` : ''}
       <div class="fb-info-row"><span class="fb-info-key">Combined extent</span><span class="fb-info-val">${fpFmtLat(e[1])} to ${fpFmtLat(e[3])}, ${fpFmtLon(e[0])} to ${fpFmtLon(e[2])}</span></div>
       <div class="fb-info-row"><span class="fb-info-key">Source CRSs</span><span class="fb-info-val">${crsSet.length}, reprojected for display with GeoCalc</span></div>
     </div>`;
@@ -3978,7 +3988,8 @@ function fpRenderLegend(){
   document.getElementById('mv-legend-body').innerHTML =
     cats.map(c=>`<div class="mv-legend-row"><span class="mv-legend-polygon" style="border-color:${FP_CAT[c].color};background:${FP_CAT[c].color}1f"></span><span class="mv-legend-text">${FP_CAT[c].label}</span></div>`).join('') +
     (hasPts ? `<div class="mv-legend-row"><span class="mv-legend-point" style="background:var(--text-muted)"></span><span class="mv-legend-text">Extent too small to draw at this zoom</span></div>` : '') +
-    (hasTiles ? `<div class="mv-legend-row"><span class="mv-legend-polygon" style="border-style:dashed;border-color:var(--text-muted);background:none"></span><span class="mv-legend-text">Tile set, zoom in to see tiles</span></div>` : '');
+    (hasTiles ? `<div class="mv-legend-row"><span class="mv-legend-polygon" style="border-style:dashed;border-color:var(--text-muted);background:none"></span><span class="mv-legend-text">Tile set, zoom in to see tiles</span></div>` : '') +
+    (fp.files.some(f=>f.linked) ? `<div class="mv-legend-row"><span class="mv-legend-polygon" style="border-style:dotted;border-color:var(--text-secondary);background:none"></span><span class="mv-legend-text">Linked from the Org library</span></div>` : '');
   fpFitLeftPanel();
 }
 /* The footprint legend is taller than a single-file legend; keep the Layers panel clear of it. */
@@ -3995,8 +4006,8 @@ function fpEnter(pid, opts){
   if(!P) return;
   fp.on = true; fp.pid = pid; fp.files = P.files; fp.sel = null; fp.hl = null; fp.hidden.clear();
   fp.refLon = fpRefLon(P.files);
-  const onMap = fp.files.filter(fpOnMap).length;
-  document.getElementById('mv-file-type').textContent = `Project · ${fp.files.length} files · ${onMap} on the map`;
+  const own = fpOwned(), onMap = own.filter(fpOnMap).length, nLinked = fp.files.length - own.length;
+  document.getElementById('mv-file-type').textContent = `Project · ${own.length} files · ${onMap} on the map` + (nLinked ? ` · ${nLinked} linked from the library` : '');
   document.querySelector('.mv-left-panel').classList.add('fp-mode');
   document.querySelector('#view-mapviewer .mapviewer-wrap').classList.add('fp-on');
   const ai = document.getElementById('mv-ai-section'); if(ai) ai.classList.add('collapsed');
@@ -4038,7 +4049,7 @@ function fpRing(b){
 }
 function fpProjectCentre(pid){
   const ref = fpRefLon(FP_PROJECTS[pid].files);
-  const bs = FP_PROJECTS[pid].files.filter(fpOnMap).map(f=>fpUnwrap(f.bbox, ref));
+  const bs = FP_PROJECTS[pid].files.filter(f=>fpOnMap(f) && !f.linked).map(f=>fpUnwrap(f.bbox, ref));
   const e = [Math.min(...bs.map(b=>b[0])), Math.min(...bs.map(b=>b[1])), Math.max(...bs.map(b=>b[2])), Math.max(...bs.map(b=>b[3]))];
   let lon = (e[0]+e[2])/2; lon = ((lon+540)%360)-180;
   return [lon, (e[1]+e[3])/2];
@@ -4114,7 +4125,7 @@ function globeDraw(){
     if(centre && d3.geoDistance(c, centre) > Math.PI/2 - 0.08) continue; // far side of the globe
     const p = G.proj(c); if(!p) continue;
     const name = (PROJECT_DATA[pid] || {}).name || pid, cur = pid === fp.pid;
-    const n = FP_PROJECTS[pid].files.length;
+    const n = FP_PROJECTS[pid].files.filter(f=>!f.linked).length;
     ph += `<g class="g-proj${cur?' current':''}" data-pid="${pid}" tabindex="0" role="button" aria-label="${cur?'Fly in to':'Open'} ${name}">
       ${cur ? `<circle class="pulse" cx="${p[0]}" cy="${p[1]}" r="7"/>` : ''}
       <circle class="dot" cx="${p[0]}" cy="${p[1]}" r="${cur?7:5}"/>
@@ -4325,8 +4336,8 @@ document.addEventListener('DOMContentLoaded', function(){
         <option>My Files / Exports</option>
       </optgroup>
       <optgroup label="ACME Corp">
-        <option>ACME Corp files / Shared Data</option>
-        <option>ACME Corp files / Archive</option>
+        <option>Org library / Shared Data</option>
+        <option>Org library / Archive</option>
       </optgroup>
       <optgroup label="Teams">
         <option>Northern Survey Project</option>
