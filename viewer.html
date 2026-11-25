@@ -954,7 +954,134 @@ body.ws-starter .fb-grid{display:none}
 body.ws-starter .fb-tree-body > :not(:first-child){display:none}
 body.ws-starter #public-warn{display:none !important}
 .ws-empty-inline{grid-column:1/-1;padding:40px 16px;text-align:center;color:var(--text-muted);font-size:12.5px;border:1px dashed var(--border);border-radius:10px}
+
+/* ═══════════════════════════════════════════════════════════
+   PROJECT FOOTPRINTS + GLOBE ("Show on map" from a project card)
+   Draws every georeferenced file's extent, reprojected to the
+   display CRS. Footprint colour = data category, not file
+   extension, so the legend stays short. Tiny extents collapse to
+   a point; tile sets collapse to one outline with a count until
+   you zoom in far enough to tell tiles apart.
+   ═══════════════════════════════════════════════════════════ */
+.fb-icon.las{background:#fff7ed;color:#b45309}
+.fb-icon.shp{background:#e6f4f6;color:#0e7a8c}
+.fb-icon.dwg{background:#f1f5f9;color:#475569}
+
+#mv-fp-svg{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:none;transition:opacity .35s ease;touch-action:none}
+#mv-fp-svg.on{display:block}
+#mv-fp-svg.fading{opacity:0}
+#mv-fp-svg.panning{cursor:grabbing}
+.fp{cursor:pointer;outline:none}
+.fp .fp-shape{fill:var(--c);fill-opacity:.1;stroke:var(--c);stroke-width:1.5;transition:fill-opacity .12s,stroke-width .12s}
+.fp.raster .fp-shape{fill-opacity:.05}
+.fp .fp-tile{fill:var(--c);fill-opacity:.08;stroke:var(--c);stroke-width:.8;stroke-opacity:.8}
+.fp .fp-merged{stroke-dasharray:5 3}
+.fp .fp-point{fill:var(--c);stroke:#fff;stroke-width:2}
+.fp .fp-badge{fill:var(--c);stroke:#fff;stroke-width:2}
+.fp .fp-badge-text{fill:#fff;font:600 10px 'DM Sans',sans-serif;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.fp:hover .fp-shape,.fp.hl .fp-shape,.fp:focus-visible .fp-shape{fill-opacity:.22;stroke-width:2.5}
+.fp.raster:hover .fp-shape,.fp.raster.hl .fp-shape{fill-opacity:.12}
+.fp:hover .fp-point,.fp.hl .fp-point{stroke-width:3}
+.fp.sel .fp-shape{fill-opacity:.24;stroke-width:3}
+.fp .fp-halo{fill:none;stroke:#fff;stroke-width:6;stroke-opacity:.85;display:none}
+.fp.sel .fp-halo,.fp:focus-visible .fp-halo{display:block}
+.fp-label{font:600 11px 'DM Sans',sans-serif;fill:var(--text-primary);paint-order:stroke;stroke:#fff;stroke-width:3.5px;stroke-linejoin:round;pointer-events:none}
+.mapviewer-canvas[data-basemap="satellite"] .fp-label{fill:#fff;stroke:var(--avenza-navy)}
+.mapviewer-canvas[data-basemap="satellite"] .fp .fp-shape{fill-opacity:.18}
+.mapviewer-canvas[data-basemap="satellite"] .fp{filter:drop-shadow(0 0 1.2px rgba(255,255,255,.95))}
+
+/* Left panel in footprint mode: Layers takes the room Ask AI had */
+.mv-left-panel.fp-mode #mv-layers-section{flex:1 0 auto}
+#mv-fp-tree{padding:0 10px}
+.fp-show-btn{margin:0 14px;width:calc(100% - 28px)}
+.fp-tree-head,.fp-folder-row,.fp-file-row{display:flex;align-items:center;gap:6px;min-height:30px;border-radius:var(--radius-sm)}
+.fp-tree-head{padding:2px 4px;margin-bottom:2px}
+.fp-tree-head .fp-tree-title{font-size:12.5px;font-weight:600;color:var(--text-primary);flex:1}
+.fp-count{font-size:11px;color:var(--text-muted);white-space:nowrap}
+.fp-folder-row{padding:0 4px 0 0}
+.fp-caret{width:20px;height:24px;border:none;background:none;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:5px}
+.fp-caret svg{transition:transform .15s}
+.fp-folder.collapsed .fp-caret svg{transform:rotate(-90deg)}
+.fp-folder.collapsed .fp-files{display:none}
+.fp-folder-name{font-size:12px;font-weight:600;color:var(--text-secondary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fp-files{padding-left:20px}
+.fp-file-row{padding:0 4px 0 0}
+.fp-file-row:hover,.fp-file-row.hl{background:var(--surface-2)}
+.fp-file-row.sel{background:var(--avenza-blue-lt);box-shadow:inset 2px 0 0 var(--avenza-blue)}
+.fp-file-row.off .fp-file-name{color:var(--text-muted)}
+.fp-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0;background:var(--c);opacity:.85}
+.fp-swatch.pt{border-radius:50%}
+.fp-file-name{flex:1;min-width:0;border:none;background:none;text-align:left;cursor:pointer;font:500 12px 'DM Sans',sans-serif;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 0}
+.fp-file-name:focus-visible,.fp-caret:focus-visible,.mv-eye-btn:focus-visible{outline:2px solid var(--avenza-blue);outline-offset:1px}
+.fp-file-meta{font-size:10.5px;color:var(--text-muted);white-space:nowrap}
+.mv-eye-btn.partial{color:var(--text-muted)}
+
+.fp-off{margin:12px 4px 0;border-top:1px solid var(--border);padding-top:10px}
+.fp-off-head{font-size:12px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.fp-off-head .fp-off-n{font-size:10.5px;font-weight:600;color:var(--amber);background:var(--amber-lt);border-radius:999px;padding:0 7px}
+.fp-off-row{display:flex;gap:8px;padding:6px 0;align-items:flex-start}
+.fp-off-row .fb-icon{width:22px;height:22px;font-size:7px;border-radius:4px}
+.fp-off-name{font-size:12px;font-weight:500;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fp-off-reason{font-size:11px;color:var(--text-muted);line-height:1.4}
+.fp-off-fix{border:none;background:none;padding:0;font:600 11px 'DM Sans',sans-serif;color:var(--avenza-teal);cursor:pointer;margin-top:2px}
+.fp-off-fix:hover{text-decoration:underline}
+.fp-restricted{display:flex;gap:7px;align-items:flex-start;font-size:11px;color:var(--text-muted);line-height:1.4;margin:10px 4px 0;padding:8px 9px;background:var(--surface-2);border-radius:var(--radius-sm)}
+.fp-restricted svg{flex-shrink:0;margin-top:1px}
+
+/* Footprint popup */
+.fp-pop{position:absolute;z-index:18;width:292px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);display:none}
+.fp-pop.open{display:block}
+.fp-pop-head{display:flex;gap:10px;align-items:flex-start;padding:12px 12px 10px}
+.fp-pop-name{font-size:13px;font-weight:600;color:var(--text-primary);word-break:break-all;line-height:1.3}
+.fp-pop-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+.fp-pop-close{margin-left:auto;width:22px;height:22px;border:none;background:none;cursor:pointer;color:var(--text-muted);border-radius:5px;flex-shrink:0}
+.fp-pop-close:hover{background:var(--surface-2);color:var(--text-primary)}
+.fp-pop-rows{padding:0 12px 10px;border-bottom:1px solid var(--border)}
+.fp-pop-row{display:grid;grid-template-columns:62px 1fr;gap:8px;font-size:11.5px;padding:3px 0}
+.fp-pop-row span:first-child{color:var(--text-muted)}
+.fp-pop-row span:last-child{color:var(--text-primary)}
+.fp-pop-note{font-size:11px;color:var(--avenza-teal);background:var(--avenza-teal-lt);border-radius:var(--radius-sm);padding:5px 8px;margin-top:6px;line-height:1.4}
+.fp-pop-actions{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 12px}
+
+/* Globe button under zoom */
+.mv-zoom-btn.globe-btn{display:none;border-top:1px solid var(--border)}
+.mv-zoom-btn.globe-btn svg{display:block;margin:0 auto}
+.fp-on .mv-zoom-btn.globe-btn{display:block}
+.mv-zoom-btn.globe-btn.active{background:var(--avenza-blue);color:#fff}
+
+/* Globe */
+#mv-globe{position:absolute;inset:0;width:100%;height:100%;z-index:3;display:none;opacity:1;transition:opacity .4s ease;cursor:grab;touch-action:none;
+  background:radial-gradient(ellipse at 50% 45%,#3a4556 0%,#2b3340 55%,#20262f 100%)}
+#mv-globe.on{display:block}
+#mv-globe.fading{opacity:0}
+#mv-globe.dragging{cursor:grabbing}
+.g-sphere{fill:#3d4a5c;stroke:rgba(255,255,255,.18);stroke-width:1}
+.g-grat{fill:none;stroke:rgba(255,255,255,.09);stroke-width:.6}
+.g-land{fill:#dfe6ee;stroke:#c3ccd6;stroke-width:.4}
+.g-file{fill:var(--c);fill-opacity:.18;stroke:var(--c);stroke-width:1.2}
+.g-extent{fill:rgba(14,122,140,.16);stroke:#0e7a8c;stroke-width:1.6;stroke-dasharray:4 3}
+.g-proj{cursor:pointer}
+.g-proj circle.dot{fill:#98a2b3;stroke:#fff;stroke-width:1.5}
+.g-proj:hover circle.dot{fill:var(--avenza-teal)}
+.g-proj.current circle.dot{fill:var(--avenza-teal);stroke:#fff;stroke-width:2.5}
+.g-proj .pulse{fill:none;stroke:var(--avenza-teal);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:gpulse 1.8s ease-out infinite}
+@keyframes gpulse{from{transform:scale(1);opacity:.9}to{transform:scale(3.2);opacity:0}}
+.g-proj text{font:600 11.5px 'DM Sans',sans-serif;fill:var(--avenza-navy);paint-order:stroke;stroke:#fff;stroke-width:3.5px;stroke-linejoin:round}
+.g-proj:not(.current) text{font-weight:500;font-size:10.5px;fill:var(--text-secondary);opacity:0;transition:opacity .12s}
+.g-proj:not(.current):hover text,.g-proj:not(.current):focus-visible text{opacity:1}
+.g-hint{position:absolute;left:50%;transform:translateX(-50%);bottom:58px;z-index:4;display:none;font-size:11.5px;color:rgba(255,255,255,.75);background:rgba(32,38,47,.7);padding:5px 12px;border-radius:999px;pointer-events:none;white-space:nowrap}
+.fp-globe .g-hint{display:block}
+.fp-globe .mv-north-arrow{display:none}
+
+@media (prefers-reduced-motion: reduce){
+  .g-proj .pulse{animation:none;opacity:0}
+  #mv-fp-svg,#mv-globe{transition:none}
+}
 </style>
+<!-- Globe view for project footprints. Pinned versions; if they fail to load,
+     the footprint map still works without the globe. -->
+<script defer src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 </head>
 <body>
 
@@ -1091,6 +1218,9 @@ body.ws-starter #public-warn{display:none !important}
                 <g id="mv-measure-group"></g>
               </g>
             </svg>
+            <!-- Project footprints (2D) and globe; see PROJECT FOOTPRINTS + GLOBE in the script -->
+            <svg id="mv-fp-svg" aria-label="Project file footprints"></svg>
+            <svg id="mv-globe" aria-label="Globe showing this organisation's projects"></svg>
             <div class="mv-drop-overlay" id="mv-drop-overlay">
               <div class="mv-drop-overlay-text">Drop file to add to this view — CRS will be detected and reprojected automatically</div>
             </div>
@@ -1193,6 +1323,11 @@ body.ws-starter #public-warn{display:none !important}
                   <span class="mv-layer-swatch" id="mv-layer-swatch"></span>
                   <span class="mv-layer-name" id="mv-layer-name">q2_survey_results</span>
                 </div>
+                <button class="mv-tool-grid-btn fp-show-btn" id="fp-show-btn" style="display:none" onclick="fpShowFromProject()" title="Draw the extent of every file in this project">
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="7" y="7" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2 1.5"/></svg>
+                  Show file footprints
+                </button>
+                <div id="mv-fp-tree"></div>
               </div>
               <div class="mv-left-section">
                 <div class="mv-left-section-title-static">Data</div>
@@ -1241,10 +1376,16 @@ body.ws-starter #public-warn{display:none !important}
             <div id="mv-legend-body"></div>
           </div>
 
+          <div class="fp-pop" id="mv-fp-pop" role="dialog" aria-label="File footprint details"></div>
+          <div class="g-hint">Drag to rotate. Click a project, or press +, to fly in.</div>
+
           <!-- Zoom controls -->
           <div class="mapviewer-zoomctl">
             <button class="mv-zoom-btn" onclick="mvZoomStep(1)" aria-label="Zoom in">+</button>
             <button class="mv-zoom-btn" onclick="mvZoomStep(-1)" aria-label="Zoom out">−</button>
+            <button class="mv-zoom-btn globe-btn" id="fp-globe-btn" onclick="fpGlobeBtn()" aria-label="Zoom out to globe" title="Zoom out to globe">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M2 8h12M8 2c-1.8 1.7-2.7 3.8-2.7 6s.9 4.3 2.7 6c1.8-1.7 2.7-3.8 2.7-6S9.8 3.7 8 2z" stroke="currentColor" stroke-width="1.1"/></svg>
+            </button>
           </div>
 
           <!-- Scale + coordinates -->
@@ -3449,6 +3590,672 @@ document.addEventListener('DOMContentLoaded', function(){
   if (!k || !USERS[k]) k = 'admin';
   switchUser(k, {silent:true});
 });
+
+/* ═══════════════════════════════════════════════════════════
+   PROJECT FOOTPRINTS + GLOBE
+   Entry: a project card's "Show on map" → viewer.html?project=<id>&footprints=1
+   (globe intro, then fly in), or "Show file footprints" inside a project map.
+   Extents are stored as WGS84 bounding boxes, as if GeoCalc had read each
+   file's native CRS on upload and transformed its densified outline. The
+   map draws them in Web Mercator; the globe draws them on an orthographic
+   projection. All data below is illustrative.
+   ═══════════════════════════════════════════════════════════ */
+const FP_CAT = {
+  raster:    {label:'Raster',                color:'#7c3aed'},
+  vector:    {label:'Vector',                color:'#0e7a8c'},
+  pointcloud:{label:'Point cloud tiles',     color:'#b45309'},
+  map:       {label:'Map (GeoPDF)',          color:'#dc2626'},
+  project:   {label:'Global Mapper project', color:'#084888'}
+};
+const FP_EXT = {
+  tif: {icon:'tif', label:'TIF',  cat:'raster',     type:'GeoTIFF raster'},
+  gpkg:{icon:'gpkg',label:'GPKG', cat:'vector',     type:'GeoPackage'},
+  shp: {icon:'shp', label:'SHP',  cat:'vector',     type:'Shapefile'},
+  kml: {icon:'kml', label:'KML',  cat:'vector',     type:'KML'},
+  las: {icon:'las', label:'LAS',  cat:'pointcloud', type:'LAS point cloud'},
+  pdf: {icon:'pdf', label:'PDF',  cat:'map',        type:'GeoPDF'},
+  gmmp:{icon:'gm',  label:'GMMP', cat:'project',    type:'Global Mapper project'},
+  dwg: {icon:'dwg', label:'DWG',  cat:'vector',     type:'AutoCAD drawing'},
+  csv: {icon:'csv', label:'CSV',  cat:'vector',     type:'CSV'}
+};
+/* bbox = [west, south, east, north] in WGS84. west > east means it crosses 180°. */
+function F(name, folder, crs, bbox, o){
+  o = o || {};
+  const ext = name.split('.').pop().toLowerCase();
+  return Object.assign({id:name.replace(/[^a-z0-9]+/gi,'-').toLowerCase(), name, folder, crs, bbox, ext,
+    size:'—', modified:'Jun 2026', by:'Jane Doe'}, o);
+}
+function NTS(code, s, w){
+  return F('nts_250k_'+code+'.pdf','Map sheets','NAD83 (EPSG:4269)',[w,s,w+2,s+1],{size:'18 MB',modified:'Apr 2, 2026',by:'Penny Purchaser'});
+}
+const FP_PROJECTS = {
+  'northern-survey': {files:[
+    F('dem_mosaic_30m.tif','Basemaps','NAD83 / UTM 17N (EPSG:26917)',[-81.0,43.0,-78.5,45.0],{size:'1.2 GB',modified:'Jun 10, 2026',fileId:'dem-mosaic'}),
+    F('ortho_2025_north.tif','Basemaps','NAD83(CSRS) / UTM 17N (EPSG:2958)',[-79.9,44.1,-79.2,44.7],{size:'3.8 GB',modified:'May 28, 2026',by:'Penny Purchaser'}),
+    F('q2_survey_results.gpkg','Field Surveys 2025','WGS 84 (EPSG:4326)',[-80.0,43.6,-79.4,44.3],{size:'142 MB',modified:'Jun 15, 2026',fileId:'q2-survey'}),
+    F('waypoints_north_sector.kml','Field Surveys 2025','WGS 84 (EPSG:4326)',[-79.8,44.0,-79.35,44.6],{size:'2.1 MB',modified:'Jun 7, 2026',fileId:'waypoints'}),
+    F('site_boundaries_v2.gpkg','Field Surveys 2025','WGS 84 (EPSG:4326)',[-79.65,43.92,-79.61,43.95],{size:'6 MB',modified:'Today',by:'Mary Beth'}),
+    F('field_map_2025_06.pdf','Field Surveys 2025','WGS 84 (EPSG:4326)',[-79.9,43.65,-79.5,44.05],{size:'34 MB',modified:'Jun 9, 2026',by:'Mary Beth',fileId:'field-map'}),
+    F('benchmarks_2025.kml','Field Surveys 2025','WGS 84 (EPSG:4326)',[-79.715,43.842,-79.705,43.848],{size:'48 KB',modified:'Jun 3, 2026',by:'Alan Rickman'}),
+    F('photos_jun_2025.csv','Field Surveys 2025',null,null,{size:'120 KB',reason:'No location columns found',fix:'Choose X/Y columns'}),
+    F('lidar_2025.las','LiDAR 2025','NAD83(CSRS) / UTM 17N (EPSG:2958)',[-79.90,43.75,-79.80,43.804],{size:'61.4 GB',modified:'May 19, 2026',by:'Alan Rickman',tiles:{cols:8,rows:6}}),
+    F('terrain_analysis_v3.gmmp','Desktop work','NAD83 / UTM 17N (EPSG:26917)',[-80.0,43.5,-79.4,44.2],{size:'88 MB',modified:'Jun 14, 2026',fileId:'terrain-analysis'}),
+    F('roads_2024.shp','Desktop work','NAD83 (EPSG:4269)',[-80.3,43.4,-79.1,44.5],{size:'210 MB',modified:'Jan 12, 2026',by:'Penny Purchaser'}),
+    F('culvert_design.dwg','Desktop work',null,null,{size:'14 MB',reason:'No coordinate system assigned',fix:'Assign a CRS'}),
+    F('drainage_study.pdf','Desktop work',null,null,{size:'9 MB',reason:'PDF is not georeferenced',fix:'Georeference in Global Mapper'}),
+    F('landowner_parcels.gpkg','Desktop work','NAD83 (EPSG:4269)',[-79.8,43.7,-79.5,44.0],{restricted:true})
+  ]},
+  'national-topo': {files:[
+    NTS('030M',43,-80), NTS('031D',44,-80), NTS('031E',45,-80),
+    NTS('040P',43,-82), NTS('041A',44,-82), NTS('041H',45,-82),
+    NTS('030N',43,-78), NTS('031C',44,-78), NTS('031F',45,-78),
+    F('sheet_index.csv','Map sheets',null,null,{size:'22 KB',reason:'No location columns found',fix:'Choose X/Y columns'})
+  ]},
+  'gateway-arch': {files:[
+    F('riverfront_flood_dem.tif','Basemaps','NAD83 / Missouri East (EPSG:26996)',[-90.25,38.55,-90.10,38.70],{size:'640 MB'}),
+    F('arch_grounds_ortho_2025.tif','Basemaps','NAD83 / UTM 15N (EPSG:26915)',[-90.193,38.618,-90.180,38.630],{size:'2.1 GB'}),
+    F('park_boundary.gpkg','Park data','WGS 84 (EPSG:4326)',[-90.191,38.619,-90.182,38.629],{size:'3 MB'}),
+    F('trails.kml','Park data','WGS 84 (EPSG:4326)',[-90.190,38.620,-90.183,38.628],{size:'800 KB'}),
+    F('monument_survey_points.kml','Park data','WGS 84 (EPSG:4326)',[-90.1856,38.6244,-90.1846,38.6250],{size:'40 KB'}),
+    F('arch_lidar.las','LiDAR','NAD83 / UTM 15N (EPSG:26915)',[-90.192,38.619,-90.180,38.629],{size:'12.8 GB',tiles:{cols:4,rows:4}}),
+    F('visitor_map.pdf','Maps','WGS 84 (EPSG:4326)',[-90.195,38.616,-90.178,38.632],{size:'22 MB'}),
+    F('grounds_model.gmmp','Maps','NAD83 / UTM 15N (EPSG:26915)',[-90.196,38.615,-90.176,38.633],{size:'54 MB'}),
+    F('utilities.dwg','CAD',null,null,{size:'18 MB',reason:'No coordinate system assigned',fix:'Assign a CRS'}),
+    F('maintenance_log.csv','Park data',null,null,{size:'64 KB',reason:'No location columns found',fix:'Choose X/Y columns'})
+  ]},
+  'colorado-maps': {files:[
+    F('co_state_dem_10m.tif','Statewide','NAD83 / Colorado Central (EPSG:26954)',[-109.05,37.0,-102.04,41.0],{size:'18.6 GB'}),
+    F('counties.gpkg','Statewide','WGS 84 (EPSG:4326)',[-109.05,37.0,-102.04,41.0],{size:'31 MB'}),
+    F('hunting_units.pdf','Statewide','WGS 84 (EPSG:4326)',[-108.0,39.0,-105.0,40.5],{size:'46 MB'}),
+    F('rmnp_trails.kml','Front Range','WGS 84 (EPSG:4326)',[-105.95,40.15,-105.5,40.55],{size:'2.4 MB'}),
+    F('denver_ortho_2025.tif','Front Range','NAD83 / UTM 13N (EPSG:26913)',[-105.1,39.6,-104.8,39.9],{size:'5.2 GB'}),
+    F('boulder_quads.pdf','Front Range','NAD83 (EPSG:4269)',[-105.375,39.875,-105.125,40.125],{size:'60 MB'}),
+    F('fourteeners.kml','Statewide','WGS 84 (EPSG:4326)',[-107.1,37.5,-105.6,40.3],{size:'90 KB'}),
+    F('ski_area_lidar.las','Mountains','NAD83 / UTM 13N (EPSG:26913)',[-106.10,39.58,-106.02,39.64],{size:'9.1 GB',tiles:{cols:5,rows:4}}),
+    F('watersheds_analysis.gmmp','Statewide','NAD83 / UTM 13N (EPSG:26913)',[-108.5,38.0,-104.5,40.8],{size:'120 MB'}),
+    F('permits_2026.csv','Admin',null,null,{size:'210 KB',reason:'No location columns found',fix:'Choose X/Y columns'})
+  ]},
+  'morialta': {files:[
+    F('adelaide_hills_dem.tif','Basemaps','GDA2020 / MGA 54 (EPSG:7854)',[138.6,-35.1,138.9,-34.7],{size:'780 MB'}),
+    F('park_boundary.gpkg','Park data','GDA2020 (EPSG:7844)',[138.69,-34.92,138.75,-34.885],{size:'2 MB'}),
+    F('trail_map.pdf','Maps','GDA2020 (EPSG:7844)',[138.68,-34.925,138.76,-34.88],{size:'16 MB'}),
+    F('falls_survey.las','LiDAR','GDA2020 / MGA 54 (EPSG:7854)',[138.712,-34.905,138.727,-34.894],{size:'4.4 GB',tiles:{cols:3,rows:3}}),
+    F('weed_control_2025.kml','Park data','WGS 84 (EPSG:4326)',[138.70,-34.91,138.74,-34.89],{size:'1.1 MB'}),
+    F('fire_tracks.shp','Park data','GDA94 (EPSG:4283)',[138.69,-34.92,138.75,-34.886],{size:'5 MB'}),
+    F('ranger_notes.csv','Admin',null,null,{size:'30 KB',reason:'No location columns found',fix:'Choose X/Y columns'})
+  ]},
+  'basemap-ref': {files:[
+    F('na_admin_boundaries.gpkg','Reference','WGS 84 (EPSG:4326)',[-168,15,-52,72],{size:'420 MB'}),
+    F('us_states.shp','Reference','NAD83 (EPSG:4269)',[-125,24.5,-66.9,49.4],{size:'28 MB'}),
+    F('canada_provinces.gpkg','Reference','NAD83(CSRS) (EPSG:4617)',[-141,41.7,-52.6,72],{size:'96 MB'}),
+    F('mexico_states.gpkg','Reference','ITRF2008 (EPSG:6365)',[-118.4,14.5,-86.7,32.7],{size:'40 MB'}),
+    F('alaska_aleutians.gpkg','Reference','NAD83 / Alaska Albers (EPSG:3338)',[172.4,51.2,-129.9,71.4],{size:'64 MB',note:'Crosses the 180° meridian. Drawn as one footprint, not two strips at the map edges.'}),
+    F('great_lakes_shoreline.gpkg','Hydro','NAD83 (EPSG:4269)',[-92.2,41.3,-76.0,49.0],{size:'52 MB'}),
+    F('hudson_bay_bathymetry.tif','Hydro','WGS 84 (EPSG:4326)',[-95,51,-77,64],{size:'1.6 GB'}),
+    F('na_dem_1km.tif','Basemaps','WGS 84 (EPSG:4326)',[-170,7,-50,72],{size:'7.9 GB'}),
+    F('us_highways.shp','Transport','NAD83 (EPSG:4269)',[-124.2,25.1,-67.0,49.0],{size:'140 MB'}),
+    F('na_major_cities.kml','Reference','WGS 84 (EPSG:4326)',[-150,19,-71,61.2],{size:'300 KB'}),
+    F('reference_readme.pdf','Reference',null,null,{size:'1 MB',reason:'PDF is not georeferenced',fix:'Georeference in Global Mapper'})
+  ]}
+};
+
+/* ─── Projection helpers (Web Mercator for the map) ─── */
+const FP_R = 6378137;
+function fpMerc(lon, lat){
+  const p = Math.max(-85, Math.min(85, lat)) * Math.PI/180;
+  return [FP_R*lon*Math.PI/180, FP_R*Math.log(Math.tan(Math.PI/4 + p/2))];
+}
+function fpInvMerc(x, y){
+  return [x/FP_R*180/Math.PI, (2*Math.atan(Math.exp(y/FP_R)) - Math.PI/2)*180/Math.PI];
+}
+/* Unwrap an antimeridian-crossing bbox so east > west, shifting it to whichever
+   side of 180° keeps it next to the rest of the project's data. */
+function fpUnwrap(b, ref){
+  if(b[0] <= b[2]) return b;
+  ref = ref == null ? (fp.refLon || 0) : ref;
+  const east = [b[0], b[1], b[2]+360, b[3]], west = [b[0]-360, b[1], b[2], b[3]];
+  const d = x => Math.abs((x[0]+x[2])/2 - ref);
+  return d(west) < d(east) ? west : east;
+}
+function fpRefLon(files){
+  const c = files.filter(f=>f.bbox && f.bbox[0] <= f.bbox[2]).map(f=>(f.bbox[0]+f.bbox[2])/2).sort((a,b)=>a-b);
+  return c.length ? c[Math.floor(c.length/2)] : 0;
+}
+function fpOnMap(f){ return f.bbox && !f.restricted; }
+function fpFmtLat(v){ return Math.abs(v).toFixed(v%1===0?0:2)+'°'+(v<0?'S':'N'); }
+function fpFmtLon(v){ v = ((v+540)%360)-180; return Math.abs(v).toFixed(v%1===0?0:2)+'°'+(v<0?'W':'E'); }
+
+const fp = {on:false, pid:null, files:[], view:null, fit:null, hidden:new Set(), sel:null, hl:null, globe:false, introTimer:null};
+const fpReduced = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* The visible map area between the floating panels — fits and the globe centre here. */
+function fpFrame(){
+  const wrap = document.querySelector('#view-mapviewer .mapviewer-wrap');
+  const W = wrap.getBoundingClientRect();
+  let l = 0, r = W.width, t = 0, b = W.height - 60;
+  const lp = document.querySelector('.mv-left-panel'), tp = document.querySelector('.mv-tools-panel'), tb = document.querySelector('.mapviewer-topbar');
+  if(lp && lp.offsetWidth) l = lp.getBoundingClientRect().right - W.left + 12;
+  if(tp && tp.offsetWidth && getComputedStyle(tp).display !== 'none') r = tp.getBoundingClientRect().left - W.left - 12;
+  if(tb) t = tb.getBoundingClientRect().bottom - W.top + 12;
+  if(r - l < 220){ l = 12; r = W.width - 12; }
+  return {l, r, t, b, w:r-l, h:b-t, cx:(l+r)/2, cy:(t+b)/2, W:W.width, H:W.height};
+}
+function fpExtentLL(){
+  const bs = fp.files.filter(fpOnMap).map(f=>fpUnwrap(f.bbox));
+  return [Math.min(...bs.map(b=>b[0])), Math.min(...bs.map(b=>b[1])), Math.max(...bs.map(b=>b[2])), Math.max(...bs.map(b=>b[3]))];
+}
+function fpFitTo(ll, pad){
+  const f = fpFrame();
+  const a = fpMerc(ll[0], ll[1]), b = fpMerc(ll[2], ll[3]);
+  const w = Math.max(b[0]-a[0], 1), h = Math.max(b[1]-a[1], 1);
+  const k = Math.min(f.w/w, f.h/h) * (pad || 0.86);
+  return {cx:(a[0]+b[0])/2, cy:(a[1]+b[1])/2, k:Math.min(k, 2.5)}; // cap ≈ 0.4 m/px
+}
+function fpToScreen(mx, my, f){ const v = fp.view; return [f.cx + (mx - v.cx)*v.k, f.cy - (my - v.cy)*v.k]; }
+function fpRect(b, f){
+  b = fpUnwrap(b);
+  const p0 = fpToScreen(...fpMerc(b[0], b[1]), f), p1 = fpToScreen(...fpMerc(b[2], b[3]), f);
+  return {x:p0[0], y:p1[1], w:p1[0]-p0[0], h:p0[1]-p1[1]};
+}
+function fpVisible(f){ return !fp.hidden.has(f.id) && !fp.hidden.has('folder:'+f.folder) && !fp.hidden.has('all'); }
+function fpFile(id){ return fp.files.find(f=>f.id===id); }
+function fpColor(f){ return FP_CAT[(FP_EXT[f.ext]||FP_EXT.gpkg).cat].color; }
+
+/* ─── Map rendering ─── */
+function fpRender(){
+  const svg = document.getElementById('mv-fp-svg');
+  if(!fp.on || fp.globe){ svg.innerHTML = ''; return; }
+  const f = fpFrame();
+  svg.setAttribute('viewBox', `0 0 ${f.W} ${f.H}`);
+  const items = fp.files.filter(x=>fpOnMap(x) && fpVisible(x)).map(x=>({x, r:fpRect(x.bbox, f)}))
+    .sort((a,b)=>b.r.w*b.r.h - a.r.w*a.r.h); // big underneath, small on top so everything stays clickable
+  let out = '', label = '';
+  for(const {x, r} of items){
+    const meta = FP_EXT[x.ext] || FP_EXT.gpkg, c = fpColor(x);
+    const cls = 'fp ' + meta.cat + (fp.sel===x.id?' sel':'') + (fp.hl===x.id?' hl':'');
+    const aria = `${x.name}, ${meta.type}`;
+    let inner = '';
+    if(x.tiles){
+      const tw = r.w / x.tiles.cols, th = r.h / x.tiles.rows;
+      const n = x.tiles.cols * x.tiles.rows;
+      if(tw < 14 || th < 14){
+        // Too small to tell tiles apart: one outline + count
+        const bw = Math.max(r.w, 14), bh = Math.max(r.h, 14), bx = r.x + r.w/2 - bw/2, by = r.y + r.h/2 - bh/2;
+        inner = `<rect class="fp-halo" x="${bx}" y="${by}" width="${bw}" height="${bh}"/><rect class="fp-shape fp-merged" x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="2"/>
+          <circle class="fp-badge" cx="${bx+bw}" cy="${by}" r="10"/><text class="fp-badge-text" x="${bx+bw}" y="${by}">${n}</text>`;
+      } else {
+        inner = `<rect class="fp-halo" x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}"/><rect class="fp-shape" x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" style="fill-opacity:.03"/>`;
+        for(let i=0;i<x.tiles.cols;i++) for(let j=0;j<x.tiles.rows;j++)
+          inner += `<rect class="fp-tile" x="${r.x+i*tw}" y="${r.y+j*th}" width="${tw}" height="${th}"/>`;
+      }
+    } else if(r.w < 10 && r.h < 10){
+      // Extent smaller than a few pixels: draw as a point so it doesn't vanish
+      inner = `<circle class="fp-halo" cx="${r.x+r.w/2}" cy="${r.y+r.h/2}" r="9"/><circle class="fp-point" cx="${r.x+r.w/2}" cy="${r.y+r.h/2}" r="6"/>`;
+    } else {
+      inner = `<rect class="fp-halo" x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}"/><rect class="fp-shape" x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}"/>`;
+    }
+    out += `<g class="${cls}" data-id="${x.id}" style="--c:${c}" tabindex="0" role="button" aria-label="${aria}">${inner}</g>`;
+    if(fp.sel === x.id){
+      const ly = Math.max(r.y - 8, f.t + 12);
+      label = `<text class="fp-label" x="${r.x + Math.max(0, Math.min(r.w, 1e4))/2}" y="${ly}" text-anchor="middle">${x.name}</text>`;
+    }
+  }
+  svg.innerHTML = out + label;
+  fpScaleLabel();
+}
+function fpScaleLabel(){
+  const el = document.getElementById('mv-scale-label');
+  if(!el) return;
+  if(fp.globe){ el.textContent = 'Globe'; return; }
+  const lat = fpInvMerc(fp.view.cx, fp.view.cy)[1];
+  const m = 30 * Math.cos(lat*Math.PI/180) / fp.view.k; // scale bar is 30px
+  el.textContent = m >= 1000 ? (m/1000 >= 10 ? Math.round(m/1000) : (m/1000).toFixed(1)) + ' km' : Math.round(m) + ' m';
+}
+
+/* ─── Selection, highlight, popup ─── */
+function fpSelect(id, opts){
+  opts = opts || {};
+  const f = fpFile(id);
+  if(!f) return;
+  fp.sel = id;
+  if(fp.hidden.has(id) || fp.hidden.has('folder:'+f.folder) || fp.hidden.has('all')){
+    fp.hidden.delete(id); fp.hidden.delete('folder:'+f.folder); fp.hidden.delete('all');
+  }
+  if(fp.globe){ fpFlyIn(id); return; }
+  if(opts.zoom) fpAnimateView(fpFitTo(fpUnwrap(f.bbox), 0.6), ()=>fpShowPop(f));
+  else { fpRender(); fpShowPop(f); }
+  fpRenderTree();
+}
+function fpDeselect(){
+  fp.sel = null; fpHidePop(); fpRender(); fpRenderTree();
+}
+function fpSetHl(id){
+  if(fp.hl === id) return;
+  fp.hl = id;
+  document.querySelectorAll('#mv-fp-svg .fp').forEach(g=>g.classList.toggle('hl', g.dataset.id===id));
+  document.querySelectorAll('.fp-file-row').forEach(r=>r.classList.toggle('hl', r.dataset.id===id));
+}
+function fpShowPop(f){
+  const pop = document.getElementById('mv-fp-pop');
+  const g = document.querySelector(`#mv-fp-svg .fp[data-id="${f.id}"]`);
+  if(!g){ pop.classList.remove('open'); return; }
+  const meta = FP_EXT[f.ext] || FP_EXT.gpkg;
+  const b = f.bbox;
+  pop.innerHTML = `
+    <div class="fp-pop-head">
+      <div class="fb-icon ${meta.icon}">${meta.label}</div>
+      <div style="min-width:0"><div class="fp-pop-name">${f.name}</div><div class="fp-pop-sub">${meta.type}${f.tiles?` · ${f.tiles.cols*f.tiles.rows} tiles`:''} · ${f.size}</div></div>
+      <button class="fp-pop-close" onclick="fpDeselect()" aria-label="Close">✕</button>
+    </div>
+    <div class="fp-pop-rows">
+      <div class="fp-pop-row"><span>Folder</span><span>${f.folder}</span></div>
+      <div class="fp-pop-row"><span>Native CRS</span><span>${f.crs}</span></div>
+      <div class="fp-pop-row"><span>Extent</span><span>${fpFmtLat(b[1])} to ${fpFmtLat(b[3])}, ${fpFmtLon(b[0])} to ${fpFmtLon(b[2])}</span></div>
+      <div class="fp-pop-row"><span>Updated</span><span>${f.modified} by ${f.by}</span></div>
+      ${f.note ? `<div class="fp-pop-note">${f.note}</div>` : ''}
+    </div>
+    <div class="fp-pop-actions">
+      <button class="btn sm primary" onclick="fpOpenFile('${f.id}')">Open</button>
+      <button class="btn sm" onclick="toast('Opening ${f.name} in Global Mapper…')">Open in Global Mapper</button>
+      <button class="btn sm" onclick="toast('${f.name} sent to Avenza Maps for project members.')">Send to Avenza Maps</button>
+    </div>`;
+  const wrap = document.querySelector('#view-mapviewer .mapviewer-wrap').getBoundingClientRect();
+  const gr = g.getBoundingClientRect(), fr = fpFrame();
+  pop.classList.add('open');
+  const pw = pop.offsetWidth, ph = pop.offsetHeight;
+  let x = gr.right - wrap.left + 12, y = gr.top - wrap.top;
+  if(x + pw > fr.r) x = gr.left - wrap.left - pw - 12;          // flip to the left
+  if(x < fr.l){ x = fr.r - pw; y = fr.t; }                        // footprint fills the view: dock top-right
+  y = Math.max(fr.t, Math.min(fr.b - ph, y));
+  pop.style.left = x + 'px'; pop.style.top = y + 'px';
+}
+function fpHidePop(){ const p = document.getElementById('mv-fp-pop'); if(p) p.classList.remove('open'); }
+function fpOpenFile(id){
+  const f = fpFile(id);
+  if(f && f.fileId && FILE_DATA[f.fileId]) { openMapViewer(f.fileId); return; }
+  toast('Opening ' + (f ? f.name : 'file') + ' in the map viewer…');
+}
+
+/* ─── View animation (2D) ─── */
+function fpAnimateView(to, done){
+  const from = Object.assign({}, fp.view);
+  if(fpReduced()){ fp.view = to; fpRender(); done && done(); return; }
+  const t0 = performance.now(), dur = 450;
+  fpHidePop();
+  const step = now => {
+    const t = Math.min(1, (now - t0)/dur), e = t<.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+    fp.view = {cx:from.cx + (to.cx-from.cx)*e, cy:from.cy + (to.cy-from.cy)*e, k:Math.exp(Math.log(from.k) + (Math.log(to.k)-Math.log(from.k))*e)};
+    fpRender();
+    if(t < 1) requestAnimationFrame(step); else { done && done(); }
+  };
+  requestAnimationFrame(step);
+}
+function fpZoomBy(factor, ax, ay){
+  const f = fpFrame(), v = fp.view;
+  ax = ax == null ? f.cx : ax; ay = ay == null ? f.cy : ay;
+  const mx = v.cx + (ax - f.cx)/v.k, my = v.cy - (ay - f.cy)/v.k;
+  const k = Math.min(v.k*factor, 2.5);
+  if(k < fp.fit.k * 0.3){ fpEnterGlobe(); return; } // zoom out far enough and you're on the globe
+  fp.view = {k, cx: mx - (ax - f.cx)/k, cy: my + (ay - f.cy)/k};
+  fpHidePop(); fpRender();
+}
+
+/* ─── Layers panel ─── */
+const FP_EYE = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-4.5 7-4.5S15 8 15 8s-2.5 4.5-7 4.5S1 8 1 8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.8" stroke="currentColor" stroke-width="1.3"/></svg>';
+const FP_EYE_OFF = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-4.5 7-4.5S15 8 15 8s-2.5 4.5-7 4.5S1 8 1 8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2.5 13.5l11-11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
+const FP_CARET = '<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const fpCollapsed = new Set();
+
+function fpRenderTree(){
+  const el = document.getElementById('mv-fp-tree');
+  if(!el) return;
+  if(!fp.on){ el.innerHTML = ''; return; }
+  const onMap = fp.files.filter(fpOnMap), off = fp.files.filter(f=>!f.bbox && !f.restricted), restricted = fp.files.filter(f=>f.restricted);
+  const allOn = !fp.hidden.has('all');
+  const folders = [...new Set(onMap.map(f=>f.folder))];
+  let h = `<div class="fp-tree-head">
+      <button class="mv-eye-btn ${allOn?'active':''}" onclick="fpToggle('all')" aria-pressed="${allOn}" aria-label="${allOn?'Hide':'Show'} all footprints">${allOn?FP_EYE:FP_EYE_OFF}</button>
+      <span class="fp-tree-title">Project files</span><span class="fp-count">${onMap.length} on the map</span>
+    </div>`;
+  for(const fo of folders){
+    const files = onMap.filter(f=>f.folder===fo);
+    const key = 'folder:'+fo, on = allOn && !fp.hidden.has(key);
+    h += `<div class="fp-folder${fpCollapsed.has(fo)?' collapsed':''}">
+      <div class="fp-folder-row">
+        <button class="fp-caret" onclick="fpToggleFolder(${JSON.stringify(fo).replace(/"/g,'&quot;')})" aria-expanded="${!fpCollapsed.has(fo)}" aria-label="Expand ${fo}">${FP_CARET}</button>
+        <button class="mv-eye-btn ${on?'active':''}" onclick="fpToggle(${JSON.stringify(key).replace(/"/g,'&quot;')})" aria-pressed="${on}" aria-label="${on?'Hide':'Show'} ${fo}">${on?FP_EYE:FP_EYE_OFF}</button>
+        <span class="fp-folder-name">${fo}</span><span class="fp-count">${files.length}</span>
+      </div>
+      <div class="fp-files">${files.map(f=>{
+        const v = on && !fp.hidden.has(f.id);
+        const small = !f.tiles && (Math.abs(fpUnwrap(f.bbox)[2]-f.bbox[0]) < 0.02);
+        return `<div class="fp-file-row${v?'':' off'}${fp.sel===f.id?' sel':''}" data-id="${f.id}" onmouseenter="fpSetHl('${f.id}')" onmouseleave="fpSetHl(null)">
+          <button class="mv-eye-btn ${v?'active':''}" onclick="fpToggle('${f.id}')" aria-pressed="${v}" aria-label="${v?'Hide':'Show'} ${f.name}">${v?FP_EYE:FP_EYE_OFF}</button>
+          <span class="fp-swatch${small?' pt':''}" style="--c:${fpColor(f)}"></span>
+          <button class="fp-file-name" onclick="fpSelect('${f.id}',{zoom:true})" title="Zoom to ${f.name}">${f.name}</button>
+          ${f.tiles ? `<span class="fp-file-meta">${f.tiles.cols*f.tiles.rows} tiles</span>` : ''}
+        </div>`;}).join('')}</div>
+    </div>`;
+  }
+  if(off.length){
+    h += `<div class="fp-off"><div class="fp-off-head">Not on the map <span class="fp-off-n">${off.length}</span></div>
+      ${off.map(f=>{ const m = FP_EXT[f.ext] || FP_EXT.csv; return `<div class="fp-off-row">
+        <div class="fb-icon ${m.icon}">${m.label}</div>
+        <div style="min-width:0"><div class="fp-off-name">${f.name}</div><div class="fp-off-reason">${f.reason}</div>
+        <button class="fp-off-fix" onclick="toast('${f.fix}: opens the fix-up flow (not in this mockup).')">${f.fix}</button></div>
+      </div>`;}).join('')}</div>`;
+  }
+  if(restricted.length){
+    h += `<div class="fp-restricted"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="3.5" y="7" width="9" height="7" rx="1.2" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.3"/></svg>
+      <span>${restricted.length} ${restricted.length===1?'file is':'files are'} hidden because you don't have access. Footprints follow file permissions.</span></div>`;
+  }
+  el.innerHTML = h;
+}
+function fpToggle(key){
+  if(key === 'all' && fp.hidden.has('all')) fp.hidden.delete('all');
+  else if(key !== 'all' && fp.hidden.has('all')){ fp.hidden.delete('all'); fp.hidden.add(key); }
+  else if(fp.hidden.has(key)) fp.hidden.delete(key); else fp.hidden.add(key);
+  if(fp.sel && !fpVisible(fpFile(fp.sel))){ fp.sel = null; fpHidePop(); }
+  fpRenderTree();
+  if(fp.globe) globeDraw(); else fpRender();
+}
+function fpToggleFolder(fo){ fpCollapsed.has(fo) ? fpCollapsed.delete(fo) : fpCollapsed.add(fo); fpRenderTree(); }
+
+function fpRenderDetails(){
+  const onMap = fp.files.filter(fpOnMap), e = fpExtentLL();
+  const crsSet = [...new Set(onMap.map(f=>f.crs))];
+  document.getElementById('mv-details-body').innerHTML = `
+    <div class="fb-info-section" style="padding:0 14px">
+      <div class="fb-info-row"><span class="fb-info-key">Files</span><span class="fb-info-val">${fp.files.length}</span></div>
+      <div class="fb-info-row"><span class="fb-info-key">On the map</span><span class="fb-info-val">${onMap.length}</span></div>
+      <div class="fb-info-row"><span class="fb-info-key">Combined extent</span><span class="fb-info-val">${fpFmtLat(e[1])} to ${fpFmtLat(e[3])}, ${fpFmtLon(e[0])} to ${fpFmtLon(e[2])}</span></div>
+      <div class="fb-info-row"><span class="fb-info-key">Source CRSs</span><span class="fb-info-val">${crsSet.length}, reprojected for display with GeoCalc</span></div>
+    </div>`;
+}
+function fpRenderLegend(){
+  const cats = [...new Set(fp.files.filter(fpOnMap).map(f=>(FP_EXT[f.ext]||FP_EXT.gpkg).cat))];
+  const hasPts = fp.files.some(f=>fpOnMap(f) && !f.tiles && Math.abs(f.bbox[2]-f.bbox[0]) < 0.05), hasTiles = fp.files.some(f=>f.tiles);
+  document.getElementById('mv-legend-body').innerHTML =
+    cats.map(c=>`<div class="mv-legend-row"><span class="mv-legend-polygon" style="border-color:${FP_CAT[c].color};background:${FP_CAT[c].color}1f"></span><span class="mv-legend-text">${FP_CAT[c].label}</span></div>`).join('') +
+    (hasPts ? `<div class="mv-legend-row"><span class="mv-legend-point" style="background:var(--text-muted)"></span><span class="mv-legend-text">Extent too small to draw at this zoom</span></div>` : '') +
+    (hasTiles ? `<div class="mv-legend-row"><span class="mv-legend-polygon" style="border-style:dashed;border-color:var(--text-muted);background:none"></span><span class="mv-legend-text">Tile set, zoom in to see tiles</span></div>` : '');
+  fpFitLeftPanel();
+}
+/* The footprint legend is taller than a single-file legend; keep the Layers panel clear of it. */
+function fpFitLeftPanel(){
+  const lp = document.querySelector('.mv-left-panel'), lg = document.getElementById('mv-legend');
+  if(!lp) return;
+  lp.style.bottom = (fp.on && lg && lg.offsetHeight) ? (lg.offsetHeight + 26) + 'px' : '';
+}
+
+/* ─── Enter / exit footprint mode ─── */
+function fpEnter(pid, opts){
+  opts = opts || {};
+  const P = FP_PROJECTS[pid];
+  if(!P) return;
+  fp.on = true; fp.pid = pid; fp.files = P.files; fp.sel = null; fp.hl = null; fp.hidden.clear();
+  fp.refLon = fpRefLon(P.files);
+  const onMap = fp.files.filter(fpOnMap).length;
+  document.getElementById('mv-file-type').textContent = `Project · ${fp.files.length} files · ${onMap} on the map`;
+  document.querySelector('.mv-left-panel').classList.add('fp-mode');
+  document.querySelector('#view-mapviewer .mapviewer-wrap').classList.add('fp-on');
+  const ai = document.getElementById('mv-ai-section'); if(ai) ai.classList.add('collapsed');
+  const btn = document.getElementById('fp-show-btn'); if(btn) btn.style.display = 'none';
+  document.getElementById('mv-fp-svg').classList.add('on');
+  fpRenderTree(); fpRenderDetails(); fpRenderLegend();
+  fp.fit = fpFitTo(fpExtentLL()); fp.view = Object.assign({}, fp.fit);
+  if(opts.intro && globeReady() && !fpReduced()) fpIntro();
+  else fpRender();
+}
+function fpExit(){
+  if(!fp.on) return;
+  fp.on = false; fp.globe = false; clearTimeout(fp.introTimer);
+  fpHidePop();
+  const svg = document.getElementById('mv-fp-svg'); svg.innerHTML = ''; svg.classList.remove('on','fading');
+  const g = document.getElementById('mv-globe'); g.classList.remove('on','fading');
+  const wrap = document.querySelector('#view-mapviewer .mapviewer-wrap'); wrap.classList.remove('fp-on','fp-globe');
+  document.querySelector('.mv-left-panel').classList.remove('fp-mode');
+  fpFitLeftPanel();
+  fpRenderTree();
+  const btn = document.getElementById('fp-show-btn'); if(btn) btn.style.display = 'none';
+}
+function fpShowFromProject(){ if(currentProjectId) fpEnter(currentProjectId); }
+
+/* ═══ GLOBE ═══ */
+let G = null;
+function globeReady(){ return !!(window.d3 && d3.geoOrthographic); }
+function globeBase(){ const f = fpFrame(); return Math.min(f.w, f.h) * 0.42; }
+function globeScaleFor(view){ const lat = fpInvMerc(view.cx, view.cy)[1]; return view.k * FP_R / Math.cos(lat*Math.PI/180); }
+function fpRing(b){
+  b = fpUnwrap(b);
+  const [w,s,e,n] = b, pts = [], steps = Math.max(2, Math.ceil(Math.max(e-w, n-s)/2));
+  // clockwise (d3's spherical convention), densified so edges follow parallels
+  for(let i=0;i<=steps;i++) pts.push([w, s+(n-s)*i/steps]);
+  for(let i=1;i<=steps;i++) pts.push([w+(e-w)*i/steps, n]);
+  for(let i=1;i<=steps;i++) pts.push([e, n-(n-s)*i/steps]);
+  for(let i=1;i<=steps;i++) pts.push([e-(e-w)*i/steps, s]);
+  return {type:'Polygon', coordinates:[pts]};
+}
+function fpProjectCentre(pid){
+  const ref = fpRefLon(FP_PROJECTS[pid].files);
+  const bs = FP_PROJECTS[pid].files.filter(fpOnMap).map(f=>fpUnwrap(f.bbox, ref));
+  const e = [Math.min(...bs.map(b=>b[0])), Math.min(...bs.map(b=>b[1])), Math.max(...bs.map(b=>b[2])), Math.max(...bs.map(b=>b[3]))];
+  let lon = (e[0]+e[2])/2; lon = ((lon+540)%360)-180;
+  return [lon, (e[1]+e[3])/2];
+}
+function globeInit(){
+  if(G) return G;
+  const svg = document.getElementById('mv-globe');
+  svg.innerHTML = '<path class="g-sphere"/><path class="g-grat"/><path class="g-land"/><g class="g-files"></g><g class="g-projs"></g>';
+  const proj = d3.geoOrthographic().clipAngle(90).precision(0.4);
+  G = {svg, proj, path:d3.geoPath(proj), grat:d3.geoGraticule10(), land:null, raf:0};
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/land-110m.json').then(r=>r.json()).then(t=>{
+    if(window.topojson){ G.land = topojson.feature(t, t.objects.land); globeDraw(); }
+  }).catch(()=>{ /* no coastlines offline: sphere + graticule still work */ });
+
+  // Drag to rotate, wheel to zoom; zooming in far enough flies into the map
+  let drag = null;
+  svg.addEventListener('pointerdown', e=>{
+    if(!fp.globe) return;
+    clearTimeout(fp.introTimer); cancelAnimationFrame(G.raf);
+    drag = {x:e.clientX, y:e.clientY, r:G.proj.rotate(), moved:false};
+    svg.classList.add('dragging');
+  });
+  window.addEventListener('pointermove', e=>{
+    if(!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if(Math.abs(dx) + Math.abs(dy) > 3) drag.moved = true;
+    const k = 60 / G.proj.scale() * 1.5;
+    G.proj.rotate([drag.r[0] + dx*k*57.3/60, Math.max(-85, Math.min(85, drag.r[1] - dy*k*57.3/60)), 0]);
+    globeDraw();
+  });
+  window.addEventListener('pointerup', e=>{
+    if(!drag) return;
+    const moved = drag.moved; drag = null; svg.classList.remove('dragging');
+    if(moved) return;
+    const t = e.target.closest && e.target.closest('.g-proj');
+    if(t) globePickProject(t.dataset.pid);
+  });
+  svg.addEventListener('wheel', e=>{
+    if(!fp.globe) return;
+    e.preventDefault(); clearTimeout(fp.introTimer);
+    const s = Math.max(globeBase()*0.6, G.proj.scale() * Math.exp(-e.deltaY*0.0015));
+    G.proj.scale(s); globeDraw();
+    if(s > globeBase() * 3.2) fpFlyIn();
+  }, {passive:false});
+  svg.addEventListener('keydown', e=>{
+    const t = e.target.closest && e.target.closest('.g-proj');
+    if(t && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); globePickProject(t.dataset.pid); }
+  });
+  return G;
+}
+function globePickProject(pid){
+  if(pid === fp.pid){ fpFlyIn(); return; }
+  window.location.href = 'viewer.html?project=' + encodeURIComponent(pid) + '&footprints=1';
+}
+function globeDraw(){
+  if(!G) return;
+  const f = fpFrame();
+  G.svg.setAttribute('viewBox', `0 0 ${f.W} ${f.H}`);
+  G.proj.translate([f.cx, f.cy]);
+  G.svg.querySelector('.g-sphere').setAttribute('d', G.path({type:'Sphere'}));
+  G.svg.querySelector('.g-grat').setAttribute('d', G.path(G.grat));
+  G.svg.querySelector('.g-land').setAttribute('d', G.land ? G.path(G.land) : '');
+  // Footprints big enough to see from orbit
+  const files = fp.files.filter(x=>fpOnMap(x) && fpVisible(x));
+  G.svg.querySelector('.g-files').innerHTML =
+    `<path class="g-extent" d="${G.path(fpRing(fpExtentLL()))||''}"/>` +
+    files.map(x=>`<path class="g-file" style="--c:${fpColor(x)}" d="${G.path(fpRing(x.bbox))||''}"/>`).join('');
+  // Every project in the org as a marker; the current one is labelled
+  const centre = G.proj.invert([f.cx, f.cy]);
+  let ph = '';
+  for(const pid of Object.keys(FP_PROJECTS)){
+    const c = fpProjectCentre(pid);
+    if(centre && d3.geoDistance(c, centre) > Math.PI/2 - 0.08) continue; // far side of the globe
+    const p = G.proj(c); if(!p) continue;
+    const name = (PROJECT_DATA[pid] || {}).name || pid, cur = pid === fp.pid;
+    const n = FP_PROJECTS[pid].files.length;
+    ph += `<g class="g-proj${cur?' current':''}" data-pid="${pid}" tabindex="0" role="button" aria-label="${cur?'Fly in to':'Open'} ${name}">
+      ${cur ? `<circle class="pulse" cx="${p[0]}" cy="${p[1]}" r="7"/>` : ''}
+      <circle class="dot" cx="${p[0]}" cy="${p[1]}" r="${cur?7:5}"/>
+      <text x="${p[0]+12}" y="${p[1]+4}">${name}${cur?` · ${n} files`:''}</text>
+    </g>`;
+  }
+  G.svg.querySelector('.g-projs').innerHTML = ph;
+}
+/* Rotate + zoom together. Rotation follows the great circle between centres. */
+function globeAnimate(toCentre, toScale, dur, done){
+  cancelAnimationFrame(G.raf);
+  const r = G.proj.rotate(), fromCentre = [-r[0], -r[1]], s0 = G.proj.scale();
+  if(fpReduced() || dur === 0){ G.proj.rotate([-toCentre[0], -toCentre[1], 0]).scale(toScale); globeDraw(); done && done(); return; }
+  const ip = d3.geoInterpolate(fromCentre, toCentre), t0 = performance.now();
+  const step = now => {
+    const t = Math.min(1, (now - t0)/dur), e = d3.easeCubicInOut(t), c = ip(e);
+    G.proj.rotate([-c[0], -c[1], 0]).scale(Math.exp(Math.log(s0) + (Math.log(toScale) - Math.log(s0))*e));
+    globeDraw();
+    if(t < 1) G.raf = requestAnimationFrame(step); else done && done();
+  };
+  G.raf = requestAnimationFrame(step);
+}
+function fpShowGlobe(){
+  fp.globe = true; fpHidePop();
+  document.querySelector('#view-mapviewer .mapviewer-wrap').classList.add('fp-globe');
+  const g = document.getElementById('mv-globe'); g.classList.remove('fading'); g.classList.add('on');
+  document.getElementById('mv-fp-svg').classList.add('fading');
+  document.getElementById('fp-globe-btn').classList.add('active');
+  fpScaleLabel();
+}
+function fpEnterGlobe(){
+  if(!globeReady()){ toast('Globe view needs the map library, which didn’t load.'); return; }
+  globeInit();
+  const ll = fpInvMerc(fp.view.cx, fp.view.cy);
+  G.proj.rotate([-ll[0], -ll[1], 0]).scale(Math.min(globeScaleFor(fp.view), globeBase()*40));
+  fpShowGlobe(); globeDraw();
+  globeAnimate(ll, globeBase(), 1000);
+}
+function fpIntro(){
+  globeInit();
+  const c = fpProjectCentre(fp.pid);
+  G.proj.rotate([-(c[0] - 80), -(c[1]*0.2), 0]).scale(globeBase());
+  fpShowGlobe(); globeDraw();
+  globeAnimate(c, globeBase(), 1600, ()=>{ fp.introTimer = setTimeout(()=>fpFlyIn(), 700); });
+}
+/* Fly from the globe into the 2D map, ending exactly on the fitted view (or a file). */
+function fpFlyIn(fileId){
+  if(!fp.globe) return;
+  clearTimeout(fp.introTimer);
+  const f = fileId ? fpFile(fileId) : null;
+  const target = f ? fpFitTo(fpUnwrap(f.bbox), 0.6) : fp.fit;
+  const ll = fpInvMerc(target.cx, target.cy);
+  globeAnimate(ll, Math.min(globeScaleFor(target), globeBase()*400), 1300, ()=>{
+    fp.view = Object.assign({}, target); fp.globe = false;
+    document.querySelector('#view-mapviewer .mapviewer-wrap').classList.remove('fp-globe');
+    document.getElementById('fp-globe-btn').classList.remove('active');
+    fpRender();
+    document.getElementById('mv-fp-svg').classList.remove('fading');
+    document.getElementById('mv-globe').classList.add('fading');
+    setTimeout(()=>{ if(!fp.globe) document.getElementById('mv-globe').classList.remove('on'); }, 420);
+    if(f) fpShowPop(f);
+  });
+}
+function fpGlobeBtn(){ if(!fp.on) return; fp.globe ? fpFlyIn() : fpEnterGlobe(); }
+
+/* ─── Wiring: zoom buttons, coords, panning, clicks, resize ─── */
+const _fpOrigZoomStep = mvZoomStep;
+mvZoomStep = function(dir){
+  if(!fp.on) return _fpOrigZoomStep(dir);
+  if(fp.globe){
+    if(dir > 0) fpFlyIn();
+    else { const s = Math.max(globeBase()*0.6, G.proj.scale()/1.3); G.proj.scale(s); globeDraw(); }
+    return;
+  }
+  fpZoomBy(dir > 0 ? 1.6 : 1/1.6);
+};
+const _fpOrigCoords = updateCoordsDisplay;
+updateCoordsDisplay = function(px, py, rect){
+  if(!fp.on) return _fpOrigCoords(px, py, rect);
+  const el = document.getElementById('mv-coords'); if(!el) return;
+  let ll;
+  if(fp.globe){ ll = G && G.proj.invert([px, py]); if(!ll || isNaN(ll[0])){ el.textContent = 'Off the globe'; return; } }
+  else { const f = fpFrame(), v = fp.view; ll = fpInvMerc(v.cx + (px - f.cx)/v.k, v.cy - (py - f.cy)/v.k); }
+  el.textContent = Math.abs(ll[1]).toFixed(4)+'° '+(ll[1]<0?'S':'N')+', '+Math.abs(((ll[0]+540)%360)-180).toFixed(4)+'° '+((((ll[0]+540)%360)-180)<0?'W':'E');
+};
+const _fpOrigOpenMapViewer = openMapViewer;
+openMapViewer = function(id){ fpExit(); return _fpOrigOpenMapViewer(id); };
+const _fpOrigOpenProjectMap = openProjectMap;
+openProjectMap = function(pid){
+  fpExit();
+  _fpOrigOpenProjectMap(pid);
+  const btn = document.getElementById('fp-show-btn');
+  if(btn) btn.style.display = FP_PROJECTS[pid] ? '' : 'none';
+};
+
+document.addEventListener('DOMContentLoaded', function(){
+  const svg = document.getElementById('mv-fp-svg');
+  let pan = null, suppressClick = false;
+  svg.addEventListener('pointerdown', e=>{
+    if(!fp.on || fp.globe || mvMeasureMode || mvAnnotateMode || e.button !== 0) return;
+    pan = {x:e.clientX, y:e.clientY, v:Object.assign({}, fp.view), moved:false};
+  });
+  window.addEventListener('pointermove', e=>{
+    if(!pan) return;
+    const dx = e.clientX - pan.x, dy = e.clientY - pan.y;
+    if(!pan.moved && Math.abs(dx) + Math.abs(dy) < 4) return;
+    if(!pan.moved){ pan.moved = true; svg.classList.add('panning'); fpHidePop(); }
+    fp.view = {k:pan.v.k, cx:pan.v.cx - dx/pan.v.k, cy:pan.v.cy + dy/pan.v.k};
+    fpRender();
+  });
+  window.addEventListener('pointerup', ()=>{
+    if(!pan) return;
+    suppressClick = pan.moved; pan = null; svg.classList.remove('panning');
+    if(suppressClick && fp.sel){ const f = fpFile(fp.sel); if(f) fpShowPop(f); }
+  });
+  svg.addEventListener('click', e=>{
+    if(suppressClick){ suppressClick = false; e.stopPropagation(); return; }
+    if(mvMeasureMode || mvAnnotateMode) return; // let the canvas tools handle it
+    const g = e.target.closest('.fp');
+    if(g) fpSelect(g.dataset.id); else if(fp.sel) fpDeselect();
+  });
+  svg.addEventListener('keydown', e=>{
+    const g = e.target.closest('.fp');
+    if(g && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); fpSelect(g.dataset.id); }
+  });
+  svg.addEventListener('mouseover', e=>{ const g = e.target.closest('.fp'); fpSetHl(g ? g.dataset.id : null); });
+  svg.addEventListener('mouseleave', ()=>fpSetHl(null));
+  svg.addEventListener('wheel', e=>{
+    if(!fp.on || fp.globe) return;
+    e.preventDefault();
+    const r = svg.getBoundingClientRect();
+    fpZoomBy(Math.exp(-e.deltaY*0.0018), e.clientX - r.left, e.clientY - r.top);
+  }, {passive:false});
+  document.addEventListener('keydown', e=>{ if(e.key === 'Escape' && fp.sel) fpDeselect(); });
+  let rt; window.addEventListener('resize', ()=>{ clearTimeout(rt); rt = setTimeout(()=>{ if(!fp.on) return; fp.globe ? globeDraw() : fpRender(); fpHidePop(); }, 80); });
+
+  const params = new URLSearchParams(window.location.search);
+  const pid = params.get('project');
+  if(pid && params.get('footprints') && FP_PROJECTS[pid] && currentProjectId === pid) fpEnter(pid, {intro:true});
+});
+
 </script>
 
 <!-- FILE CONTEXT MENU (singleton, repositioned by JS) -->

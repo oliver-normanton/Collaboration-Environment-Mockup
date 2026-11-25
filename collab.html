@@ -354,6 +354,11 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 .dash-pcard-star:hover{background:#fff}
 .dash-pcard-star svg{width:14px;height:14px}
 .dash-pcard-star.starred{background:#fff}
+/* "Show on map": opens the project's file footprints, starting from the globe */
+.dash-pcard-map{position:absolute;left:8px;bottom:8px;display:flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:7px;border:1px solid var(--border);background:rgba(255,255,255,.94);font:600 11.5px 'DM Sans',sans-serif;color:var(--avenza-blue-dk);cursor:pointer;transition:background .1s,border-color .1s}
+.dash-pcard-map:hover{background:#fff;border-color:var(--avenza-blue)}
+.dash-pcard-map:focus-visible{outline:2px solid var(--avenza-blue);outline-offset:1px}
+.dash-pcard-thumb .dash-pcard-map svg{opacity:1}
 .dash-pcard-body{padding:12px 14px 14px}
 .dash-pcard-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
 .dash-pcard-title{font-size:13.5px;font-weight:600;color:var(--text-primary);line-height:1.3}
@@ -3788,7 +3793,7 @@ const PROJECTS_PREVIEW = [
   {id:'colorado-maps',   name:'Colorado Maps',               starred:false, updated:'35 mins ago', docs:10, comments:4},
   {id:'morialta',        name:'Morialta Conservation Park',  starred:false, updated:'1 hour ago',  docs:7,  comments:2},
   {id:'northern-survey', name:'Northern Survey Project',     starred:false, updated:'2 hours ago', docs:14, comments:6},
-  {id:'basemap-ref',     name:'Basemap & Reference Layers',  starred:false, updated:'Yesterday',   docs:22, comments:1},
+  {id:'basemap-ref',     name:'Basemap & Reference Layers',  starred:false, updated:'Yesterday',   docs:11, comments:1},
 ];
 const ACTIVITY_FEED = [
   {user:'mary',  text:'uploaded <b>q2_survey_results.gpkg</b>', time:'Just now'},
@@ -3808,6 +3813,10 @@ function renderProjectsPreview(){
         <svg width="36" height="36" viewBox="0 0 16 16" fill="none"><path d="M2 4l4-1.4 4 1.4 4-1.4v9.4l-4 1.4-4-1.4-4 1.4V4z" stroke="#98a2b3" stroke-width="1.1" stroke-linejoin="round"/><path d="M6 2.8v9.4M10 4.2v9.4" stroke="#98a2b3" stroke-width="1.1"/></svg>
         <button class="dash-pcard-star${p.starred?' starred':''}" onclick="event.stopPropagation();toggleDashStar(${i})" title="${p.starred?'Unstar':'Star'}">
           <svg viewBox="0 0 16 16" fill="${p.starred?'#fec84b':'none'}"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="${p.starred?'#fec84b':'#98a2b3'}" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="dash-pcard-map" onclick="event.stopPropagation();window.location.href='viewer.html?project=${encodeURIComponent(p.id)}&footprints=1'" title="See where every file in this project sits">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M2 8h12M8 2c-1.8 1.7-2.7 3.8-2.7 6s.9 4.3 2.7 6c1.8-1.7 2.7-3.8 2.7-6S9.8 3.7 8 2z" stroke="currentColor" stroke-width="1.1"/></svg>
+          Show on map
         </button>
       </div>
       <div class="dash-pcard-body">
