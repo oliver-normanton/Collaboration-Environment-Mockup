@@ -4684,6 +4684,10 @@ function openMapViewer(id){
     toast('Preview not available for this file type.');
     return;
   }
+  // One map for the whole product: the dedicated viewer (viewer.html). The older
+  // in-page map below is no longer reached.
+  window.location.href = 'viewer.html?file=' + encodeURIComponent(id);
+  return;
   _mvFileId = id;
   const activePage = document.querySelector('.page.active');
   _mvReturnView = activePage ? activePage.id.replace('view-','') : 'files';

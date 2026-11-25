@@ -710,7 +710,8 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 .mapviewer-topbar-file{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
 .mapviewer-file-name{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mapviewer-file-type{font-size:11px;color:var(--text-muted)}
-.mapviewer-topbar-actions{display:flex;gap:8px;flex-shrink:0}
+.mapviewer-topbar-actions{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.mapviewer-topbar{flex-wrap:wrap}
 
 .mapviewer-panel{
   position:absolute;z-index:15;background:var(--surface);border:1px solid var(--border);
@@ -720,7 +721,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
    leave room for the floating Legend (bottom-left) and CRS bar/zoom controls
    (bottom-right) — same clearance on both sides for a symmetric layout. */
 .mv-left-panel{
-  top:66px;bottom:150px;left:14px;width:264px;
+  top:var(--mv-top,66px);bottom:var(--mv-left-bottom,150px);left:14px;width:264px;
   display:flex;flex-direction:column;overflow:hidden;
 }
 .mv-left-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column}
@@ -765,7 +766,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 .mv-ai-input-row input:focus{outline:2px solid var(--avenza-blue-lt);outline-offset:-1px;border-color:var(--avenza-blue)}
 
 .mv-tools-panel{
-  top:66px;bottom:150px;right:14px;width:252px;
+  top:var(--mv-top,66px);bottom:var(--mv-right-bottom,150px);right:14px;width:252px;
   display:flex;flex-direction:column;overflow:hidden;
 }
 .mv-tools-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column}
@@ -851,12 +852,40 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 .mv-legend-ramp{width:16px;height:10px;border-radius:2px;flex-shrink:0;background:linear-gradient(90deg,#166534,#d97706,#f5f3ff)}
 
 .mapviewer-zoomctl{
-  position:absolute;bottom:54px;right:14px;z-index:15;
+  position:absolute;bottom:var(--mv-zoom-bottom,54px);right:14px;z-index:15;
   display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius-md);box-shadow:var(--shadow-md);overflow:hidden;
 }
 .mv-zoom-btn{width:34px;height:32px;border:none;background:none;cursor:pointer;font-size:16px;color:var(--text-secondary);line-height:1;font-family:'DM Sans',sans-serif}
 .mv-zoom-btn:first-child{border-bottom:1px solid var(--border)}
+/* Left-panel action buttons: inset like the rest of the panel content */
+.mv-panel-action{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 28px);margin:0 14px 14px;padding:9px 10px;
+  border:1px dashed var(--border-2,#cbd5e1);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;
+  font:500 12.5px 'DM Sans',sans-serif;color:var(--text-secondary);transition:border-color .1s,color .1s,background .1s}
+.mv-panel-action:hover{border-color:var(--avenza-blue);color:var(--avenza-blue);background:var(--avenza-blue-lt)}
+.mv-panel-action:focus-visible{outline:2px solid var(--avenza-blue);outline-offset:1px}
+#mv-details-body{padding-bottom:12px}
+#mv-details-body > *:not([style*="padding"]){padding-left:14px;padding-right:14px}
+
+/* Add data dialog */
+.ad-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin:4px 0 14px}
+.ad-tab{border:none;background:none;padding:8px 10px;font:500 12.5px 'DM Sans',sans-serif;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.ad-tab.active{color:var(--text-primary);border-bottom-color:var(--avenza-blue)}
+.ad-tab:focus-visible{outline:2px solid var(--avenza-blue);outline-offset:-2px}
+.ad-list{max-height:300px;overflow-y:auto;margin-top:10px;border:1px solid var(--border);border-radius:var(--radius-sm)}
+.ad-group{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;padding:10px 12px 6px;background:var(--surface-2);position:sticky;top:0}
+.ad-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--surface-3)}
+.ad-item .fb-icon{width:26px;height:26px;font-size:7.5px;flex-shrink:0}
+.ad-name{font-size:12.5px;font-weight:500;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ad-meta{font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ad-item > div:not(.fb-icon){flex:1;min-width:0}
+.ad-on{font-size:11px;color:var(--green);font-weight:600;white-space:nowrap}
+.ad-empty{padding:16px 12px;font-size:12px;color:var(--text-muted)}
+.ad-note{font-size:11.5px;color:var(--text-muted);margin-top:8px}
+.ad-keep{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.ad-keep label{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--text-secondary);cursor:pointer}
+.ad-keep label span small{display:block;font-size:11px;color:var(--text-muted)}
+.fp.session .fp-shape{fill:var(--amber);fill-opacity:.08;stroke:var(--amber);stroke-dasharray:4 3}
 .mv-zoom-btn:hover{background:var(--surface-2);color:var(--avenza-blue)}
 
 .mapviewer-statusbar{
@@ -880,7 +909,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 .mv-presence-label{font-size:11px;color:var(--text-secondary);white-space:nowrap}
 
 .mv-crs-bar{
-  position:absolute;bottom:46px;right:14px;z-index:15;
+  position:absolute;bottom:var(--mv-crs-bottom,46px);right:var(--mv-crs-right,14px);z-index:15;
   display:flex;align-items:center;gap:7px;
   background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
   padding:5px 8px;font-size:10.5px;color:var(--text-secondary);box-shadow:var(--shadow-sm);
@@ -896,7 +925,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 }
 
 .mv-north-arrow{
-  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:14;
+  position:absolute;bottom:var(--mv-north-bottom,14px);right:var(--mv-north-right,auto);z-index:14;
   width:30px;height:30px;background:var(--surface);border:1px solid var(--border);border-radius:50%;
   display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);
 }
@@ -907,7 +936,7 @@ th.sort-desc .sort-icon .desc-arrow{color:var(--avenza-blue)}
 .mv-pin-num{fill:#fff;font-size:9px;font-weight:700;font-family:'DM Sans',sans-serif;text-anchor:middle}
 
 .mv-annotations-panel{
-  position:absolute;top:66px;right:14px;width:236px;max-height:calc(100% - 130px);
+  position:absolute;top:var(--mv-top,66px);right:14px;width:236px;max-height:calc(100% - var(--mv-top,66px) - var(--mv-right-bottom,64px));
   display:none;flex-direction:column;overflow:hidden;
 }
 .mv-annotations-panel.open{display:flex}
@@ -995,7 +1024,7 @@ body.ws-starter #public-warn{display:none !important}
 /* Left panel in footprint mode: Layers takes the room Ask AI had */
 .mv-left-panel.fp-mode #mv-layers-section{flex:1 0 auto}
 #mv-fp-tree{padding:0 10px}
-.fp-show-btn{margin:0 14px;width:calc(100% - 28px)}
+.fp-show-btn{margin-top:0}
 .fp-tree-head,.fp-folder-row,.fp-file-row{display:flex;align-items:center;gap:6px;min-height:30px;border-radius:var(--radius-sm)}
 .fp-tree-head{padding:2px 4px;margin-bottom:2px}
 .fp-tree-head .fp-tree-title{font-size:12.5px;font-weight:600;color:var(--text-primary);flex:1}
@@ -1325,7 +1354,7 @@ body.ws-starter #public-warn{display:none !important}
                   <span class="mv-layer-swatch" id="mv-layer-swatch"></span>
                   <span class="mv-layer-name" id="mv-layer-name">q2_survey_results</span>
                 </div>
-                <button class="mv-tool-grid-btn fp-show-btn" id="fp-show-btn" style="display:none" onclick="fpShowFromProject()" title="Draw the extent of every file in this project">
+                <button class="mv-panel-action fp-show-btn" id="fp-show-btn" style="display:none" onclick="fpShowFromProject()" title="Draw the extent of every file in this project">
                   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="7" y="7" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2 1.5"/></svg>
                   Show file footprints
                 </button>
@@ -1333,7 +1362,7 @@ body.ws-starter #public-warn{display:none !important}
               </div>
               <div class="mv-left-section">
                 <div class="mv-left-section-title-static">Data</div>
-                <button class="mv-tool-grid-btn" id="mv-adddata-btn" style="width:100%" onclick="triggerAddData()" title="Drag a file onto the map, or click to browse">
+                <button class="mv-panel-action" id="mv-adddata-btn" onclick="triggerAddData()" title="Add a layer from Relay or your computer. You can also drag a file onto the map.">
                   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                   Add data
                 </button>
@@ -1680,6 +1709,38 @@ body.ws-starter #public-warn{display:none !important}
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+
+<!-- ADD DATA: from Relay (My files, Org library) or from the computer -->
+<div class="modal-bg" id="modal-adddata" onclick="if(event.target===this)closeModal('modal-adddata')">
+  <div class="modal" style="width:520px;max-width:calc(100vw - 32px)" role="dialog" aria-labelledby="ad-title">
+    <div class="modal-title" id="ad-title">Add data to this map</div>
+    <div class="modal-sub" id="ad-sub">Layers are reprojected to the map's coordinate system with GeoCalc.</div>
+    <div class="ad-tabs" role="tablist">
+      <button class="ad-tab active" role="tab" id="ad-tab-relay" aria-selected="true" onclick="adTab('relay')">From Relay</button>
+      <button class="ad-tab" role="tab" id="ad-tab-upload" aria-selected="false" onclick="adTab('upload')">From your computer</button>
+    </div>
+    <div id="ad-pane-relay">
+      <div class="fb-search"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="var(--text-muted)" stroke-width="1.4"/><path d="M10.5 10.5L13 13" stroke="var(--text-muted)" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <input id="ad-search" placeholder="Search My files and the Org library" oninput="adRender()" style="border:none;background:none;outline:none;font-size:12.5px;flex:1;font-family:'DM Sans',sans-serif;color:var(--text-primary)"></div>
+      <div class="ad-list" id="ad-list"></div>
+      <div class="ad-note">Only map data is listed. Documents such as Word files can't be added as layers.</div>
+    </div>
+    <div id="ad-pane-upload" style="display:none">
+      <label class="upload-zone" for="ad-file" style="display:block;cursor:pointer"
+        ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"
+        ondrop="event.preventDefault();this.classList.remove('drag-over');adUploadPicked(event.dataTransfer.files)">
+        <div class="upload-zone-title">Drag files here, or click to browse</div>
+        <div class="upload-zone-sub">GeoPackage, GeoTIFF, KML, shapefile (.zip), GeoPDF, LAS, CSV with coordinates, and more</div>
+      </label>
+      <input type="file" id="ad-file" multiple style="display:none" onchange="adUploadPicked(this.files);this.value=''">
+      <div class="ad-keep" role="radiogroup" aria-label="Keep the uploaded data">
+        <label><input type="radio" name="ad-keep" value="session" checked><span>Just for this session<small>Shown on this map until you close it. Nothing is stored.</small></span></label>
+        <label><input type="radio" name="ad-keep" value="save"><span id="ad-save-label">Save to My files<small>Stored in Relay, so it's there next time.</small></span></label>
+      </div>
+    </div>
+    <div class="modal-row" style="justify-content:flex-end"><button class="btn" onclick="closeModal('modal-adddata')">Done</button></div>
+  </div>
+</div>
 <script>
 /* ─── TOAST ─── */
 function toast(msg){
@@ -2480,6 +2541,12 @@ const FILE_DATA={
   'field-map':{name:'field_map_2025_06.pdf',type:'GeoPDF',modified:'Jun 9, 2026',size:'34 MB',sharing:'Private',icon:'pdf',crs:'EPSG:4326',bbox:'43.6°N–44.1°N, 79.5°W–79.9°W'},
   'waypoints':{name:'waypoints_north_sector.kml',type:'KML',modified:'Jun 7, 2026',size:'2.1 MB',sharing:'Org only',icon:'kml',crs:'EPSG:4326',bbox:'44.0°N–44.8°N, 79.3°W–79.8°W'},
   'metadata-export':{name:'metadata_export_jun2026.csv',type:'CSV',modified:'Jun 5, 2026',size:'840 KB',sharing:'Private',icon:'csv',crs:null,bbox:null},
+  // Personal files from My files (collab.html opens maps here)
+  'my-client-extract':{name:'client_extract_q2.gpkg',type:'GeoPackage',modified:'Jun 15, 2026',size:'142 MB',sharing:'Public link',icon:'gpkg',crs:'EPSG:4326 (WGS 84)',bbox:'43.2°N–44.8°N, 79.3°W–80.1°W'},
+  'my-terrain-draft':{name:'terrain_test_v4_draft.gmmp',type:'Global Mapper Project',modified:'Jun 14, 2026',size:'88 MB',sharing:'Private',icon:'gm',crs:'EPSG:32617',bbox:'43.5°N–44.2°N, 79.4°W–80.0°W'},
+  'my-dem-clip':{name:'dem_clip_test.tif',type:'GeoTIFF Raster',modified:'Jun 10, 2026',size:'1.2 GB',sharing:'Password link',icon:'tif',crs:'EPSG:32617 (UTM Zone 17N)',bbox:'43.8°N–44.0°N, 79.6°W–79.8°W'},
+  'my-field-markup':{name:'field_map_markup_jane.pdf',type:'GeoPDF',modified:'Jun 9, 2026',size:'34 MB',sharing:'Private',icon:'pdf',crs:'EPSG:4326',bbox:'43.6°N–44.1°N, 79.5°W–79.9°W'},
+  'my-waypoints-scratch':{name:'waypoints_scratch.kml',type:'KML',modified:'Jun 7, 2026',size:'2.1 MB',sharing:'Private',icon:'kml',crs:'EPSG:4326',bbox:'44.0°N–44.6°N, 79.35°W–79.8°W'}
 };
 
 /* ─── MAP VIEWER (Felt-inspired, read-only preview) ───
@@ -3002,8 +3069,156 @@ function renderAnnotations(){
 }
 
 /* ─── Drag-and-drop ingestion (session-only/ephemeral by default; CRS auto-detected) ─── */
+/* ═══ LAYOUT: keep the floating panels from colliding ═══
+   The top bar can grow (long names, wrapping buttons) and the legend changes
+   height with its content, so the side panels and the bottom-right controls
+   are positioned from their measured sizes rather than fixed offsets. */
+function mvLayout(){
+  const wrap = document.querySelector('#view-mapviewer .mapviewer-wrap');
+  if(!wrap) return;
+  const W = wrap.getBoundingClientRect(), E = 14, GAP = 10;
+  const q = sel => wrap.querySelector(sel);
+  const tb = q('.mapviewer-topbar'), lg = document.getElementById('mv-legend'), st = q('.mapviewer-statusbar'),
+        crs = q('.mv-crs-bar'), zc = q('.mapviewer-zoomctl'), na = q('.mv-north-arrow');
+  const vis = el => el && el.offsetParent !== null && getComputedStyle(el).display !== 'none';
+  const top = vis(tb) ? tb.getBoundingClientRect().bottom - W.top + GAP : E;
+  const stW = vis(st) ? st.offsetWidth : 0, stH = vis(st) ? st.offsetHeight : 0;
+  const crsW = vis(crs) ? crs.offsetWidth : 0, crsH = vis(crs) ? crs.offsetHeight : 0;
+  const legR = vis(lg) ? E + lg.offsetWidth : 0;
+  // CRS bar sits left of the status bar when there's room, otherwise on top of it
+  let crsBottom, crsRight, rowTop;
+  if(W.width - (E + stW + 8 + crsW) > legR + 16){ crsBottom = E; crsRight = E + stW + 8; rowTop = E + Math.max(stH, crsH); }
+  else { crsBottom = E + stH + 8; crsRight = E; rowTop = crsBottom + crsH; }
+  const zoomBottom = rowTop + 8, zoomH = vis(zc) ? zc.offsetHeight : 0, zoomW = vis(zc) ? zc.offsetWidth : 34;
+  const set = (k, v) => wrap.style.setProperty(k, Math.round(v) + 'px');
+  set('--mv-top', top);
+  set('--mv-left-bottom', vis(lg) ? E + lg.offsetHeight + GAP : E);
+  set('--mv-crs-bottom', crsBottom); set('--mv-crs-right', crsRight);
+  set('--mv-zoom-bottom', zoomBottom);
+  set('--mv-north-bottom', zoomBottom); set('--mv-north-right', E + zoomW + 8);   // compass beside the zoom buttons
+  set('--mv-right-bottom', zoomBottom + zoomH + GAP);
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  const wrap = document.querySelector('#view-mapviewer .mapviewer-wrap');
+  if(!wrap) return;
+  mvLayout();
+  if(window.ResizeObserver){
+    const ro = new ResizeObserver(()=>requestAnimationFrame(mvLayout));
+    ['.mapviewer-topbar','#mv-legend','.mapviewer-statusbar','.mv-crs-bar','.mapviewer-zoomctl'].forEach(sel=>{ const el = wrap.querySelector(sel) || document.querySelector(sel); if(el) ro.observe(el); });
+    ro.observe(wrap);
+  } else window.addEventListener('resize', mvLayout);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(mvLayout);
+});
+
+/* ═══ ADD DATA ═══
+   From Relay: My files and the Org library (map data only). In a project's
+   footprint view, a library file is LINKED into the project; a personal file is
+   added for this session. From your computer: real file picker or drop. */
+const AD_SOURCES = [
+  {group:'Org library', items:[
+    {name:'acme_basemap_2026.tif', ext:'tif', type:'GeoTIFF raster', crs:'NAD83 / UTM 17N (EPSG:26917)', bbox:[-81.6,42.6,-77.8,45.6], lib:true, size:'4.2 GB', by:'Penny Purchaser', modified:'Mar 4, 2026'},
+    {name:'admin_boundaries_v3.gpkg', ext:'gpkg', type:'GeoPackage', crs:'NAD83 (EPSG:4269)', bbox:[-82.2,42.2,-77.2,46.0], lib:true, size:'88 MB', by:'Penny Purchaser', modified:'Feb 18, 2026'},
+    {name:'acme_offices_locations.kml', ext:'kml', type:'KML', crs:'WGS 84 (EPSG:4326)', bbox:[-79.62,43.62,-79.30,43.80], lib:true, size:'420 KB', by:'Jane Doe', modified:'Jan 30, 2026'}
+  ]},
+  {group:'My files', items:[
+    {name:'client_extract_q2.gpkg', ext:'gpkg', type:'GeoPackage', crs:'WGS 84 (EPSG:4326)', bbox:[-80.0,43.6,-79.4,44.3], size:'142 MB', modified:'Jun 15, 2026'},
+    {name:'gps_log_jun12.csv', ext:'csv', type:'CSV with latitude/longitude', crs:'WGS 84, from lat/long columns', bbox:[-79.69,43.91,-79.58,43.98], size:'1.8 MB', modified:'Jun 12, 2026'},
+    {name:'harbour_site_points.csv', ext:'csv', type:'CSV with latitude/longitude', crs:'WGS 84, from lat/long columns', bbox:[-80.24,44.49,-80.20,44.52], size:'64 KB', modified:'Jun 11, 2026'},
+    {name:'terrain_test_v4_draft.gmmp', ext:'gmmp', type:'Global Mapper project', crs:'WGS 84 / UTM 17N (EPSG:32617)', bbox:[-80.0,43.5,-79.4,44.2], size:'88 MB', modified:'Jun 14, 2026'},
+    {name:'dem_clip_test.tif', ext:'tif', type:'GeoTIFF raster', crs:'WGS 84 / UTM 17N (EPSG:32617)', bbox:[-79.8,43.8,-79.6,44.0], size:'1.2 GB', modified:'Jun 10, 2026'},
+    {name:'waypoints_scratch.kml', ext:'kml', type:'KML', crs:'WGS 84 (EPSG:4326)', bbox:[-79.8,44.0,-79.35,44.6], size:'2.1 MB', modified:'Jun 7, 2026'}
+  ]}
+];
+const AD_ICON = {tif:['tif','TIF'],gpkg:['gpkg','GPKG'],kml:['kml','KML'],csv:['csv','CSV'],gmmp:['gm','GMMP'],shp:['shp','SHP'],las:['las','LAS'],pdf:['pdf','PDF']};
+function adOnMap(name){
+  if(fp.on) return fp.files.some(f=>f.name===name);
+  const cur = FILE_DATA[_mvFileId];
+  return (cur && cur.name===name) || mvTempLayers.includes(name);
+}
+function adContextName(){
+  const pid = fp.on ? fp.pid : (typeof currentProjectId!=='undefined' ? currentProjectId : null);
+  return pid && PROJECT_DATA[pid] ? PROJECT_DATA[pid].name : null;
+}
 function triggerAddData(){
-  toast('Drag a file onto the map to add it — or this would open a file picker.');
+  const proj = adContextName();
+  document.getElementById('ad-sub').textContent = proj
+    ? `Add layers to ${proj}. Library files are linked, so they stay in sync. Layers are reprojected with GeoCalc.`
+    : `Layers are reprojected to the map's coordinate system with GeoCalc.`;
+  document.getElementById('ad-save-label').innerHTML = (proj ? `Save to ${proj}` : 'Save to My files') +
+    `<small>${proj ? 'Project members will see it.' : 'Only you will see it.'} It's there next time.</small>`;
+  document.getElementById('ad-search').value = '';
+  adTab('relay'); adRender();
+  openModal('modal-adddata');
+  setTimeout(()=>document.getElementById('ad-search').focus(), 50);
+}
+function adTab(t){
+  ['relay','upload'].forEach(k=>{
+    const on = k===t;
+    document.getElementById('ad-tab-'+k).classList.toggle('active', on);
+    document.getElementById('ad-tab-'+k).setAttribute('aria-selected', on);
+    document.getElementById('ad-pane-'+k).style.display = on ? '' : 'none';
+  });
+}
+function adRender(){
+  const q = (document.getElementById('ad-search').value || '').toLowerCase();
+  let h = '';
+  AD_SOURCES.forEach((g,gi)=>{
+    const items = g.items.map((it,ii)=>({it,ii})).filter(({it})=>!q || it.name.toLowerCase().includes(q));
+    if(!items.length) return;
+    h += `<div class="ad-group">${g.group}</div>` + items.map(({it,ii})=>{
+      const ic = AD_ICON[it.ext] || ['csv','FILE'], on = adOnMap(it.name);
+      return `<div class="ad-item"><div class="fb-icon ${ic[0]}">${ic[1]}</div>
+        <div><div class="ad-name">${it.name}</div><div class="ad-meta">${it.type} · ${it.crs}</div></div>
+        ${on ? '<span class="ad-on">On the map</span>' : `<button class="btn xs" onclick="adAdd(${gi},${ii})">${it.lib && fp.on ? 'Link' : 'Add'}</button>`}
+      </div>`;}).join('');
+  });
+  document.getElementById('ad-list').innerHTML = h || '<div class="ad-empty">Nothing matches. Try another name, or upload from your computer.</div>';
+}
+function adFpAdd(it, kind){
+  // kind: 'linked' (Org library), 'session' (not stored), 'saved' (stored in the project)
+  const id = 'add-' + it.name.replace(/[^a-z0-9]+/gi,'-').toLowerCase();
+  if(fp.files.some(f=>f.id===id)) return;
+  fp.files.push({id, name:it.name, ext:it.ext, crs:it.crs, bbox:it.bbox, size:it.size||'—', modified:it.modified||'Just now', by:it.by||'Jane Doe',
+    folder: kind==='linked' ? 'Linked from Org library' : kind==='session' ? 'Added this session' : 'Uploads',
+    linked: kind==='linked', session: kind==='session',
+    note: kind==='session' ? 'Added for this session only. It is not saved to the project.' : undefined});
+  fp.sel = id;
+  fpRenderTree(); fpRenderLegend(); fpRenderDetails(); fpRender(); fpTopbarText();
+  const f = fpFile(id); if(f && !fp.globe) fpShowPop(f);
+}
+function adAdd(gi, ii){
+  const it = AD_SOURCES[gi].items[ii], proj = adContextName();
+  if(fp.on){
+    if(it.lib){ adFpAdd(it,'linked'); toast(`Linked ${it.name} into ${proj}. It stays read-only and in sync with the library.`); }
+    else { adFpAdd(it,'session'); toast(`Added ${it.name} for this session. Move it into the project to keep it here.`); }
+  } else {
+    addTempLayer(it.name);
+    toast(`Added ${it.name}, reprojected from ${it.crs} with GeoCalc.`);
+  }
+  adRender();
+}
+function adUploadPicked(files){
+  if(!files || !files.length) return;
+  const keep = (document.querySelector('input[name="ad-keep"]:checked')||{}).value || 'session';
+  [...files].forEach(f=>mvIngest(f.name, keep));
+  closeModal('modal-adddata');
+}
+/* One path for anything that arrives from the computer (picker or drop) */
+function mvIngest(fileName, keep){
+  keep = keep || 'session';
+  const proj = adContextName();
+  toast('Detecting coordinate system for "'+fileName+'"…');
+  setTimeout(()=>{
+    const detected = 'EPSG:26917 (NAD83 / UTM 17N)';
+    const where = keep==='save' ? ('Saved to ' + (proj || 'My files') + '.') : 'Session only, not saved.';
+    toast('Added "'+fileName+'", reprojected from '+detected+' with GeoCalc. '+where);
+    if(fp.on){
+      const e = fpExtentLL(), cx = (e[0]+e[2])/2, cy = (e[1]+e[3])/2, w = (e[2]-e[0])*0.12, h = (e[3]-e[1])*0.12;
+      const ox = (Math.random()-.5)*(e[2]-e[0])*0.4, oy = (Math.random()-.5)*(e[3]-e[1])*0.4;
+      const ext = (fileName.split('.').pop()||'').toLowerCase();
+      adFpAdd({name:fileName, ext: FP_EXT[ext] ? ext : 'gpkg', crs:'NAD83 / UTM 17N (EPSG:26917)', bbox:[cx+ox-w/2, cy+oy-h/2, cx+ox+w/2, cy+oy+h/2], size:'—', modified:'Just now'}, keep==='save' ? 'saved' : 'session');
+    } else addTempLayer(fileName, keep==='save');
+  }, 900);
 }
 
 function mvHandleDrop(e){
@@ -3023,17 +3238,11 @@ function mvHandleDrop(e){
     return;
   }
 
-  const fileName = (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) ? e.dataTransfer.files[0].name : 'dropped_layer.shp';
-  toast('Detecting coordinate system for "'+fileName+'"…');
-  setTimeout(()=>{
-    const detected = 'EPSG:26917 (NAD83 / UTM 17N)';
-    const target = document.getElementById('mv-crs-select').selectedOptions[0];
-    toast('Added — reprojected from '+detected+' to '+(target?target.textContent:'project CRS')+' via Geocalc. Session only — not saved to Relay yet.');
-    addTempLayer(fileName);
-  }, 900);
+  const files = (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) ? [...e.dataTransfer.files].map(f=>f.name) : ['dropped_layer.shp'];
+  files.forEach(n=>mvIngest(n, 'session'));
 }
 
-function addTempLayer(name){
+function addTempLayer(name, saved){
   mvTempLayers.push(name);
   const g = document.getElementById('mv-pins-group'); // reuse pins group's un-zoomed... actually goes in scale group via overlay-group sibling
   const x = 250 + Math.random()*300, y = 150 + Math.random()*220;
@@ -3048,7 +3257,7 @@ function addTempLayer(name){
   row.innerHTML = `<span class="mv-eye-btn active" style="pointer-events:none"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-4.5 7-4.5S15 8 15 8s-2.5 4.5-7 4.5S1 8 1 8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.8" stroke="currentColor" stroke-width="1.3"/></svg></span>
     <span class="mv-layer-swatch" style="background:var(--amber)"></span>
     <span class="mv-layer-name" style="max-width:90px;overflow:hidden;text-overflow:ellipsis" title="${name}">${name}</span>
-    <span class="mv-temp-badge">Unsaved</span>`;
+    <span class="mv-temp-badge"${saved?' style="color:var(--green)"':''}>${saved?'Saved':'Unsaved'}</span>`;
   layersPanel.appendChild(row);
 }
 
@@ -3746,7 +3955,7 @@ function fpFrame(){
   if(r - l < 220){ l = 12; r = W.width - 12; }
   return {l, r, t, b, w:r-l, h:b-t, cx:(l+r)/2, cy:(t+b)/2, W:W.width, H:W.height};
 }
-function fpOwned(files){ return (files || fp.files).filter(f=>!f.linked); }
+function fpOwned(files){ return (files || fp.files).filter(f=>!f.linked && !f.session); }
 function fpExtentLL(){
   let src = fp.files.filter(f=>fpOnMap(f) && !f.linked); if(!src.length) src = fp.files.filter(fpOnMap);
   const bs = src.map(f=>fpUnwrap(f.bbox));
@@ -3780,7 +3989,7 @@ function fpRender(){
   let out = '', label = '';
   for(const {x, r} of items){
     const meta = FP_EXT[x.ext] || FP_EXT.gpkg, c = fpColor(x);
-    const cls = 'fp ' + meta.cat + (x.linked?' linked':'') + (fp.sel===x.id?' sel':'') + (fp.hl===x.id?' hl':'');
+    const cls = 'fp ' + meta.cat + (x.linked?' linked':'') + (x.session?' session':'') + (fp.sel===x.id?' sel':'') + (fp.hl===x.id?' hl':'');
     const aria = `${x.name}, ${meta.type}`;
     let inner = '';
     if(x.tiles){
@@ -3940,7 +4149,7 @@ function fpRenderTree(){
         const small = !f.tiles && (Math.abs(fpUnwrap(f.bbox)[2]-f.bbox[0]) < 0.02);
         return `<div class="fp-file-row${v?'':' off'}${fp.sel===f.id?' sel':''}" data-id="${f.id}" onmouseenter="fpSetHl('${f.id}')" onmouseleave="fpSetHl(null)">
           <button class="mv-eye-btn ${v?'active':''}" onclick="fpToggle('${f.id}')" aria-pressed="${v}" aria-label="${v?'Hide':'Show'} ${f.name}">${v?FP_EYE:FP_EYE_OFF}</button>
-          <span class="fp-swatch${small?' pt':''}" style="--c:${f.linked?'var(--text-secondary)':fpColor(f)}"></span>
+          <span class="fp-swatch${small?' pt':''}" style="--c:${f.linked?'var(--text-secondary)':f.session?'var(--amber)':fpColor(f)}"></span>
           <button class="fp-file-name" onclick="fpSelect('${f.id}',{zoom:true})" title="Zoom to ${f.name}">${f.name}</button>
           ${f.tiles ? `<span class="fp-file-meta">${f.tiles.cols*f.tiles.rows} tiles</span>` : ''}
         </div>`;}).join('')}</div>
@@ -3993,11 +4202,7 @@ function fpRenderLegend(){
   fpFitLeftPanel();
 }
 /* The footprint legend is taller than a single-file legend; keep the Layers panel clear of it. */
-function fpFitLeftPanel(){
-  const lp = document.querySelector('.mv-left-panel'), lg = document.getElementById('mv-legend');
-  if(!lp) return;
-  lp.style.bottom = (fp.on && lg && lg.offsetHeight) ? (lg.offsetHeight + 26) + 'px' : '';
-}
+function fpFitLeftPanel(){ if(typeof mvLayout==='function') mvLayout(); }
 
 /* ─── Enter / exit footprint mode ─── */
 function fpEnter(pid, opts){
@@ -4006,8 +4211,7 @@ function fpEnter(pid, opts){
   if(!P) return;
   fp.on = true; fp.pid = pid; fp.files = P.files; fp.sel = null; fp.hl = null; fp.hidden.clear();
   fp.refLon = fpRefLon(P.files);
-  const own = fpOwned(), onMap = own.filter(fpOnMap).length, nLinked = fp.files.length - own.length;
-  document.getElementById('mv-file-type').textContent = `Project · ${own.length} files · ${onMap} on the map` + (nLinked ? ` · ${nLinked} linked from the library` : '');
+  fpTopbarText();
   document.querySelector('.mv-left-panel').classList.add('fp-mode');
   document.querySelector('#view-mapviewer .mapviewer-wrap').classList.add('fp-on');
   const ai = document.getElementById('mv-ai-section'); if(ai) ai.classList.add('collapsed');
@@ -4017,6 +4221,12 @@ function fpEnter(pid, opts){
   fp.fit = fpFitTo(fpExtentLL()); fp.view = Object.assign({}, fp.fit);
   if(opts.intro && globeReady() && !fpReduced()) fpIntro();
   else fpRender();
+}
+function fpTopbarText(){
+  const own = fp.files.filter(f=>!f.linked && !f.session), onMap = own.filter(fpOnMap).length;
+  const nLinked = fp.files.filter(f=>f.linked).length, nSession = fp.files.filter(f=>f.session).length;
+  document.getElementById('mv-file-type').textContent = `Project · ${own.length} files · ${onMap} on the map` +
+    (nLinked ? ` · ${nLinked} linked from the library` : '') + (nSession ? ` · ${nSession} added this session` : '');
 }
 function fpExit(){
   if(!fp.on) return;
