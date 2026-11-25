@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blue Marble Blue Marble Drive</title>
+<title>Blue Marble Relay</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -1114,7 +1114,7 @@ body.ws-starter #public-warn{display:none !important}
   </button>
   <div class="proto-hint">
     <svg viewBox="0 0 16 16" fill="none" width="12" height="12"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 7v4M8 5.5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-    A standalone window — open a file from the Collaboration Environment, or drag one in
+    A standalone window — open a file from Relay, or drag one in
   </div>
 </div>
 
@@ -1130,7 +1130,7 @@ body.ws-starter #public-warn{display:none !important}
         <span class="breadcrumb">
           <a onclick="window.location.href='index.html?resume=1'" style="color:var(--text-muted);cursor:pointer;text-decoration:none;transition:color .1s" onmouseover="this.style.color='var(--avenza-blue)'" onmouseout="this.style.color='var(--text-muted)'">Blue Marble Hub</a>
           <span style="margin:0 5px;color:var(--border-2)">›</span>
-          <a onclick="window.location.href='collab.html'" style="color:var(--text-muted);cursor:pointer;text-decoration:none;transition:color .1s" onmouseover="this.style.color='var(--avenza-blue)'" onmouseout="this.style.color='var(--text-muted)'">Collaboration Environment</a>
+          <a onclick="window.location.href='collab.html'" style="color:var(--text-muted);cursor:pointer;text-decoration:none;transition:color .1s" onmouseover="this.style.color='var(--avenza-blue)'" onmouseout="this.style.color='var(--text-muted)'">Relay</a>
           <span style="margin:0 5px;color:var(--border-2)">›</span>
           <span id="breadcrumb-current">Map Viewer</span>
         </span>
@@ -1140,9 +1140,9 @@ body.ws-starter #public-warn{display:none !important}
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4l4-1.4 4 1.4 4-1.4v9.4l-4 1.4-4-1.4-4 1.4V4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
           Map
         </button>
-        <button class="mode-tab" onclick="window.location.href='collab.html'" title="Back to Drive">
+        <button class="mode-tab" onclick="window.location.href='collab.html'" title="Back to files">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="4" rx="6" ry="2" stroke="currentColor" stroke-width="1.2"/><path d="M2 4v4c0 1.1 2.7 2 6 2s6-.9 6-2V4" stroke="currentColor" stroke-width="1.2"/><path d="M2 8v4c0 1.1 2.7 2 6 2s6-.9 6-2V8" stroke="currentColor" stroke-width="1.2"/></svg>
-          Drive
+          Files
         </button>
       </div>
       <div class="topbar-actions">
@@ -1188,7 +1188,7 @@ body.ws-starter #public-warn{display:none !important}
               </button>
               <button class="app-launcher-tile" onclick="window.location.href='collab.html'">
                 <div class="app-launcher-tile-icon" style="background:#0e7a8c"><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#fff" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2.5 3.5-2.5 5.5s1 4 2.5 5.5M8 2.5c1.5 1.5 2.5 3.5 2.5 5.5s-1 4-2.5 5.5M2.5 8h11" stroke="#fff" stroke-width="1.2"/></svg></div>
-                <span class="app-launcher-tile-label">Collaboration Environment</span>
+                <span class="app-launcher-tile-label">Blue Marble Relay</span>
               </button>
               <div class="app-launcher-tile current" title="You're here">
                 <div class="app-launcher-tile-icon" style="background:#166534">
@@ -1229,7 +1229,7 @@ body.ws-starter #public-warn{display:none !important}
             <div class="mv-empty-state" id="mv-empty-state">
               <svg width="32" height="32" viewBox="0 0 16 16" fill="none"><path d="M2 8s2.5-4.5 6-4.5S14 8 14 8s-2.5 4.5-6 4.5S2 8 2 8z" stroke="var(--text-muted)" stroke-width="1.1" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.8" stroke="var(--text-muted)" stroke-width="1.1"/></svg>
               <div class="mv-empty-state-title">No file open</div>
-              <div class="mv-empty-state-sub">Right-click a file in the Collaboration Environment and choose "Open in Map Viewer" — or drag a file from that window directly onto this map.</div>
+              <div class="mv-empty-state-sub">Right-click a file in Relay and choose "Open in Map Viewer" — or drag a file from that window directly onto this map.</div>
             </div>
           </div>
 
@@ -1266,7 +1266,7 @@ body.ws-starter #public-warn{display:none !important}
               <div class="fb-icon" id="mv-file-icon" style="width:28px;height:28px;font-size:9px;background:var(--surface-3)">—</div>
               <div style="min-width:0">
                 <div class="mapviewer-file-name" id="mv-file-name">No file open</div>
-                <div class="mapviewer-file-type" id="mv-file-type">Open a file from the Collaboration Environment, or drag one in</div>
+                <div class="mapviewer-file-type" id="mv-file-type">Open a file from Relay, or drag one in</div>
               </div>
             </div>
             <div class="mv-freshness-badge" id="mv-freshness-badge" title="This view reflects the current file state">
@@ -1616,7 +1616,7 @@ body.ws-starter #public-warn{display:none !important}
 <div class="modal-bg" id="modal-grant-access">
   <div class="modal">
     <div class="modal-title">Grant drive access</div>
-    <div class="modal-sub">Add a user to the Blue Marble Drive. They must already be a member of your Hub organisation.</div>
+    <div class="modal-sub">Add a user to Blue Marble Relay. They must already be a member of your Hub organisation.</div>
 
     <div class="modal-label">User</div>
     <select class="modal-select">
@@ -1624,7 +1624,7 @@ body.ws-starter #public-warn{display:none !important}
       <option>Priya Nair (priya@acme.com)</option>
     </select>
 
-    <div class="modal-label">Drive role</div>
+    <div class="modal-label">Relay role</div>
     <select class="modal-select">
       <option>Member — upload, download, share own files</option>
       <option>Data Admin — manage all files and user access</option>
@@ -1656,7 +1656,7 @@ body.ws-starter #public-warn{display:none !important}
     </div>
     <div style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Access pending</div>
     <div style="font-size:13.5px;color:var(--text-muted);line-height:1.6;margin-bottom:6px">
-      Your account <strong style="color:var(--text-secondary)">gary@acme.com</strong> doesn't have access to Blue Marble Drive yet.
+      Your account <strong style="color:var(--text-secondary)">gary@acme.com</strong> doesn't have access to Blue Marble Relay yet.
     </div>
     <div style="font-size:13px;color:var(--text-muted);margin-bottom:24px">
       Contact your organisation admin to request access, or return to the Hub.
@@ -2628,7 +2628,7 @@ function toggleLayerVisibility(){
    pattern (ask, get a grounded-sounding answer referencing this map's
    actual layers/CRS, suggested follow-ups) is what's real here, matching
    how every other "AI" touchpoint in this mockup is scoped — see the
-   Collaboration Environment specs' CE-9 notes on staying narrowly
+   Relay specs' CE-9 notes on staying narrowly
    grounded rather than open-ended chat. ─── */
 const AI_SUGGESTIONS = [
   'What layers are on this map?',
@@ -2641,7 +2641,7 @@ const AI_RESPONSES = [
     reply: () => {
       const f = FILE_DATA[_mvFileId];
       if (f) return `This map has one layer loaded: <b>${f.name}</b> (${f.type}). You can toggle its visibility or add another from the Data section on the right.`;
-      return `No data layers are loaded yet — this is just the project basemap. Use <b>Add data</b> on the right, or drag a file in from Drive, to add one.`;
+      return `No data layers are loaded yet — this is just the project basemap. Use <b>Add data</b> on the right, or drag a file in from your files, to add one.`;
     }
   },
   {
@@ -3010,7 +3010,7 @@ function mvHandleDrop(e){
   e.preventDefault();
   document.getElementById('mv-canvas').classList.remove('mv-drag-active');
 
-  // A file dragged from the Collaboration Environment's file browser (a
+  // A file dragged from Relay's file browser (a
   // different window/tab) carries its file id as plain text, not a real OS
   // File object — this is a genuine cross-window HTML5 drag, not a stand-in.
   // Distinguish that from an actual file dropped from the desktop, which
@@ -3019,7 +3019,7 @@ function mvHandleDrop(e){
   if(draggedId && FILE_DATA[draggedId] && MV_VIEWABLE.has(FILE_DATA[draggedId].icon)){
     openMapViewer(draggedId);
     history.replaceState(null, '', '?file=' + encodeURIComponent(draggedId));
-    toast('Opened "' + FILE_DATA[draggedId].name + '" from the Collaboration Environment.');
+    toast('Opened "' + FILE_DATA[draggedId].name + '" from Relay.');
     return;
   }
 
@@ -3028,7 +3028,7 @@ function mvHandleDrop(e){
   setTimeout(()=>{
     const detected = 'EPSG:26917 (NAD83 / UTM 17N)';
     const target = document.getElementById('mv-crs-select').selectedOptions[0];
-    toast('Added — reprojected from '+detected+' to '+(target?target.textContent:'project CRS')+' via Geocalc. Session only — not saved to the Collaboration Environment yet.');
+    toast('Added — reprojected from '+detected+' to '+(target?target.textContent:'project CRS')+' via Geocalc. Session only — not saved to Relay yet.');
     addTempLayer(fileName);
   }, 900);
 }
@@ -3061,7 +3061,7 @@ function openSaveViewModal(){
 function saveCurrentView(){
   const name = document.getElementById('save-view-name-input').value.trim() || 'Untitled task view';
   closeModal('modal-save-view');
-  toast('Saved view "'+name+'" — share its link like any other Collaboration Environment share, honoring the same access controls.');
+  toast('Saved view "'+name+'" — share its link like any other Relay share, honoring the same access controls.');
 }
 
 /* ─── Canvas click routing + coordinate tracking + drag/drop wiring ─── */
@@ -3089,7 +3089,7 @@ document.addEventListener('DOMContentLoaded', function(){
   canvas.addEventListener('drop', mvHandleDrop);
 
   // Standalone-window entry point: ?file=<id> opens a specific file (from the
-  // Collaboration Environment's "Open in Map Viewer" action, a drop in this
+  // Relay's "Open in Map Viewer" action, a drop in this
   // window, or the Drive<->Map mode tab); ?project=<id> opens that project's
   // basemap with no specific file loaded yet (from a Projects card).
   const params = new URLSearchParams(window.location.search);
@@ -4068,7 +4068,7 @@ function globeInit(){
   let drag = null;
   svg.addEventListener('pointerdown', e=>{
     if(!fp.globe) return;
-    clearTimeout(fp.introTimer); cancelAnimationFrame(G.raf);
+    clearTimeout(fp.introTimer); cancelAnimationFrame(G.raf); G.animating = false;
     drag = {x:e.clientX, y:e.clientY, r:G.proj.rotate(), moved:false};
     svg.classList.add('dragging');
   });
@@ -4090,9 +4090,13 @@ function globeInit(){
   svg.addEventListener('wheel', e=>{
     if(!fp.globe) return;
     e.preventDefault(); clearTimeout(fp.introTimer);
-    const s = Math.max(globeBase()*0.6, G.proj.scale() * Math.exp(-e.deltaY*0.0015));
+    // Ignore the tail of the gesture that brought us here, and anything during a flight
+    if(G.animating || performance.now() < (G.quietUntil || 0)) return;
+    const zoomingIn = e.deltaY < 0;
+    const s = Math.min(globeBase()*4, Math.max(globeBase()*0.6, G.proj.scale() * Math.exp(-e.deltaY*0.0015)));
     G.proj.scale(s); globeDraw();
-    if(s > globeBase() * 3.2) fpFlyIn();
+    // Only a deliberate zoom IN, well past the whole-globe view, flies back to the data
+    if(zoomingIn && s >= globeBase()*3.9) fpFlyIn();
   }, {passive:false});
   svg.addEventListener('keydown', e=>{
     const t = e.target.closest && e.target.closest('.g-proj');
@@ -4137,6 +4141,8 @@ function globeDraw(){
 /* Rotate + zoom together. Rotation follows the great circle between centres. */
 function globeAnimate(toCentre, toScale, dur, done){
   cancelAnimationFrame(G.raf);
+  G.animating = !(fpReduced() || dur === 0);
+  const finish = done; done = () => { G.animating = false; G.quietUntil = performance.now() + 350; finish && finish(); };
   const r = G.proj.rotate(), fromCentre = [-r[0], -r[1]], s0 = G.proj.scale();
   if(fpReduced() || dur === 0){ G.proj.rotate([-toCentre[0], -toCentre[1], 0]).scale(toScale); globeDraw(); done && done(); return; }
   const ip = d3.geoInterpolate(fromCentre, toCentre), t0 = performance.now();
@@ -4169,7 +4175,7 @@ function fpIntro(){
   const c = fpProjectCentre(fp.pid);
   G.proj.rotate([-(c[0] - 80), -(c[1]*0.2), 0]).scale(globeBase());
   fpShowGlobe(); globeDraw();
-  globeAnimate(c, globeBase(), 1600, ()=>{ fp.introTimer = setTimeout(()=>fpFlyIn(), 700); });
+  globeAnimate(c, globeBase(), 1600, ()=>{ fp.introTimer = setTimeout(()=>fpFlyIn(), 1400); });
 }
 /* Fly from the globe into the 2D map, ending exactly on the fitted view (or a file). */
 function fpFlyIn(fileId){

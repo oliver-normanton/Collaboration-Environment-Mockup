@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blue Marble Blue Marble Drive</title>
+<title>Blue Marble Relay</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -404,7 +404,7 @@ html,body{min-height:100%;font-family:'DM Sans',system-ui,sans-serif;background:
 .drive-filter-tab.active{color:var(--text-primary);border-bottom-color:var(--avenza-blue);font-weight:600}
 /* Map/Drive mode switcher — sits in the topbar alongside (not instead of) the
    9-dot app launcher. The 9-dot is the permanent app-level switcher (Hub,
-   Collaboration Environment, Map Viewer, Geographic Calculator Cloud); this
+   Relay, Map Viewer, Geographic Calculator Cloud); this
    is a lighter, project-scoped switch for the common case of working within
    one file/project without leaving the window. Right-click "Open in Map
    Viewer" and dragging a file to a separately-opened viewer window still
@@ -965,6 +965,12 @@ body.ws-starter #public-warn{display:none !important}
 .fb-icon.las{background:#fff7ed;color:#b45309}
 .fb-icon.shp{background:#e6f4f6;color:#0e7a8c}
 .fb-icon.dwg{background:#f1f5f9;color:#475569}
+.fb-icon.docx{background:#e8f0fe;color:#1d4ed8}
+.fb-path-link{color:var(--avenza-teal);cursor:pointer}
+/* The folder tree already shows where you are, and the toolbar has no room for a path */
+#view-files .fb-toolbar .fb-path{visibility:hidden;flex:1;min-width:0}
+.fb-toolbar .fb-search{min-width:120px}
+.fb-path-link:hover{text-decoration:underline}
 .pj-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
 .pj-title{font-size:22px;font-weight:600;color:var(--text-primary);line-height:1.25}
 .pj-sub{font-size:12.5px;color:var(--text-muted);margin-top:4px}
@@ -1039,7 +1045,7 @@ body.ws-starter #public-warn{display:none !important}
         </svg>
       </div>
       <div>
-        <div class="sb-product-name">Blue Marble Drive</div>
+        <div class="sb-product-name">Blue Marble Relay</div>
         <div class="sb-product-tag">Blue Marble Geographics</div>
       </div>
     </div>
@@ -1082,7 +1088,7 @@ body.ws-starter #public-warn{display:none !important}
       </div>
 
       <div class="sb-group">
-        <div class="sb-group-label">Drive</div>
+        <div class="sb-group-label">Files</div>
         <button class="sb-item active" id="si-myfiles" onclick="navSidebar('myfiles')">
           <svg viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="4" rx="6" ry="2" stroke="currentColor" stroke-width="1.3"/><path d="M2 4v4c0 1.1 2.7 2 6 2s6-.9 6-2V4" stroke="currentColor" stroke-width="1.3"/><path d="M2 8v4c0 1.1 2.7 2 6 2s6-.9 6-2V8" stroke="currentColor" stroke-width="1.3"/></svg>
           My files
@@ -1156,7 +1162,7 @@ body.ws-starter #public-warn{display:none !important}
         </button>
         <button class="mode-tab active" title="You're here">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="4" rx="6" ry="2" stroke="currentColor" stroke-width="1.2"/><path d="M2 4v4c0 1.1 2.7 2 6 2s6-.9 6-2V4" stroke="currentColor" stroke-width="1.2"/><path d="M2 8v4c0 1.1 2.7 2 6 2s6-.9 6-2V8" stroke="currentColor" stroke-width="1.2"/></svg>
-          Drive
+          Files
         </button>
       </div>
       <div class="topbar-actions">
@@ -1204,7 +1210,7 @@ body.ws-starter #public-warn{display:none !important}
                 <div class="app-launcher-tile-icon" style="background:#0e7a8c">
                   <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#fff" stroke-width="1.4"/><path d="M8 2.5c-1.5 1.5-2.5 3.5-2.5 5.5s1 4 2.5 5.5M8 2.5c1.5 1.5 2.5 3.5 2.5 5.5s-1 4-2.5 5.5M2.5 8h11" stroke="#fff" stroke-width="1.2"/></svg>
                 </div>
-                <span class="app-launcher-tile-label">Collaboration Environment</span>
+                <span class="app-launcher-tile-label">Blue Marble Relay</span>
                 <span class="app-launcher-tile-badge">Current</span>
               </div>
               <button class="app-launcher-tile" onclick="window.location.href='viewer.html'">
@@ -1356,21 +1362,21 @@ body.ws-starter #public-warn{display:none !important}
                 </button>
               </div>
               <div class="fb-tree-body">
-                <button class="fb-tree-item active" onclick="selectFolder('root')">
+                <button class="fb-tree-item active" data-folder="root" onclick="selectFolder('root')">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
                   My files
                 </button>
-                <button class="fb-tree-item fb-tree-indent" onclick="selectFolder('field-surveys')">
+                <button class="fb-tree-item fb-tree-indent" data-folder="notes" onclick="selectFolder('notes')">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-                  Drafts
+                  Notes &amp; reference
                 </button>
-                <button class="fb-tree-item fb-tree-indent" onclick="selectFolder('basemaps')">
+                <button class="fb-tree-item fb-tree-indent" data-folder="scratch" onclick="selectFolder('scratch')">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-                  Imports
+                  Scratch work
                 </button>
-                <button class="fb-tree-item fb-tree-indent" onclick="selectFolder('exports')">
+                <button class="fb-tree-item fb-tree-indent" data-folder="proposals" onclick="selectFolder('proposals')">
                   <svg viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-                  Exports
+                  Proposals
                 </button>
               </div>
             </div>
@@ -1481,51 +1487,65 @@ body.ws-starter #public-warn{display:none !important}
                     </tr>
                   </thead>
                   <tbody id="fb-tbody">
-                    <!-- Folder rows -->
-                    <tr onclick="selectFile('field-surveys-folder')" id="row-field-surveys-folder">
+                    <!-- My files: personal work only. Folders are the person's own; rows carry data-folder so the tree filters them. -->
+                    <tr onclick="selectFolder('notes')" id="row-f-notes" data-folder="root" title="Open folder">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
-                          <div class="fb-icon folder">
-                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="#c2410c" stroke-width="1.4" stroke-linejoin="round"/></svg>
-                          </div>
+                          <div class="fb-icon folder"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="#c2410c" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
                           <div>
-                            <div class="fb-file-name">Drafts</div>
-                            <div class="fb-file-type">Folder · 4 files</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="fb-meta">Jun 17, 2026</td>
-                      <td class="fb-size">410 MB</td>
-                      <td><span class="share-badge private">Private</span></td>
-                      <td>
-                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
-                      </td>
-                    </tr>
-                    <tr onclick="selectFile('basemaps-folder')" id="row-basemaps-folder">
-                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
-                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
-                      <td>
-                        <div class="fb-name-cell">
-                          <div class="fb-icon folder">
-                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="#c2410c" stroke-width="1.4" stroke-linejoin="round"/></svg>
-                          </div>
-                          <div>
-                            <div class="fb-file-name">Imports</div>
+                            <div class="fb-file-name">Notes &amp; reference</div>
                             <div class="fb-file-type">Folder · 3 files</div>
                           </div>
                         </div>
                       </td>
-                      <td class="fb-meta">Jun 12, 2026</td>
-                      <td class="fb-size">2.9 GB</td>
+                      <td class="fb-meta">Jun 18, 2026</td>
+                      <td class="fb-size">1.5 MB</td>
                       <td><span class="share-badge private">Private</span></td>
                       <td>
                         <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
                       </td>
                     </tr>
-                    <!-- File rows -->
-                    <tr onclick="selectFile('my-client-extract')" ondblclick="openMapViewer('my-client-extract')" id="row-my-client-extract" draggable="true" ondragstart="fileDragStart(event,'my-client-extract')" title="Drag onto a Map Viewer window to open it there">
+                    <tr onclick="selectFolder('scratch')" id="row-f-scratch" data-folder="root" title="Open folder">
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon folder"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="#c2410c" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+                          <div>
+                            <div class="fb-file-name">Scratch work</div>
+                            <div class="fb-file-type">Folder · 4 files</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 14, 2026</td>
+                      <td class="fb-size">1.3 GB</td>
+                      <td><span class="share-badge private">Private</span></td>
+                      <td>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFolder('proposals')" id="row-f-proposals" data-folder="root" title="Open folder">
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon folder"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="#c2410c" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+                          <div>
+                            <div class="fb-file-name">Proposals</div>
+                            <div class="fb-file-type">Folder · 2 files</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 12, 2026</td>
+                      <td class="fb-size">2.5 MB</td>
+                      <td><span class="share-badge private">Private</span></td>
+                      <td>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('my-client-extract')" ondblclick="openMapViewer('my-client-extract')" draggable="true" ondragstart="fileDragStart(event,'my-client-extract')" title="Drag onto a Map Viewer window to open it there" id="row-my-client-extract" data-folder="root">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
@@ -1544,7 +1564,102 @@ body.ws-starter #public-warn{display:none !important}
                         <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
                       </td>
                     </tr>
-                    <tr onclick="selectFile('my-terrain-draft')" ondblclick="openMapViewer('my-terrain-draft')" id="row-my-terrain-draft" draggable="true" ondragstart="fileDragStart(event,'my-terrain-draft')" title="Drag onto a Map Viewer window to open it there">
+                    <tr onclick="selectFile('gps-log-jun12')" id="row-gps-log-jun12" data-folder="root">
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon csv">CSV</div>
+                          <div>
+                            <div class="fb-file-name">gps_log_jun12.csv</div>
+                            <div class="fb-file-type">CSV · latitude/longitude found</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 12, 2026</td>
+                      <td class="fb-size">1.8 MB</td>
+                      <td><span class="share-badge private">Private</span></td>
+                      <td>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('metadata-export')" id="row-metadata-export" data-folder="root">
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon csv">CSV</div>
+                          <div>
+                            <div class="fb-file-name">metadata_export_jun2026.csv</div>
+                            <div class="fb-file-type">CSV · no location columns</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 5, 2026</td>
+                      <td class="fb-size">840 KB</td>
+                      <td><span class="share-badge private">Private</span></td>
+                      <td>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('survey-method-notes')" id="row-survey-method-notes" data-folder="notes" style="display:none">
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon docx">DOCX</div>
+                          <div>
+                            <div class="fb-file-name">survey_method_notes.docx</div>
+                            <div class="fb-file-type">Word document</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 18, 2026</td>
+                      <td class="fb-size">260 KB</td>
+                      <td><span class="share-badge private">Private</span></td>
+                      <td>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('lidar-qc-checklist')" id="row-lidar-qc-checklist" data-folder="notes" style="display:none">
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon docx">DOCX</div>
+                          <div>
+                            <div class="fb-file-name">lidar_qc_checklist.docx</div>
+                            <div class="fb-file-type">Word document</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">May 30, 2026</td>
+                      <td class="fb-size">94 KB</td>
+                      <td><span class="share-badge private">Private</span></td>
+                      <td>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('crs-cheatsheet')" id="row-crs-cheatsheet" data-folder="notes" style="display:none">
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon pdf">PDF</div>
+                          <div>
+                            <div class="fb-file-name">crs_cheatsheet.pdf</div>
+                            <div class="fb-file-type">PDF document</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Apr 22, 2026</td>
+                      <td class="fb-size">1.1 MB</td>
+                      <td><span class="share-badge private">Private</span></td>
+                      <td>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('my-terrain-draft')" ondblclick="openMapViewer('my-terrain-draft')" draggable="true" ondragstart="fileDragStart(event,'my-terrain-draft')" title="Drag onto a Map Viewer window to open it there" id="row-my-terrain-draft" data-folder="scratch" style="display:none">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
@@ -1563,7 +1678,7 @@ body.ws-starter #public-warn{display:none !important}
                         <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
                       </td>
                     </tr>
-                    <tr onclick="selectFile('my-dem-clip')" ondblclick="openMapViewer('my-dem-clip')" id="row-my-dem-clip" draggable="true" ondragstart="fileDragStart(event,'my-dem-clip')" title="Drag onto a Map Viewer window to open it there">
+                    <tr onclick="selectFile('my-dem-clip')" ondblclick="openMapViewer('my-dem-clip')" draggable="true" ondragstart="fileDragStart(event,'my-dem-clip')" title="Drag onto a Map Viewer window to open it there" id="row-my-dem-clip" data-folder="scratch" style="display:none">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
@@ -1582,7 +1697,7 @@ body.ws-starter #public-warn{display:none !important}
                         <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
                       </td>
                     </tr>
-                    <tr onclick="selectFile('my-field-markup')" ondblclick="openMapViewer('my-field-markup')" id="row-my-field-markup" draggable="true" ondragstart="fileDragStart(event,'my-field-markup')" title="Drag onto a Map Viewer window to open it there">
+                    <tr onclick="selectFile('my-field-markup')" ondblclick="openMapViewer('my-field-markup')" draggable="true" ondragstart="fileDragStart(event,'my-field-markup')" title="Drag onto a Map Viewer window to open it there" id="row-my-field-markup" data-folder="scratch" style="display:none">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
@@ -1601,7 +1716,7 @@ body.ws-starter #public-warn{display:none !important}
                         <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
                       </td>
                     </tr>
-                    <tr onclick="selectFile('my-waypoints-scratch')" ondblclick="openMapViewer('my-waypoints-scratch')" id="row-my-waypoints-scratch" draggable="true" ondragstart="fileDragStart(event,'my-waypoints-scratch')" title="Drag onto a Map Viewer window to open it there">
+                    <tr onclick="selectFile('my-waypoints-scratch')" ondblclick="openMapViewer('my-waypoints-scratch')" draggable="true" ondragstart="fileDragStart(event,'my-waypoints-scratch')" title="Drag onto a Map Viewer window to open it there" id="row-my-waypoints-scratch" data-folder="scratch" style="display:none">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
@@ -1620,20 +1735,39 @@ body.ws-starter #public-warn{display:none !important}
                         <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
                       </td>
                     </tr>
-                    <tr onclick="selectFile('metadata-export')" id="row-metadata-export">
+                    <tr onclick="selectFile('harbour-proposal')" id="row-harbour-proposal" data-folder="proposals" style="display:none">
+                      <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
+                      <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
+                      <td>
+                        <div class="fb-name-cell">
+                          <div class="fb-icon docx">DOCX</div>
+                          <div>
+                            <div class="fb-file-name">harbour_survey_proposal.docx</div>
+                            <div class="fb-file-type">Word document</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fb-meta">Jun 12, 2026</td>
+                      <td class="fb-size">2.4 MB</td>
+                      <td><span class="share-badge private">Private</span></td>
+                      <td>
+                        <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
+                      </td>
+                    </tr>
+                    <tr onclick="selectFile('harbour-site-points')" id="row-harbour-site-points" data-folder="proposals" style="display:none">
                       <td><input type="checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()"></td>
                       <td><button class="star-btn" onclick="event.stopPropagation();toggleStar(this)" title="Star" aria-label="Star"><svg class="star-icon" viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></td>
                       <td>
                         <div class="fb-name-cell">
                           <div class="fb-icon csv">CSV</div>
                           <div>
-                            <div class="fb-file-name">metadata_export_jun2026.csv</div>
-                            <div class="fb-file-type">CSV Spreadsheet</div>
+                            <div class="fb-file-name">harbour_site_points.csv</div>
+                            <div class="fb-file-type">CSV · latitude/longitude found</div>
                           </div>
                         </div>
                       </td>
-                      <td class="fb-meta">Jun 5, 2026</td>
-                      <td class="fb-size">840 KB</td>
+                      <td class="fb-meta">Jun 11, 2026</td>
+                      <td class="fb-size">64 KB</td>
                       <td><span class="share-badge private">Private</span></td>
                       <td>
                         <div class="fb-actions-cell" ><button class="btn xs" onclick="event.stopPropagation();toast('Downloading…')">Download</button><button class="btn xs" onclick="event.stopPropagation();openModal('modal-share')">Share</button><button class="file-menu-btn" onclick="event.stopPropagation();openFileMenu(event,this)" aria-label="More options" title="More options"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></div>
@@ -2126,8 +2260,8 @@ body.ws-starter #public-warn{display:none !important}
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4.5h4l1.5 1.5H14v7H2z" stroke="#c2410c" stroke-width="1.4" stroke-linejoin="round"/></svg>
                     </div>
                     <div>
-                      <div class="fb-file-name">Drafts</div>
-                      <div class="fb-file-type">Folder · 4 files · 410 MB</div>
+                      <div class="fb-file-name">Proposals</div>
+                      <div class="fb-file-type">Folder · 2 files · 2.5 MB</div>
                     </div>
                   </div>
                 </td>
@@ -2141,7 +2275,7 @@ body.ws-starter #public-warn{display:none !important}
                 <td>
                   <div style="display:flex;gap:4px">
                     <button class="btn xs" onclick="event.stopPropagation();toast('Settings opened…')">Manage</button>
-                    <button class="btn xs danger" onclick="event.stopPropagation();revokeShare(this,'Drafts')">Revoke</button>
+                    <button class="btn xs danger" onclick="event.stopPropagation();revokeShare(this,'Proposals')">Revoke</button>
                   </div>
                 </td>
               </tr>
@@ -3261,7 +3395,7 @@ body.ws-starter #public-warn{display:none !important}
     <select class="modal-select" id="upload-dest" onchange="updateUploadDest(this.value)">
       <optgroup label="My files (only you)">
         <option>My files /</option>
-        <option>My files / Exports</option>
+        <option>My files / Proposals</option>
       </optgroup>
       <optgroup label="Projects (project members)">
         <option>National Topographic Sets</option>
@@ -3378,7 +3512,7 @@ body.ws-starter #public-warn{display:none !important}
     <div class="modal-label">Location</div>
     <select class="modal-select">
       <option>My files /</option>
-      <option>My files / Drafts</option>
+      <option>My files / Scratch work</option>
       <option>Org library /</option>
     </select>
     <div class="modal-row">
@@ -3392,7 +3526,7 @@ body.ws-starter #public-warn{display:none !important}
 <div class="modal-bg" id="modal-grant-access">
   <div class="modal">
     <div class="modal-title">Grant drive access</div>
-    <div class="modal-sub">Add a user to the Blue Marble Drive. They must already be a member of your Hub organisation.</div>
+    <div class="modal-sub">Add a user to Blue Marble Relay. They must already be a member of your Hub organisation.</div>
 
     <div class="modal-label">User</div>
     <select class="modal-select">
@@ -3400,7 +3534,7 @@ body.ws-starter #public-warn{display:none !important}
       <option>Priya Nair (priya@acme.com)</option>
     </select>
 
-    <div class="modal-label">Drive role</div>
+    <div class="modal-label">Relay role</div>
     <select class="modal-select">
       <option>Member — upload, download, share own files</option>
       <option>Data Admin — manage all files and user access</option>
@@ -3432,7 +3566,7 @@ body.ws-starter #public-warn{display:none !important}
     </div>
     <div style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Access pending</div>
     <div style="font-size:13.5px;color:var(--text-muted);line-height:1.6;margin-bottom:6px">
-      Your account <strong style="color:var(--text-secondary)">gary@acme.com</strong> doesn't have access to Blue Marble Drive yet.
+      Your account <strong style="color:var(--text-secondary)">gary@acme.com</strong> doesn't have access to Blue Marble Relay yet.
     </div>
     <div style="font-size:13px;color:var(--text-muted);margin-bottom:24px">
       Contact your organisation admin to request access, or return to the Hub.
@@ -3850,11 +3984,12 @@ const PROJECTS_PREVIEW = [
   {id:'basemap-ref',     name:'Basemap & Reference Layers',  starred:false, updated:'Yesterday',   docs:11, comments:1},
 ];
 const ACTIVITY_FEED = [
-  {user:'mary',  text:'uploaded <b>q2_survey_results.gpkg</b>', time:'Just now'},
-  {user:'penny', text:'shared <b>Colorado Maps</b> with Rand McNally', time:'28 mins ago'},
-  {user:'alan',  text:'added a pin to <b>terrain_analysis_v3.gmmp</b>', time:'2 hours ago'},
-  {user:'jane',  text:'created new folder <b>Field Surveys 2025</b>', time:'1 day ago'},
-  {user:'gary',  text:'joined <b>Northern Survey Project</b>', time:'2 days ago'},
+  // My files is private, so its feed is your own actions plus people using what you shared
+  {user:'jane',  text:'added <b>harbour_site_points.csv</b>. Latitude/longitude columns found', time:'Just now'},
+  {user:'mary',  text:'opened your shared folder <b>Proposals</b>', time:'28 mins ago'},
+  {user:'jane',  text:'moved <b>q2_survey_results.gpkg</b> into <b>Northern Survey Project</b>', time:'2 hours ago'},
+  {user:'jane',  text:'created a public link to <b>client_extract_q2.gpkg</b>', time:'1 day ago'},
+  {user:'mary',  text:'viewed <b>waypoints_scratch.kml</b>, which you shared with her', time:'2 days ago'},
 ];
 function renderProjectsPreview(){
   const grid=document.getElementById('dash-projects-grid');
@@ -4448,30 +4583,47 @@ function filterAuditLog(val){
     row.style.display = (val==='all' || row.dataset.action===val) ? '' : 'none';
   });
 }
+/* My files folders really filter now. Rows carry data-folder; folder rows live in root. */
+const MY_FOLDERS = {root:'My files', notes:'Notes & reference', scratch:'Scratch work', proposals:'Proposals'};
+let currentMyFolder = 'root';
 function selectFolder(id){
-  document.querySelectorAll('.fb-tree-item').forEach(el=>el.classList.remove('active'));
-  event.target.closest('.fb-tree-item').classList.add('active');
-  const labels={'root':'My files','field-surveys':'Drafts','basemaps':'Imports','exports':'Exports','org':'Org library','shared-data':'Shared Data','archive':'Archive'};
-  document.getElementById('fb-path-label').textContent=labels[id]||'My files';
-  toast('Opened folder');
+  if(!MY_FOLDERS[id]) id = 'root';
+  currentMyFolder = id;
+  document.querySelectorAll('#view-files .fb-tree-item').forEach(el=>el.classList.toggle('active', el.dataset.folder===id));
+  const label = document.getElementById('fb-path-label');
+  // The folder tree shows where you are; the toolbar just names the open folder
+  label.textContent = MY_FOLDERS[id];
+  const search = document.querySelector('#view-files .fb-search input'); if(search) search.value = '';
+  document.querySelectorAll('#fb-tbody tr[data-folder]').forEach(r=>{ r.style.display = r.dataset.folder===id ? '' : 'none'; r.classList.remove('selected'); });
+  document.querySelectorAll('#fb-tbody input[type=checkbox]').forEach(c=>c.checked=false);
+  if(typeof onCheckboxChange==='function') onCheckboxChange();
+  if(typeof renderGrid==='function') renderGrid();
 }
 
 /* ─── FILE SELECTION ─── */
 const FILE_DATA={
-  'field-surveys-folder':{name:'Drafts',type:'Folder',modified:'Jun 17, 2026',size:'410 MB',sharing:'Private',icon:'folder',crs:null},
-  'basemaps-folder':{name:'Imports',type:'Folder',modified:'Jun 12, 2026',size:'2.9 GB',sharing:'Private',icon:'folder',crs:null},
   'q2-survey':{name:'q2_survey_results.gpkg',type:'GeoPackage',modified:'Jun 15, 2026',size:'142 MB',sharing:'Project members',icon:'gpkg',crs:'EPSG:4326 (WGS 84)',bbox:'43.2°N–44.8°N, 79.3°W–80.1°W'},
   'terrain-analysis':{name:'terrain_analysis_v3.gmmp',type:'Global Mapper Project',modified:'Jun 14, 2026',size:'88 MB',sharing:'Project members',icon:'gm',crs:'EPSG:32617',bbox:'43.5°N–44.2°N, 79.4°W–80.0°W'},
   'dem-mosaic':{name:'dem_mosaic_30m.tif',type:'GeoTIFF Raster',modified:'Jun 10, 2026',size:'1.2 GB',sharing:'Project members',icon:'tif',crs:'EPSG:32617 (UTM Zone 17N)',bbox:'43.0°N–45.0°N, 78.5°W–81.0°W'},
   'field-map':{name:'field_map_2025_06.pdf',type:'GeoPDF',modified:'Jun 9, 2026',size:'34 MB',sharing:'Project members',icon:'pdf',crs:'EPSG:4326',bbox:'43.6°N–44.1°N, 79.5°W–79.9°W'},
   'waypoints':{name:'waypoints_north_sector.kml',type:'KML',modified:'Jun 7, 2026',size:'2.1 MB',sharing:'Project members',icon:'kml',crs:'EPSG:4326',bbox:'44.0°N–44.8°N, 79.3°W–79.8°W'},
-  'metadata-export':{name:'metadata_export_jun2026.csv',type:'CSV',modified:'Jun 5, 2026',size:'840 KB',sharing:'Private',icon:'csv',crs:null,bbox:null},
+  'metadata-export':{name:'metadata_export_jun2026.csv',type:'CSV (no location columns)',modified:'Jun 5, 2026',size:'840 KB',sharing:'Private',icon:'csv',crs:null,bbox:null},
   // Personal files in My files (the originals above are Northern Survey Project files)
   'my-client-extract':{name:'client_extract_q2.gpkg',type:'GeoPackage',modified:'Jun 15, 2026',size:'142 MB',sharing:'Public link',icon:'gpkg',crs:'EPSG:4326 (WGS 84)',bbox:'43.2°N–44.8°N, 79.3°W–80.1°W'},
   'my-terrain-draft':{name:'terrain_test_v4_draft.gmmp',type:'Global Mapper Project',modified:'Jun 14, 2026',size:'88 MB',sharing:'Private',icon:'gm',crs:'EPSG:32617',bbox:'43.5°N–44.2°N, 79.4°W–80.0°W'},
   'my-dem-clip':{name:'dem_clip_test.tif',type:'GeoTIFF Raster',modified:'Jun 10, 2026',size:'1.2 GB',sharing:'Password link',icon:'tif',crs:'EPSG:32617 (UTM Zone 17N)',bbox:'43.0°N–45.0°N, 78.5°W–81.0°W'},
   'my-field-markup':{name:'field_map_markup_jane.pdf',type:'GeoPDF',modified:'Jun 9, 2026',size:'34 MB',sharing:'Private',icon:'pdf',crs:'EPSG:4326',bbox:'43.6°N–44.1°N, 79.5°W–79.9°W'},
   'my-waypoints-scratch':{name:'waypoints_scratch.kml',type:'KML',modified:'Jun 7, 2026',size:'2.1 MB',sharing:'Private',icon:'kml',crs:'EPSG:4326',bbox:'44.0°N–44.8°N, 79.3°W–79.8°W'},
+  // My files folders + personal files (docs and CSVs included)
+  'f-notes':{name:'Notes & reference',type:'Folder',modified:'Jun 18, 2026',size:'1.5 MB',sharing:'Private',icon:'folder',crs:null},
+  'f-scratch':{name:'Scratch work',type:'Folder',modified:'Jun 14, 2026',size:'1.3 GB',sharing:'Private',icon:'folder',crs:null},
+  'f-proposals':{name:'Proposals',type:'Folder',modified:'Jun 12, 2026',size:'2.5 MB',sharing:'Private',icon:'folder',crs:null},
+  'gps-log-jun12':{name:'gps_log_jun12.csv',type:'CSV (latitude/longitude columns found)',modified:'Jun 12, 2026',size:'1.8 MB',sharing:'Private',icon:'csv',crs:'EPSG:4326 (assumed from lat/long columns)',bbox:'43.91°N–43.98°N, 79.58°W–79.69°W'},
+  'survey-method-notes':{name:'survey_method_notes.docx',type:'Word document',modified:'Jun 18, 2026',size:'260 KB',sharing:'Private',icon:'docx',crs:null,bbox:null},
+  'lidar-qc-checklist':{name:'lidar_qc_checklist.docx',type:'Word document',modified:'May 30, 2026',size:'94 KB',sharing:'Private',icon:'docx',crs:null,bbox:null},
+  'crs-cheatsheet':{name:'crs_cheatsheet.pdf',type:'PDF document (not georeferenced)',modified:'Apr 22, 2026',size:'1.1 MB',sharing:'Private',icon:'pdfdoc',crs:null,bbox:null},
+  'harbour-proposal':{name:'harbour_survey_proposal.docx',type:'Word document',modified:'Jun 12, 2026',size:'2.4 MB',sharing:'Private',icon:'docx',crs:null,bbox:null},
+  'harbour-site-points':{name:'harbour_site_points.csv',type:'CSV (latitude/longitude columns found)',modified:'Jun 11, 2026',size:'64 KB',sharing:'Private',icon:'csv',crs:'EPSG:4326 (assumed from lat/long columns)',bbox:'44.49°N–44.52°N, 80.20°W–80.24°W'}
 };
 
 /* ─── MAP VIEWER (Felt-inspired, read-only preview) ───
@@ -4829,7 +4981,7 @@ function mvHandleDrop(e){
   setTimeout(()=>{
     const detected = 'EPSG:26917 (NAD83 / UTM 17N)';
     const target = document.getElementById('mv-crs-select').selectedOptions[0];
-    toast('Added — reprojected from '+detected+' to '+(target?target.textContent:'project CRS')+' via Geocalc. Session only — not saved to the Collaboration Environment yet.');
+    toast('Added — reprojected from '+detected+' to '+(target?target.textContent:'project CRS')+' via Geocalc. Session only — not saved to Relay yet.');
     addTempLayer(fileName);
   }, 900);
 }
@@ -4862,7 +5014,7 @@ function openSaveViewModal(){
 function saveCurrentView(){
   const name = document.getElementById('save-view-name-input').value.trim() || 'Untitled task view';
   closeModal('modal-save-view');
-  toast('Saved view "'+name+'" — share its link like any other Collaboration Environment share, honoring the same access controls.');
+  toast('Saved view "'+name+'" — share its link like any other Relay share, honoring the same access controls.');
 }
 
 /* ─── Canvas click routing + coordinate tracking + drag/drop wiring ─── */
@@ -4903,9 +5055,9 @@ function selectFile(id) {
   const f = FILE_DATA[id];
   if (!f) return;
 
-  const iconClasses = {folder:'folder',gpkg:'gpkg',gm:'gm',tif:'tif',pdf:'pdf',kml:'kml',csv:'csv'};
+  const iconClasses = {folder:'folder',gpkg:'gpkg',gm:'gm',tif:'tif',pdf:'pdf',kml:'kml',csv:'csv',docx:'docx',pdfdoc:'pdf'};
   const ic = iconClasses[f.icon] || 'gm';
-  const labelMap = {folder:'📁',gpkg:'GPKG',gm:'GMMP',tif:'TIF',pdf:'PDF',kml:'KML',csv:'CSV'};
+  const labelMap = {folder:'📁',gpkg:'GPKG',gm:'GMMP',tif:'TIF',pdf:'PDF',kml:'KML',csv:'CSV',docx:'DOCX',pdfdoc:'PDF'};
   const label = labelMap[f.icon] || 'FILE';
 
   let geoRows = '';
@@ -5030,7 +5182,7 @@ function renderMultiSelectPanel(checkedBoxes) {
   const titleEl = document.getElementById('fb-info-title');
   if (titleEl) titleEl.textContent = checkedBoxes.length + ' items selected';
 
-  const iconClasses = {folder:'folder',gpkg:'gpkg',gm:'gm',tif:'tif',pdf:'pdf',kml:'kml',csv:'csv'};
+  const iconClasses = {folder:'folder',gpkg:'gpkg',gm:'gm',tif:'tif',pdf:'pdf',kml:'kml',csv:'csv',docx:'docx',pdfdoc:'pdf'};
 
   // Build list of selected files (up to 6, then "+N more")
   const items = checkedBoxes.slice(0,6).map(cb => {
@@ -5038,7 +5190,7 @@ function renderMultiSelectPanel(checkedBoxes) {
     const name = row ? (row.querySelector('.fb-file-name') || {}).textContent || 'Unknown' : 'Unknown';
     const iconEl = row && row.querySelector('.fb-icon');
     const iconCls = iconEl ? iconEl.className.replace('fb-icon ','') : 'gm';
-    const labelMap = {folder:'📁',gpkg:'GPKG',gm:'GMMP',tif:'TIF',pdf:'PDF',kml:'KML',csv:'CSV'};
+    const labelMap = {folder:'📁',gpkg:'GPKG',gm:'GMMP',tif:'TIF',pdf:'PDF',kml:'KML',csv:'CSV',docx:'DOCX',pdfdoc:'PDF'};
     const label = labelMap[iconCls] || 'FILE';
     const sizeEl = row && row.querySelector('.fb-size');
     const size = sizeEl ? sizeEl.textContent.trim() : '';
@@ -5126,9 +5278,11 @@ function toggleSelectAll(cb) {
 
 /* ─── FILTER ─── */
 function filterFiles(q){
+  // Empty search = the open folder; a search looks across all of My files
   const rows=document.querySelectorAll('#fb-tbody tr');
   rows.forEach(r=>{
     const name=r.querySelector('.fb-file-name');
+    if(!q){ r.style.display = (!r.dataset.folder || r.dataset.folder===currentMyFolder) ? '' : 'none'; return; }
     if(!name){r.style.display='';return;}
     r.style.display=name.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';
   });
@@ -5566,9 +5720,9 @@ function openLinkFromLibrary(){
     <select class="modal-select" id="move-destination">
       <optgroup label="My files (only you)">
         <option>My files /</option>
-        <option>My files / Drafts</option>
-        <option>My files / Imports</option>
-        <option>My files / Exports</option>
+        <option>My files / Notes &amp; reference</option>
+        <option>My files / Scratch work</option>
+        <option>My files / Proposals</option>
       </optgroup>
       <optgroup label="Projects (project members)">
         <option>National Topographic Sets</option>
