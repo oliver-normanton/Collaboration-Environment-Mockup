@@ -995,6 +995,7 @@ body.ws-starter #public-warn{display:none !important}
 .fb-icon.las{background:#fff7ed;color:#b45309}
 .fb-icon.shp{background:#e6f4f6;color:#0e7a8c}
 .fb-icon.dwg{background:#f1f5f9;color:#475569}
+.fb-icon.docx{background:#e8f0fe;color:#1d4ed8}
 
 #mv-fp-svg{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:none;transition:opacity .35s ease;touch-action:none}
 #mv-fp-svg.on{display:block}
@@ -3827,7 +3828,8 @@ const FP_EXT = {
   pdf: {icon:'pdf', label:'PDF',  cat:'map',        type:'GeoPDF'},
   gmmp:{icon:'gm',  label:'GMMP', cat:'project',    type:'Global Mapper project'},
   dwg: {icon:'dwg', label:'DWG',  cat:'vector',     type:'AutoCAD drawing'},
-  csv: {icon:'csv', label:'CSV',  cat:'vector',     type:'CSV'}
+  csv: {icon:'csv', label:'CSV',  cat:'vector',     type:'CSV'},
+  docx:{icon:'docx',label:'DOCX', cat:'vector',     type:'Word document'}
 };
 /* bbox = [west, south, east, north] in WGS84. west > east means it crosses 180°. */
 function F(name, folder, crs, bbox, o){
@@ -3958,6 +3960,7 @@ function fpFrame(){
 function fpOwned(files){ return (files || fp.files).filter(f=>!f.linked && !f.session); }
 function fpExtentLL(){
   let src = fp.files.filter(f=>fpOnMap(f) && !f.linked); if(!src.length) src = fp.files.filter(fpOnMap);
+  if(!src.length) return [-80.5,43.2,-78.8,44.4]; // nothing on the map yet: a neutral regional view
   const bs = src.map(f=>fpUnwrap(f.bbox));
   return [Math.min(...bs.map(b=>b[0])), Math.min(...bs.map(b=>b[1])), Math.max(...bs.map(b=>b[2])), Math.max(...bs.map(b=>b[3]))];
 }
@@ -4160,7 +4163,7 @@ function fpRenderTree(){
       ${off.map(f=>{ const m = FP_EXT[f.ext] || FP_EXT.csv; return `<div class="fp-off-row">
         <div class="fb-icon ${m.icon}">${m.label}</div>
         <div style="min-width:0"><div class="fp-off-name">${f.name}</div><div class="fp-off-reason">${f.reason}</div>
-        <button class="fp-off-fix" onclick="toast('${f.fix}: opens the fix-up flow (not in this mockup).')">${f.fix}</button></div>
+        ${f.fix ? `<button class="fp-off-fix" onclick="toast('${f.fix}: opens the fix-up flow (not in this mockup).')">${f.fix}</button>` : ''}</div>
       </div>`;}).join('')}</div>`;
   }
   if(restricted.length){
@@ -4219,7 +4222,9 @@ function fpEnter(pid, opts){
   document.getElementById('mv-fp-svg').classList.add('on');
   fpRenderTree(); fpRenderDetails(); fpRenderLegend();
   fp.fit = fpFitTo(fpExtentLL()); fp.view = Object.assign({}, fp.fit);
-  if(opts.intro && globeReady() && !fpReduced()) fpIntro();
+  const hasData = fp.files.some(f=>fpOnMap(f) && !f.linked);
+  if(!hasData) toast('Nothing in this project is on the map yet. Use Add data, or move files in from My files.');
+  if(opts.intro && hasData && globeReady() && !fpReduced()) fpIntro();
   else fpRender();
 }
 function fpTopbarText(){
@@ -4335,6 +4340,7 @@ function globeDraw(){
   const centre = G.proj.invert([f.cx, f.cy]);
   let ph = '';
   for(const pid of Object.keys(FP_PROJECTS)){
+    if(!FP_PROJECTS[pid].files.some(f=>fpOnMap(f) && !f.linked)) continue; // nowhere to put it yet
     const c = fpProjectCentre(pid);
     if(centre && d3.geoDistance(c, centre) > Math.PI/2 - 0.08) continue; // far side of the globe
     const p = G.proj(c); if(!p) continue;
@@ -4408,6 +4414,20 @@ function fpFlyIn(fileId){
 function fpGlobeBtn(){ if(!fp.on) return; fp.globe ? fpFlyIn() : fpEnterGlobe(); }
 
 /* ─── Wiring: zoom buttons, coords, panning, clicks, resize ─── */
+
+/* Projects created in Relay (collab.html) are kept in localStorage; add them
+   here so "Show on map" and the globe know about them. */
+(function loadCreatedProjects(){
+  let list = [];
+  try { list = JSON.parse(localStorage.getItem('relay:projects') || '[]'); } catch(e){}
+  list.forEach(p=>{
+    PROJECT_DATA[p.id] = {name:p.name, basemap:'light'};
+    const files = p.files.map(f=>F(f.n, 'Moved from My files', f.crs, f.bbox, {size:f.s, modified:'Today', by:p.ownerName,
+      reason: f.bbox ? undefined : (f.reason || 'Not map data')}));
+    (p.library || []).forEach(l=>files.push(F(l.n, 'Linked from Org library', l.crs, l.bbox, {linked:true, size:'—', modified:'—', by:'Org library'})));
+    FP_PROJECTS[p.id] = {files};
+  });
+})();
 const _fpOrigZoomStep = mvZoomStep;
 mvZoomStep = function(dir){
   if(!fp.on) return _fpOrigZoomStep(dir);

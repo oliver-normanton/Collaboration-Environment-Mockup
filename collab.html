@@ -974,6 +974,7 @@ body.ws-starter #public-warn{display:none !important}
 .pj-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
 .pj-title{font-size:22px;font-weight:600;color:var(--text-primary);line-height:1.25}
 .pj-sub{font-size:12.5px;color:var(--text-muted);margin-top:4px}
+.pj-desc{font-size:13px;color:var(--text-secondary);margin-top:4px;max-width:620px}
 .pj-actions{display:flex;gap:8px;flex-wrap:wrap}
 .pj-count{font-size:11.5px;color:var(--text-muted)}
 .pj-folder-row td{background:var(--surface-2);font-size:11.5px;font-weight:600;color:var(--text-secondary);padding-top:7px;padding-bottom:7px}
@@ -991,6 +992,46 @@ body.ws-starter #public-warn{display:none !important}
 #view-private #private-notice-member,#view-private #private-notice-admin,#view-private #private-user-picker{display:none !important}
 #view-private .two-col{grid-template-columns:minmax(0,620px)}
 #view-private .two-col > div:first-child{display:none}
+
+/* ─── New project flow ─── */
+.np-modal{width:600px;padding:0;display:flex;flex-direction:column;max-height:calc(100vh - 48px)}
+.np-head{padding:22px 24px 0}
+.np-steps{display:flex;gap:6px;list-style:none;margin:14px 0 0;padding:0 0 14px;border-bottom:1px solid var(--border)}
+.np-steps li{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-muted);flex:1}
+.np-steps li span{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;flex-shrink:0}
+.np-steps li.active{color:var(--text-primary);font-weight:600}
+.np-steps li.active span{border-color:var(--avenza-blue);background:var(--avenza-blue);color:#fff}
+.np-steps li.done span{border-color:var(--avenza-teal);background:var(--avenza-teal-lt);color:var(--avenza-teal)}
+.np-pane{padding:18px 24px 6px;overflow-y:auto}
+.np-pane textarea{resize:vertical;font-family:'DM Sans',sans-serif}
+.np-opt{text-transform:none;letter-spacing:0;font-weight:500;color:var(--text-muted)}
+.np-error{font-size:11.5px;color:var(--red);min-height:16px;margin-top:4px}
+.np-hint{font-size:11.5px;color:var(--text-muted);line-height:1.5;margin-top:6px}
+.np-add-row{display:flex;gap:8px}
+.np-add-row .modal-select{margin:0;flex:1}
+.np-people{margin:12px 0 6px;border:1px solid var(--border);border-radius:var(--radius-sm)}
+.np-person{display:flex;align-items:center;gap:10px;padding:9px 12px;border-top:1px solid var(--surface-3)}
+.np-person:first-child{border-top:none}
+.np-person .pj-av{width:26px;height:26px;font-size:9.5px}
+.np-pname{flex:1;min-width:0;font-size:12.5px;font-weight:500;color:var(--text-primary)}
+.np-pname small{display:block;font-size:11px;font-weight:400;color:var(--text-muted)}
+.np-person select,.np-person input[type=date]{font:12px 'DM Sans',sans-serif;border:1px solid var(--border);border-radius:6px;padding:4px 6px;background:var(--surface);color:var(--text-primary)}
+.np-person-head{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;padding-top:7px;padding-bottom:7px;background:var(--surface-2)}
+.np-person select{width:104px}
+.np-person input[type=date]{width:122px}
+.np-x{border:none;background:none;color:var(--text-muted);cursor:pointer;width:24px;height:24px;border-radius:5px}
+.np-x:hover{background:var(--surface-2);color:var(--red)}
+.np-group-title{font-size:12.5px;font-weight:600;color:var(--text-primary);display:flex;gap:8px;align-items:center}
+.np-count{font-size:11px;font-weight:500;color:var(--avenza-teal)}
+.np-sub{font-size:11.5px;color:var(--text-muted);margin:2px 0 8px}
+.np-list{border:1px solid var(--border);border-radius:var(--radius-sm);max-height:180px;overflow-y:auto}
+.np-file{display:flex;align-items:center;gap:10px;padding:7px 12px;border-top:1px solid var(--surface-3);cursor:pointer;font-size:12.5px}
+.np-file:first-child{border-top:none}
+.np-file:hover{background:var(--surface-2)}
+.np-file .fb-icon{width:24px;height:24px;font-size:7px;flex-shrink:0}
+.np-file-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-primary)}
+.np-file-meta{font-size:11px;color:var(--text-muted);white-space:nowrap}
+.np-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 24px 18px;border-top:1px solid var(--border);margin-top:12px}
 </style>
 </head>
 <body>
@@ -1071,7 +1112,7 @@ body.ws-starter #public-warn{display:none !important}
     </div>
 
     <div class="sb-nav">
-      <button class="sb-new-project-btn" onclick="toast('This would open the Create Project flow — not part of this mockup yet.')">
+      <button class="sb-new-project-btn" onclick="openNewProject()">
         <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         New project
       </button>
@@ -1254,7 +1295,7 @@ body.ws-starter #public-warn{display:none !important}
                 <option>Name</option>
                 <option>Date created</option>
               </select>
-              <button class="btn primary sm" onclick="toast('This would open the Create Project flow — not part of this mockup yet.')">+ Create new</button>
+              <button class="btn primary sm" onclick="openNewProject()">+ Create new</button>
             </div>
           </div>
           <div class="dash-projects-grid" id="dash-projects-grid"></div>
@@ -1274,6 +1315,7 @@ body.ws-starter #public-warn{display:none !important}
           <div class="pj-head">
             <div style="min-width:0">
               <h1 class="pj-title" id="pj-name">Project</h1>
+              <div class="pj-desc" id="pj-desc" style="display:none"></div>
               <div class="pj-sub" id="pj-sub"></div>
             </div>
             <div class="pj-actions">
@@ -1285,6 +1327,7 @@ body.ws-starter #public-warn{display:none !important}
                 <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M6.5 9.5l3-3M7 4.5l1-1a2.8 2.8 0 014 4l-1 1M9 11.5l-1 1a2.8 2.8 0 01-4-4l1-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
                 Link from library
               </button>
+              <button class="btn" id="pj-delete-btn" style="display:none" onclick="deleteCreatedProject()" title="Delete this project and move its files back to My files">Delete</button>
               <button class="btn primary" id="pj-map-btn">
                 <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M2 8h12M8 2c-1.8 1.7-2.7 3.8-2.7 6s.9 4.3 2.7 6c1.8-1.7 2.7-3.8 2.7-6S9.8 3.7 8 2z" stroke="currentColor" stroke-width="1.1"/></svg>
                 Show on map
@@ -3994,13 +4037,14 @@ const ACTIVITY_FEED = [
 function renderProjectsPreview(){
   const grid=document.getElementById('dash-projects-grid');
   if(!grid) return;
-  const _pl = ceWorkspaceIsStarter() ? [] : PROJECTS_PREVIEW;
+  const org = currentOrg || 'acme';
+  const _pl = PROJECTS_PREVIEW.filter(p => p.created ? p.org === org : !ceWorkspaceIsStarter());
   if(!_pl.length){ grid.innerHTML = '<div class="ws-empty-inline">No projects yet in this workspace.</div>'; return; }
   grid.innerHTML = _pl.map((p,i)=>`
     <div class="dash-pcard" onclick="openProject('${p.id}')">
       <div class="dash-pcard-thumb">
         <svg width="36" height="36" viewBox="0 0 16 16" fill="none"><path d="M2 4l4-1.4 4 1.4 4-1.4v9.4l-4 1.4-4-1.4-4 1.4V4z" stroke="#98a2b3" stroke-width="1.1" stroke-linejoin="round"/><path d="M6 2.8v9.4M10 4.2v9.4" stroke="#98a2b3" stroke-width="1.1"/></svg>
-        <button class="dash-pcard-star${p.starred?' starred':''}" onclick="event.stopPropagation();toggleDashStar(${i})" title="${p.starred?'Unstar':'Star'}">
+        <button class="dash-pcard-star${p.starred?' starred':''}" onclick="event.stopPropagation();toggleDashStar(${PROJECTS_PREVIEW.indexOf(p)})" title="${p.starred?'Unstar':'Star'}">
           <svg viewBox="0 0 16 16" fill="${p.starred?'#fec84b':'none'}"><path d="M8 2l1.5 3.5 3.8.4-2.7 2.6.7 3.7L8 10.5l-3.3 1.7.7-3.7-2.7-2.6 3.8-.4L8 2z" stroke="${p.starred?'#fec84b':'#98a2b3'}" stroke-width="1.3" stroke-linejoin="round"/></svg>
         </button>
         <button class="dash-pcard-map" onclick="event.stopPropagation();window.location.href='viewer.html?project=${encodeURIComponent(p.id)}&footprints=1'" title="See where every file in this project sits">
@@ -4594,7 +4638,7 @@ function selectFolder(id){
   // The folder tree shows where you are; the toolbar just names the open folder
   label.textContent = MY_FOLDERS[id];
   const search = document.querySelector('#view-files .fb-search input'); if(search) search.value = '';
-  document.querySelectorAll('#fb-tbody tr[data-folder]').forEach(r=>{ r.style.display = r.dataset.folder===id ? '' : 'none'; r.classList.remove('selected'); });
+  document.querySelectorAll('#fb-tbody tr[data-folder]').forEach(r=>{ r.style.display = (r.dataset.folder===id && r.dataset.moved!=='1') ? '' : 'none'; r.classList.remove('selected'); });
   document.querySelectorAll('#fb-tbody input[type=checkbox]').forEach(c=>c.checked=false);
   if(typeof onCheckboxChange==='function') onCheckboxChange();
   if(typeof renderGrid==='function') renderGrid();
@@ -5286,6 +5330,7 @@ function filterFiles(q){
   const rows=document.querySelectorAll('#fb-tbody tr');
   rows.forEach(r=>{
     const name=r.querySelector('.fb-file-name');
+    if(r.dataset.moved==='1'){ r.style.display='none'; return; }
     if(!q){ r.style.display = (!r.dataset.folder || r.dataset.folder===currentMyFolder) ? '' : 'none'; return; }
     if(!name){r.style.display='';return;}
     r.style.display=name.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';
@@ -5577,7 +5622,7 @@ const PROJECT_MEMBERS = [
   {n:'Penny Purchaser', i:'PP', c:'#be185d', r:'Viewer'}
 ];
 const PJ_EXT = {tif:['tif','TIF','GeoTIFF raster'],gpkg:['gpkg','GPKG','GeoPackage'],shp:['shp','SHP','Shapefile'],kml:['kml','KML','KML'],
-  las:['las','LAS','LAS point cloud'],pdf:['pdf','PDF','GeoPDF'],gmmp:['gm','GMMP','Global Mapper project'],dwg:['dwg','DWG','AutoCAD drawing'],csv:['csv','CSV','CSV']};
+  las:['las','LAS','LAS point cloud'],pdf:['pdf','PDF','GeoPDF'],gmmp:['gm','GMMP','Global Mapper project'],dwg:['dwg','DWG','AutoCAD drawing'],csv:['csv','CSV','CSV'],docx:['docx','DOCX','Word document']};
 let currentProjectPageId = null;
 const PJ_LINK_SVG = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6.5 9.5l3-3M7 4.5l1-1a2.8 2.8 0 014 4l-1 1M9 11.5l-1 1a2.8 2.8 0 01-4-4l1-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
 
@@ -5592,7 +5637,11 @@ function openProject(id){
   const visible = files.filter(f=>!f.r), restricted = files.length - visible.length;
   const links = PROJECT_LINKS[id] || [];
   document.getElementById('pj-sub').textContent =
-    `${files.length} files · ${links.length} linked from the library · ${PROJECT_MEMBERS.length} members · Updated ${meta.updated}`;
+    `${files.length} files · ${links.length} linked from the library · ${projectMembers(id).length} members · Updated ${meta.updated}`;
+  const del = document.getElementById('pj-delete-btn'); if(del) del.style.display = meta.created ? '' : 'none';
+  const created = meta.created ? relayLoadCreated().find(p=>p.id===id) : null;
+  const dEl = document.getElementById('pj-desc');
+  dEl.textContent = created && created.desc ? created.desc : ''; dEl.style.display = dEl.textContent ? '' : 'none';
   document.getElementById('pj-map-btn').onclick = ()=>{ window.location.href = 'viewer.html?project='+encodeURIComponent(id)+'&footprints=1'; };
   document.getElementById('pj-upload-btn').onclick = ()=>openUploadTo(meta.name);
   document.getElementById('pj-files-count').textContent = visible.length + (visible.length===1?' file':' files');
@@ -5625,7 +5674,7 @@ function openProject(id){
     </tr>`;}).join('')
     : '<tr><td class="pj-empty">Nothing linked yet. Link basemaps or boundaries from the Org library so this project always uses the current version.</td></tr>';
 
-  document.getElementById('pj-members').innerHTML = PROJECT_MEMBERS.map(m=>`
+  document.getElementById('pj-members').innerHTML = projectMembers(id).map(m=>`
     <div class="pj-member"><span class="pj-av" style="background:${m.c}">${m.i}</span>
       <div><div class="pj-mname">${m.n}</div><div class="pj-mrole">${m.r}</div></div>
       ${m.exp ? `<span class="pj-expiry" title="Their access ends; the files they uploaded stay with the project">${m.exp}</span>` : ''}
@@ -5655,6 +5704,202 @@ function openUploadTo(dest){
 function openLinkFromLibrary(){
   toast('Pick files from the Org library to link. They stay read-only here and update when the library copy changes.');
 }
+
+
+/* ═══ NEW PROJECT ═══
+   Created projects are kept in localStorage (key relay:projects) so they
+   survive a reload and the map viewer can draw their footprints. */
+const RELAY_PROJECTS_KEY = 'relay:projects';
+const NP_COLLEAGUES = [
+  {n:'Mary Beth',       i:'MB', c:'#1ba461', note:'Acme Corp'},
+  {n:'Alan Rickman',    i:'AR', c:'#0f766e', note:'Contractor'},
+  {n:'Penny Purchaser', i:'PP', c:'#be185d', note:'Acme Corp'},
+  {n:'Amy Lee',         i:'AL', c:'#7c3aed', note:'Acme Corp'},
+  {n:'Mark Smith',      i:'MS', c:'#2563eb', note:'Acme Corp'}
+];
+/* What can be moved in: My files rows (map data and documents). bbox = [w,s,e,n] WGS84. */
+const NP_MYFILES = [
+  {id:'my-client-extract',   n:'client_extract_q2.gpkg',      ext:'gpkg', s:'142 MB', crs:'WGS 84 (EPSG:4326)', bbox:[-80.0,43.6,-79.4,44.3]},
+  {id:'gps-log-jun12',       n:'gps_log_jun12.csv',           ext:'csv',  s:'1.8 MB', crs:'WGS 84, from lat/long columns', bbox:[-79.69,43.91,-79.58,43.98]},
+  {id:'metadata-export',     n:'metadata_export_jun2026.csv', ext:'csv',  s:'840 KB', reason:'No location columns found'},
+  {id:'survey-method-notes', n:'survey_method_notes.docx',    ext:'docx', s:'260 KB', reason:'Document, not map data'},
+  {id:'lidar-qc-checklist',  n:'lidar_qc_checklist.docx',     ext:'docx', s:'94 KB',  reason:'Document, not map data'},
+  {id:'crs-cheatsheet',      n:'crs_cheatsheet.pdf',          ext:'pdf',  s:'1.1 MB', reason:'PDF is not georeferenced'},
+  {id:'my-terrain-draft',    n:'terrain_test_v4_draft.gmmp',  ext:'gmmp', s:'88 MB',  crs:'WGS 84 / UTM 17N (EPSG:32617)', bbox:[-80.0,43.5,-79.4,44.2]},
+  {id:'my-dem-clip',         n:'dem_clip_test.tif',           ext:'tif',  s:'1.2 GB', crs:'WGS 84 / UTM 17N (EPSG:32617)', bbox:[-79.8,43.8,-79.6,44.0]},
+  {id:'my-field-markup',     n:'field_map_markup_jane.pdf',   ext:'pdf',  s:'34 MB',  crs:'WGS 84 (EPSG:4326)', bbox:[-79.9,43.6,-79.5,44.1]},
+  {id:'my-waypoints-scratch',n:'waypoints_scratch.kml',       ext:'kml',  s:'2.1 MB', crs:'WGS 84 (EPSG:4326)', bbox:[-79.8,44.0,-79.35,44.6]},
+  {id:'harbour-proposal',    n:'harbour_survey_proposal.docx',ext:'docx', s:'2.4 MB', reason:'Document, not map data'},
+  {id:'harbour-site-points', n:'harbour_site_points.csv',     ext:'csv',  s:'64 KB',  crs:'WGS 84, from lat/long columns', bbox:[-80.24,44.49,-80.20,44.52]}
+];
+const NP_LIBRARY = [
+  {n:'acme_basemap_2026.tif',      ext:'tif',  crs:'NAD83 / UTM 17N (EPSG:26917)', bbox:[-81.6,42.6,-77.8,45.6]},
+  {n:'admin_boundaries_v3.gpkg',   ext:'gpkg', crs:'NAD83 (EPSG:4269)',            bbox:[-82.2,42.2,-77.2,46.0]},
+  {n:'acme_offices_locations.kml', ext:'kml',  crs:'WGS 84 (EPSG:4326)',           bbox:[-79.62,43.62,-79.30,43.80]}
+];
+LIBRARY_FILES['acme_offices_locations.kml'] = {type:'KML', size:'420 KB', by:'Jane Doe', m:'Jan 30, 2026'};
+const PROJECT_MEMBERS_BY = {};
+function projectMembers(id){ return PROJECT_MEMBERS_BY[id] || PROJECT_MEMBERS; }
+
+function relayLoadCreated(){ try { return JSON.parse(localStorage.getItem(RELAY_PROJECTS_KEY) || '[]'); } catch(e){ return []; } }
+function relaySaveCreated(list){ try { localStorage.setItem(RELAY_PROJECTS_KEY, JSON.stringify(list)); } catch(e){} }
+function relayApplyCreated(){
+  // Drop earlier copies, then add every stored project into the shared structures
+  for(let i = PROJECTS_PREVIEW.length - 1; i >= 0; i--) if(PROJECTS_PREVIEW[i].created) PROJECTS_PREVIEW.splice(i,1);
+  const moved = new Set();
+  relayLoadCreated().forEach(p=>{
+    PROJECTS_PREVIEW.unshift({id:p.id, name:p.name, starred:false, updated:p.updatedLabel || 'Just now', docs:p.files.length, comments:0, created:true, org:p.org});
+    PROJECT_FILES[p.id] = p.files.map(f=>({n:f.n, f:'Moved from My files', s:f.s, m:'Today', b:p.ownerName, x: f.bbox ? undefined : 1}));
+    PROJECT_LINKS[p.id] = p.links.slice();
+    PROJECT_MEMBERS_BY[p.id] = p.members;
+    p.files.forEach(f=>moved.add(f.id));
+  });
+  // Files moved into a project are no longer in My files
+  document.querySelectorAll('#fb-tbody tr[data-folder]').forEach(r=>{
+    const id = r.id.replace('row-','');
+    r.dataset.moved = moved.has(id) ? '1' : '';
+  });
+  npRefreshMyFiles();
+}
+function npRefreshMyFiles(){
+  document.querySelectorAll('#fb-tbody tr[data-folder]').forEach(r=>{
+    const inFolder = r.dataset.folder === (typeof currentMyFolder !== 'undefined' ? currentMyFolder : 'root');
+    r.style.display = (inFolder && r.dataset.moved !== '1') ? '' : 'none';
+  });
+  // Keep folder counts honest
+  ['notes','scratch','proposals'].forEach(k=>{
+    const n = [...document.querySelectorAll(`#fb-tbody tr[data-folder="${k}"]`)].filter(r=>r.dataset.moved !== '1').length;
+    const t = document.querySelector(`#row-f-${k} .fb-file-type`); if(t) t.textContent = `Folder · ${n} file${n===1?'':'s'}`;
+  });
+}
+
+let np = null;
+function openNewProject(){
+  if(typeof ceGuard === 'function' && !ceGuard('organize')) return;
+  const me = currentUser || {name:'Jane Doe', initials:'JD', color:'#0d6efd'};
+  np = {step:1, people:[{n:me.name, i:me.initials, c:me.color, role:'Project admin', me:true}], move:new Set(), link:new Set()};
+  document.getElementById('np-name').value = '';
+  document.getElementById('np-desc').value = '';
+  document.getElementById('np-crs').value = 'auto';
+  document.getElementById('np-name-error').textContent = '';
+  npRenderPeople(); npRenderFiles(); npGo(1);
+  openModal('modal-new-project');
+  setTimeout(()=>document.getElementById('np-name').focus(), 60);
+}
+function npValidate(show){
+  const v = document.getElementById('np-name').value.trim();
+  const org = currentOrg || 'acme';
+  let err = '';
+  if(!v) err = 'Give the project a name.';
+  else if(PROJECTS_PREVIEW.some(p=>p.name.toLowerCase() === v.toLowerCase() && (!p.created || p.org === org))) err = 'A project with this name already exists.';
+  const el = document.getElementById('np-name-error');
+  if(show || (v && err)) el.textContent = err; else el.textContent = '';
+  document.getElementById('np-name').setAttribute('aria-invalid', err ? 'true' : 'false');
+  return !err;
+}
+function npGo(step){
+  np.step = step;
+  document.querySelectorAll('#modal-new-project .np-pane').forEach(p=>p.hidden = +p.dataset.pane !== step);
+  document.querySelectorAll('#modal-new-project .np-steps li').forEach(li=>{
+    const k = +li.dataset.step;
+    li.classList.toggle('active', k === step); li.classList.toggle('done', k < step);
+    li.setAttribute('aria-current', k === step ? 'step' : 'false');
+  });
+  document.getElementById('np-back').textContent = step === 1 ? 'Cancel' : 'Back';
+  document.getElementById('np-next').textContent = step === 3 ? 'Create project' : 'Next';
+}
+function npNext(){
+  if(np.step === 1 && !npValidate(true)){ document.getElementById('np-name').focus(); return; }
+  if(np.step < 3) npGo(np.step + 1); else npCreate();
+}
+function npBack(){ if(np.step === 1) closeModal('modal-new-project'); else npGo(np.step - 1); }
+
+function npRenderPeople(){
+  const taken = new Set(np.people.map(p=>p.n));
+  const sel = document.getElementById('np-person');
+  const avail = NP_COLLEAGUES.filter(p=>!taken.has(p.n));
+  sel.innerHTML = avail.length ? avail.map(p=>`<option value="${p.n}">${p.n} (${p.note})</option>`).join('') : '<option value="">Everyone has been added</option>';
+  sel.disabled = !avail.length;
+  document.getElementById('np-people').innerHTML = (np.people.length > 1 ? '<div class="np-person np-person-head"><span style="width:26px"></span><span class="np-pname"></span><span style="width:104px">Role</span><span style="width:122px">Access ends (optional)</span><span style="width:24px"></span></div>' : '') + np.people.map((p,i)=>`
+    <div class="np-person">
+      <span class="pj-av" style="background:${p.c}">${p.i}</span>
+      <div class="np-pname">${p.n}${p.me ? '<small>You</small>' : (p.note ? `<small>${p.note}</small>` : '')}</div>
+      ${p.me ? '<span class="pj-mrole">Project admin</span>' : `
+        <select aria-label="Role for ${p.n}" onchange="np.people[${i}].role=this.value">
+          ${['Editor','Viewer','Project admin'].map(r=>`<option${p.role===r?' selected':''}>${r}</option>`).join('')}
+        </select>
+        <input type="date" aria-label="Access ends for ${p.n} (optional)" title="Access ends (optional)" value="${p.ends||''}" onchange="np.people[${i}].ends=this.value">
+        <button class="np-x" aria-label="Remove ${p.n}" onclick="np.people.splice(${i},1);npRenderPeople()">✕</button>`}
+    </div>`).join('');
+}
+function npAddPerson(){
+  const v = document.getElementById('np-person').value;
+  const p = NP_COLLEAGUES.find(x=>x.n === v); if(!p) return;
+  np.people.push({n:p.n, i:p.i, c:p.c, note:p.note, role: p.note === 'Contractor' ? 'Editor' : 'Editor'});
+  npRenderPeople();
+}
+const NP_ICON = {tif:['tif','TIF'],gpkg:['gpkg','GPKG'],kml:['kml','KML'],csv:['csv','CSV'],gmmp:['gm','GMMP'],pdf:['pdf','PDF'],docx:['docx','DOCX']};
+function npRenderFiles(){
+  const movedAlready = new Set(relayLoadCreated().flatMap(p=>p.files.map(f=>f.id)));
+  const mine = NP_MYFILES.filter(f=>!movedAlready.has(f.id));
+  document.getElementById('np-move-list').innerHTML = mine.map(f=>{
+    const ic = NP_ICON[f.ext] || ['csv','FILE'];
+    return `<label class="np-file"><input type="checkbox" ${np.move.has(f.id)?'checked':''} onchange="this.checked?np.move.add('${f.id}'):np.move.delete('${f.id}');npCounts()">
+      <span class="fb-icon ${ic[0]}">${ic[1]}</span><span class="np-file-name">${f.n}</span><span class="np-file-meta">${f.bbox ? f.s : 'Not map data · ' + f.s}</span></label>`;
+  }).join('') || '<div class="pj-empty">Nothing left in My files to move.</div>';
+  document.getElementById('np-link-list').innerHTML = NP_LIBRARY.map(f=>{
+    const ic = NP_ICON[f.ext];
+    return `<label class="np-file"><input type="checkbox" ${np.link.has(f.n)?'checked':''} onchange="this.checked?np.link.add('${f.n}'):np.link.delete('${f.n}');npCounts()">
+      <span class="fb-icon ${ic[0]}">${ic[1]}</span><span class="np-file-name">${f.n}</span><span class="np-file-meta">${f.crs}</span></label>`;
+  }).join('');
+  npCounts();
+}
+function npCounts(){
+  document.getElementById('np-move-count').textContent = np.move.size ? np.move.size + ' selected' : '';
+  document.getElementById('np-link-count').textContent = np.link.size ? np.link.size + ' selected' : '';
+}
+function npCreate(){
+  const name = document.getElementById('np-name').value.trim();
+  const org = currentOrg || 'acme';
+  let id = 'p-' + name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const list = relayLoadCreated();
+  if(list.some(p=>p.id===id) || PROJECTS_PREVIEW.some(p=>p.id===id)) id += '-' + Date.now().toString(36).slice(-4);
+  const files = NP_MYFILES.filter(f=>np.move.has(f.id)).map(f=>({id:f.id, n:f.n, ext:f.ext, s:f.s, crs:f.crs||null, bbox:f.bbox||null, reason:f.reason||null}));
+  const crsSel = document.getElementById('np-crs');
+  const proj = {
+    id, org, name, created: new Date().toISOString(), updatedLabel:'Just now',
+    desc: document.getElementById('np-desc').value.trim(),
+    crs: crsSel.value === 'auto' ? null : crsSel.value,
+    ownerName: (currentUser && currentUser.name) || 'Jane Doe',
+    members: np.people.map(p=>({n:p.n, i:p.i, c:p.c, r: p.me ? 'Project admin' : p.role + (p.note==='Contractor' ? ', contractor' : ''),
+      exp: p.ends ? 'Access ends ' + new Date(p.ends + 'T00:00').toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}) : undefined})),
+    files,
+    links: [...np.link],
+    library: NP_LIBRARY.filter(f=>np.link.has(f.n))
+  };
+  list.push(proj); relaySaveCreated(list);
+  relayApplyCreated();
+  closeModal('modal-new-project');
+  renderProjectsPreview();
+  openProject(id);
+  const bits = [];
+  if(files.length) bits.push(`${files.length} file${files.length===1?'':'s'} moved in`);
+  if(proj.links.length) bits.push(`${proj.links.length} linked from the library`);
+  if(proj.members.length > 1) bits.push(`${proj.members.length - 1} ${proj.members.length===2?'person':'people'} added`);
+  toast(`Created ${name}` + (bits.length ? '. ' + bits.join(', ') + '.' : '.'));
+}
+function deleteCreatedProject(){
+  const id = currentProjectPageId;
+  const list = relayLoadCreated(), p = list.find(x=>x.id===id);
+  if(!p) return;
+  if(!confirm(`Delete ${p.name}? Its files go back to My files. Linked library files are not affected.`)) return;
+  relaySaveCreated(list.filter(x=>x.id!==id));
+  delete PROJECT_FILES[id]; delete PROJECT_LINKS[id]; delete PROJECT_MEMBERS_BY[id];
+  relayApplyCreated(); renderProjectsPreview();
+  navSidebar('projects');
+  toast(`Deleted ${p.name}. ${p.files.length ? p.files.length + ' file' + (p.files.length===1?'':'s') + ' moved back to My files.' : ''}`);
+}
+document.addEventListener('DOMContentLoaded', ()=>{ relayApplyCreated(); renderProjectsPreview(); });
 
 </script>
 
@@ -5711,6 +5956,66 @@ function openLinkFromLibrary(){
     <div class="modal-row">
       <button class="btn primary" onclick="confirmRename()">Rename</button>
       <button class="btn" onclick="closeModal('modal-rename')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- NEW PROJECT: three short steps. Details → People → Files.
+     A project owns what's moved into it and links Org library data. -->
+<div class="modal-bg" id="modal-new-project">
+  <div class="modal np-modal" role="dialog" aria-labelledby="np-title" aria-modal="true">
+    <div class="np-head">
+      <div class="modal-title" id="np-title">New project</div>
+      <ol class="np-steps" aria-label="Steps">
+        <li data-step="1" class="active"><span>1</span>Details</li>
+        <li data-step="2"><span>2</span>People</li>
+        <li data-step="3"><span>3</span>Files</li>
+      </ol>
+    </div>
+
+    <div class="np-pane" data-pane="1">
+      <div class="modal-label"><label for="np-name">Project name</label></div>
+      <input class="modal-input" id="np-name" maxlength="60" placeholder="For example, Harbour Survey 2026" autocomplete="off" oninput="npValidate()" onkeydown="if(event.key==='Enter'){event.preventDefault();npNext();}">
+      <div class="np-error" id="np-name-error" role="alert"></div>
+      <div class="modal-label" style="margin-top:14px"><label for="np-desc">Description <span class="np-opt">optional</span></label></div>
+      <textarea class="modal-input" id="np-desc" rows="2" maxlength="280" placeholder="What the project is for, the client, the site"></textarea>
+      <div class="modal-label" style="margin-top:14px"><label for="np-crs">Map coordinate system</label></div>
+      <select class="modal-select" id="np-crs">
+        <option value="auto">Use the first file's coordinate system (recommended)</option>
+        <option>WGS 84 (EPSG:4326)</option>
+        <option>WGS 84 / Pseudo-Mercator (EPSG:3857)</option>
+        <option>NAD83 / UTM zone 17N (EPSG:26917)</option>
+        <option>NAD83(CSRS) / UTM zone 17N (EPSG:2958)</option>
+        <option>GDA2020 / MGA zone 54 (EPSG:7854)</option>
+        <option>British National Grid (EPSG:27700)</option>
+      </select>
+      <div class="np-hint">Files keep their own coordinate systems. The project map shows them in this one, reprojected with GeoCalc. You can change it later.</div>
+    </div>
+
+    <div class="np-pane" data-pane="2" hidden>
+      <div class="np-hint" style="margin:0 0 12px">Members see every file in the project. Contractors can be given an end date, and the files they add stay with the project.</div>
+      <div class="np-add-row">
+        <select class="modal-select" id="np-person" aria-label="Person to add"></select>
+        <button class="btn" onclick="npAddPerson()">Add</button>
+      </div>
+      <div class="np-people" id="np-people"></div>
+      <div class="np-hint">People outside your organisation can be invited from the project after it's created.</div>
+    </div>
+
+    <div class="np-pane" data-pane="3" hidden>
+      <div class="np-hint" style="margin:0 0 10px">Optional. You can also upload files once the project exists.</div>
+      <div class="np-group-title">Move from My files <span class="np-count" id="np-move-count"></span></div>
+      <div class="np-sub">Moved files belong to the project: members can see them, and they stay if you leave.</div>
+      <div class="np-list" id="np-move-list"></div>
+      <div class="np-group-title" style="margin-top:14px">Link from the Org library <span class="np-count" id="np-link-count"></span></div>
+      <div class="np-sub">Linked files stay in the library, read-only, and update when the library copy does.</div>
+      <div class="np-list" id="np-link-list"></div>
+    </div>
+
+    <div class="np-foot">
+      <button class="btn" id="np-back" onclick="npBack()">Cancel</button>
+      <button class="btn primary" id="np-next" onclick="npNext()">Next</button>
     </div>
   </div>
 </div>
